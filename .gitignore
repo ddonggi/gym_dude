@@ -3,7 +3,6 @@ HELP.md
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
-!**/src/main/resources/application.properties
 !**/src/test/**/build/
 
 ### STS ###
@@ -36,3 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### config
+src/main/resources/application.properties

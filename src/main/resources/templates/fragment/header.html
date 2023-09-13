@@ -1,0 +1,28 @@
+<th:block th:fragment="header">
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a class="navbar-brand" href="/">Home</a>
+
+<!--            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">-->
+
+            <!--
+            사용자의 로그인 여부는 타임리프의 sec:authorize 속성을 통해 알수 있다.
+sec:authorize="isAnonymous()" - 이 속성은 로그인 되지 않은 경우에만 해당 엘리먼트가 표시되게 한다.
+sec:authorize="isAuthenticated()" - 이 속성은 로그인 된 경우에만 해당 엘리먼트가 표시되게 한다.-->
+<!--            <a class="nav-link" th:href="@{/user/login}">로그인</a>-->
+            <!-- 비로그인 사용자만 보이는 항목-->
+            <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
+            <!-- 권한이 있는 사용자만 보이는 항목-->
+            <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/user/logout}">로그아웃</a>
+            <a class="nav-link" th:href="@{/user/signup}">회원가입</a>
+<!--                    </li>
+                </ul>
+            </div>-->
+            <button class="navbar-toggler" type="button">
+                <span class="navbar-toggler-icon">toggle</span>
+            </button>
+        </div>
+    </nav>
+</th:block>

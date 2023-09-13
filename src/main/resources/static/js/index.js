@@ -1,0 +1,9 @@
+console.log('index.js')
+/*
+document.querySelector(".signup").addEventListener('click',()=>{
+    location.href="/signup";
+})
+document.querySelector(".board").addEventListener('click',()=>{
+    location.href="/question/list";
+})
+*/

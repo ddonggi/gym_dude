@@ -1,0 +1,33 @@
+<html layout:decorate="~{layout/layout}">
+<div class="content-container" layout:fragment="content">
+    <h1 th:text="${question.title}">제목</h1>
+    <div class="context-container">
+        <div th:text="${question.content}">내용</div>
+    </div>
+<!--    TODO : 작성자 본인만 삭제 가능하게-->
+    <form>
+        <input type="button" th:action="@{|/question/delete/${question.id}|}" value="삭제하기" method="get" />
+    </form>
+    <!--  답변의 개수 표시 -->
+    <div class ="answer-container">
+        <h2 th:text="|${#lists.size(question.answerList)}개의 답변이 있습니다.|"></h2>
+        <!-- 답변 반복 -->
+        <div class="answer-list">
+            <div class="answer" th:each="answer : ${question.answerList}" >
+                <div th:text="${answer.content}"></div>
+                <div th:text="${#temporals.format(answer.createDate,'yyyy-MM-dd HH:mm')}"></div>
+            </div>
+        </div>
+    </div>
+    <!-- 답변 작성 -->
+    <!-- java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다 -->
+    <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post">
+<!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
+        <label for="content">답변</label>
+        <textarea th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" id="content"  rows="15" class="text-container" minlength="3"></textarea>
+        <textarea th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" id="content" rows="15" class="text-container" minlength="3"></textarea>
+        <input type="submit" value="답변등록"/>
+    </form>
+    <a th:href="@{/question/list}" th:text="목록으로"></a>
+</div>
+</html>

@@ -1,0 +1,8 @@
+<html layout:decorate="~{layout/layout}">
+<div layout:fragment="content">
+    <h2>홈페이지</h2>
+    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세요</button></a>
+    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>
+</div>
+<script layout:fragment="js" th:src="@{/js/index.js}"></script>
+</html>

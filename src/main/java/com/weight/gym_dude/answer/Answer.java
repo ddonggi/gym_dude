@@ -34,4 +34,6 @@ public class Answer {
     // 여러개의 답변은 하나의 질문에 달릴 수 있다
     @ManyToOne
     private Question question;
+
+    // 여러개의 답변은 여러 사용자가 달 수 있다??
 }

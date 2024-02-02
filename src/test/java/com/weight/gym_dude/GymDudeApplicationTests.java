@@ -29,7 +29,6 @@ class GymDudeApplicationTests {
 //    @Transactional
     void inputTest() {
         Question question = Question.builder()
-                .title("안녕하세요")
                 .content("이게 제가 쓰는 내용 입니다.")
                 .createDate(LocalDateTime.now()).build();
         this.questionRepository.save(question);
@@ -48,7 +47,6 @@ class GymDudeApplicationTests {
 //        assertEquals(2,questionList.size());
 
         Question question = questionList.get(0);
-        assertEquals("ㅁㄴㅇㄹㅁㄴㅇㄹ",question.getTitle());
         assertEquals("ㅁㅇㄴㄹㅍㅁㅇㄴㄹㅍ",question.getContent());
     }
 
@@ -58,12 +56,10 @@ class GymDudeApplicationTests {
         Optional<Question> oq = this.questionRepository.findById(1);
         if(oq.isPresent()){
             Question question = oq.get();
-            System.out.println("question.getTitle() = " + question.getTitle());
             System.out.println("question.getContent() = " + question.getContent());
-            assertEquals("ㅁㄴㅇㄹㅁㄴㅇㄹ",question.getTitle());
         }
     }
-
+/*
     //제목으로 질문 조회
     @Test
     void findByTitleTest() {
@@ -74,7 +70,9 @@ class GymDudeApplicationTests {
             Question question = oq.get();
             System.out.println("question.getId = " + question.getId());
         }
-    }
+    }*/
+
+/*
 
     //단어 포함된 질문 조회
     @Test
@@ -90,6 +88,8 @@ class GymDudeApplicationTests {
             }
         }
     }
+*/
+/*
 
     //아이디 및 제목으로 질문 조회
     @Test
@@ -100,7 +100,8 @@ class GymDudeApplicationTests {
             System.out.println("question.toString() = " + question);
         }
     }
-
+*/
+/*
     //글자가 포함되는 질문 찾기
     @Test
     @Transactional // 없다면, 영속성 컨텍스트가 종료되어 버려서, 지연 로딩을 할 수 없어서 오류가 발생할 수 있다
@@ -112,7 +113,7 @@ class GymDudeApplicationTests {
             Question q = questionList.get(0);
             System.out.println("q.toString() = " + q.toString());
         }
-    }
+    }*/
 
     //글 내용으로 찾기
     @Test
@@ -120,7 +121,7 @@ class GymDudeApplicationTests {
         Optional<Question> oq = this.questionRepository.findByContent("ㅁㅇㄴㄹㅍㅁㅇㄴㄹㅍ");
         if(oq.isPresent()){
             Question question = oq.get();
-            System.out.println("question.getTitle() = " + question.getTitle());
+            System.out.println("question = " + question.getContent());
         }
     }
 
@@ -131,7 +132,6 @@ class GymDudeApplicationTests {
         //assertTrue()는 괄호 안의 값이 true(참) 인지를 테스트한다. oq.isPresent()가 false를 리턴하면 오류가 발생하고 테스트가 종료된다.
         assertTrue(oq.isPresent());
         Question q = oq.get();
-        q.setTitle("9번 글 수정할게요");
         q.setContent("변경된 내용!");
         q.setCreateDate(LocalDateTime.now());
         this.questionRepository.save(q);
@@ -155,11 +155,11 @@ class GymDudeApplicationTests {
     //댓글 데이터 생성, 저장
     @Test
     void answerCreateAndSaveTest(){
-        Optional<Question> oq = this.questionRepository.findById(9);
+        Optional<Question> oq = this.questionRepository.findById(7);
         //assertTrue()는 괄호 안의 값이 true(참) 인지를 테스트한다. oq.isPresent()가 false를 리턴하면 오류가 발생하고 테스트가 종료된다.
         assertTrue(oq.isPresent());
         Question question = oq.get();
-        String content = "지금 질문에 대한 답변은 이러합니다.";
+        String content = "ㅡㅡㅡㅡㅡ지금 질문에 대한 답변은 이러합니다.";
         Answer answer = Answer.builder()
                 .content(content)
                 .createDate(LocalDateTime.now())

@@ -39,6 +39,19 @@ public class QuestionService {
         * */
         // NOTE : page 는 optional 이 안되는가 //
     }
+    public Page<Question> getFeedList(int page){
+        List<Sort.Order> sortedList = new ArrayList<>();
+        sortedList.add(Sort.Order.desc("id")); //작성날짜순 -> 글 번호순??
+        Pageable pageable = PageRequest.of(page,10,Sort.by(sortedList));
+        return questionRepository.findAll(pageable);
+        /*
+         * 게시물을 역순으로 조회하기 위해서는 위와 같이 PageRequest.of 메서드의 세번째 파라미터로 Sort 객체를 전달해야 한다.
+         *  Sort.Order 객체로 구성된 리스트에 Sort.Order 객체를 추가하고 Sort.by(소트리스트)로 소트 객체를 생성할 수 있다.
+         * 작성일시(createDate)를 역순(Desc)으로 조회하려면 Sort.Order.desc("createDate") 같이 작성한다.
+         * 만약 작성일시 외에 추가로 정렬조건이 필요할 경우에는 sorts 리스트에 추가하면 된다.
+         * */
+        // NOTE : page 는 optional 이 안되는가 //
+    }
 
     public Question getQuestion(Integer id){
         Optional<Question> optionalQuestion = questionRepository.findById(id);
@@ -48,10 +61,9 @@ public class QuestionService {
             throw new DataNotFoundException("question not found");
     }
 
-    public void create(String title, String content){
+    public void create(String content){
 //        QuestionDTO questionDTO = new QuestionDTO(title,content,LocalDateTime.now());
         QuestionDTO questionDTO = QuestionDTO.builder()
-                .title(title)
                 .content(content)
                 .createDate(LocalDateTime.now())
                 .build();
@@ -61,6 +73,9 @@ public class QuestionService {
 
     public void delete(Integer id) {
 //        Question question = Question.builder().build();
-//        questionRepository.delete(question);
+        Optional<Question> oq = questionRepository.findById(id);
+        if(oq.isPresent()) {
+            questionRepository.deleteById(id);
+        }
     }
 }

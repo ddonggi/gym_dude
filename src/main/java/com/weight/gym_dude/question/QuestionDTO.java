@@ -15,7 +15,6 @@ import java.util.List;
 @Builder
 public class QuestionDTO {
     private Integer id;
-    private String title;
     private String content;
     private LocalDateTime createDate;
     private List<Answer> answerList;
@@ -27,6 +26,6 @@ public class QuestionDTO {
     }*/
 
     public Question toEntity(){
-        return new Question(this.title,this.content,this.createDate);
+        return new Question(this.content,this.createDate);
     }
 }

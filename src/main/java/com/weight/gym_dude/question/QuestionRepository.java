@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QuestionRepository extends JpaRepository<Question, Integer> {
-    Optional<Question> findByTitle(String title);
-    Optional<Question> findByIdAndTitle(Integer id,String title);
-    Optional<List<Question>> findByTitleLike(String title);
+//    Optional<Question> findByTitle(String title);
+//    Optional<Question> findByIdAndTitle(Integer id,String title);
+//    Optional<List<Question>> findByTitleLike(String title);
 
     Optional<Question> findByContent(String content);
     Optional<List<Question>> findByContentLike(String content);

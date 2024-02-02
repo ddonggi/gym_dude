@@ -15,11 +15,7 @@ import jakarta.validation.constraints.*;
 @Getter
 @Setter
 public class QuestionForm {
-//    @NonNull // null 을 허용하지 않는다.
-    @NotEmpty(message = "제목을 입력해 주세요") // null 및 "" 을 허용하지 않는다.
-    @Size(max=200)
-    private String title;
-
     @NotEmpty(message = "내용을 입력해 주세요") // null 및 "" 을 허용하지 않는다.
+    @Size(max=200)
     private String content;
 }

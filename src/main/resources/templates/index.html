@@ -1,8 +1,142 @@
 <html layout:decorate="~{layout/layout}">
-<div layout:fragment="content">
-    <h2>홈페이지</h2>
-    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세요</button></a>
-    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>
+<div layout:fragment="content" class="index-container">
+<!--피드 등록 폼-->
+    <form th:action="@{/create}" method="post" th:object="${questionForm}" class="feed-width">
+        <!--        오류를 표시하기 위해서는 타임리프의 th:object 속성이 반드시 필요하다.
+th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구성된다는 점을 타임리프 엔진에 알려줘야 하기 때문이다.  -->
+        <!--        <div th:if="${#fields.hasAnyErrors()}" role="alert">-->
+        <!--            <div th:each="err:${#fields.allErrors()}" th:text="${err}"> </div>-->
+        <!--        </div>-->
+
+
+        <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
+        <!--
+        타임리프의 th:replace 속성을 사용하면 공통 템플릿을 템플릿 내에 삽입할수 있다.
+        <div th:replace="~{form_errors :: formErrorsFragment}"></div> 의 의미는 div 엘리먼트를
+        form_errors.html 파일의 th:fragment 속성명이 formErrorsFragment인 엘리먼트로 교체하라는 의미이다.
+        -->
+        <div class="question-content feed-width">
+            <label for="content" class="form-label">내용</label>
+            <div th:if="${#fields.hasErrors('content')}" role="alert">
+                <textarea rows="10" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="text-container"></textarea>
+<!--                <div contenteditable="true" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="text-container"></div>-->
+            </div>
+            <div th:unless="${#fields.hasErrors('content')}" role="alert">
+                <textarea rows="10" th:field="*{content}" class="text-container" placeholder="운동해 대해 적어주세요."></textarea>
+<!--                <div contenteditable="true" th:field="*{content}" class="text-container"></div>-->
+            </div>
+            <!--            <textarea name="content" id="content" rows="10" th:field="*{content}"></textarea>-->
+            <!--            <textarea rows="10" th:field="*{content}" required></textarea>-->
+        </div>
+        <input type="submit" value="저장하기">
+    </form>
+
+<!--피드 리스트 -->
+    <div class="feed-container feed-width">
+        <div th:each="question,loop : ${paging}" class="feed">
+            <div class="feed-header padding-default">
+                <a aria-label="{User}의 프로필">
+                    <div class="feed-profile-image">프로필사진</div>
+                    <div>
+                        <div class="feed-writer text-sm font-bold">글쓴이</div>
+                        <div class="feed-tag text-xs">태그</div>
+                        <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
+                        <div class="feed-timestamps text-xs" th:text="${#temporals.format(question.createDate,'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                </a>
+                <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
+                <div>팔로우</div>
+
+            </div>
+            <div class="feed-body padding-default">
+                <!--게시물 번호(갯수로)-->
+        <!--        <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>-->
+                <!--        <td th:if="${loop.first}" th:text="첫빠따"></td>-->
+                <!--        <td th:if="${loop.first}" th:text="내가처음임"></td>-->
+                <!--        <td th:if="${!loop.first}" th:text="${question.title}"></td>-->
+                <!--        <td th:if="${!loop.first}" th:text="${question.createDate}"></td>-->
+                <!--                <td th:text="${loop.count}"></td>-->
+                <div>
+                    <!-- url 주소를 나타낼때는 @{} 을 써야 하고, java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다-->
+                    <!--                <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.content}"></a>-->
+                    <a th:text="${question.content}"></a>
+
+                    <!--답변 갯수 출력-->
+<!--                    <span class="answer-count"-->
+<!--                          th:if="${#lists.size(question.answerList) > 0}"-->
+<!--                          th:text="${#lists.size(question.answerList)}">-->
+<!--                    </span>-->
+
+                    <!--                    th:if="${#lists.size(question.answerList) > 0}"로 답변이 있는지 조사하고, th:text="${#lists.size(question.answerList)}"로 답변 개수를 표시했다.-->
+                    <!--                    #list.size(이터러블객체)는 이터러블 객체의 사이즈를 반환하는 타임리프의 유틸리티이다.-->
+                </div>
+                <!-- 삭제기능-->
+<!--                <form th:action="@{|/delete/${question.id}|}" method="post">
+                    <input type="submit"  value="삭제하기" />
+                </form>-->
+                <!-- 삭제기능 끝-->
+            </div><!--feed-body-->
+            <div class="feed-footer padding-half text-xs"><!--feed-footer-->
+                <div class="like" th:text="|좋아요n개|"></div>
+                <!--답변 갯수 출력-->
+
+                <span class="answer-count"
+                      th:if="${#lists.size(question.answerList) > 0}">
+<!--                      th:text="|댓글 ${#lists.size(question.answerList)}개|">-->
+                    •댓글[[${#lists.size(question.answerList)}]]개
+                </span>
+            </div><!--feed-footer-->
+
+            <!-- 댓글 반복 -->
+            <div class="answer-list">
+                <div class="answer padding-half" th:each="answer : ${question.answerList}" >
+                    <div>
+                        <div>작성자 프사</div>
+                    </div>
+                    <div>
+                        <div class="answer-header">
+                            <div class="text-sm">작성자 이름</div>
+                            <div th:text="${#temporals.format(answer.createDate,'yyyy-MM-dd HH:mm')}" class="feed-timestamps text-xs"></div>
+                        </div>
+                        <div>
+                            <div th:text="${answer.content}" class="answer-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </div> <!--comment-->
+        </div> <!--feed -->
+    </div>
+
+    <!-- 페이징처리 시작 -->
+    <div th:if="${!paging.isEmpty()}">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{|?page=${paging.number-1}|}">
+                    <span>이전</span>
+                </a>
+            </li>
+            <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                th:if="${page >= paging.number-2 and page <= paging.number+2}"
+                th:classappend="${page == paging.number} ? 'active'"
+                class="page-item">
+                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+            </li>
+            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                    <span>다음</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div th:unless="${!paging.isEmpty()}">
+    </div>
+
+    <!-- 페이징처리 끝 -->
+<!--    <h2>홈페이지다</h2>-->
+<!--    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세용</button></a>-->
+<!--    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>-->
+
 </div>
 <script layout:fragment="js" th:src="@{/js/index.js}"></script>
 </html>

@@ -1,10 +1,35 @@
 @charset "utf-8";
 /* 데스크탑에서 사용될 스타일을 먼저 작성합니다. */
-
+:root{
+    --background100:#f8fafc;
+    --border-silver100:#cbd5e1;
+    --border-silver200:#e6e6e6;
+    --text-subtitle:#334155;
+    --text-timestamps:#64748b;
+}
+img, svg {
+    vertical-align: middle;
+}
+.font-bold {
+    font-weight: 700;
+}
+.text-sm {
+    font-size: .875rem;
+}
+.text-xs {
+    font-size: .75rem;
+}
+.padding-default{
+    padding: 1rem;
+}
+.padding-half{
+    padding: 0.5rem 1rem;
+}
 @font-face {
-    font-family: 'GmarketSansMedium';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-    font-weight: normal;
+    /*font-family: 'GmarketSansMedium';*/
+    /*src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');*/
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 400;
     font-style: normal;
 }
 body {
@@ -12,20 +37,49 @@ body {
     font-weight: 400;
     /*font-family: 'IBMPlexSansKR-Regular';*/
     /*font-family: 'Spoqa Han Sans Neo';*/
-    font-family: 'GmarketSansMedium', serif;
+    background: var(--background100);
+    /*font-family: 'GmarketSansMedium', serif;*/
+    font-family: 'Noto Sans', sans-serif;
     font-size: 1em;
     line-height: 1.25;
     letter-spacing: -0.4px;
+    box-sizing: border-box;
 }
 html, body {
-    width: 100%;
     height: 100%;
     margin: 0;
     padding: 0;
-    font-size: 100%;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+/*헤더*/
+.navbar{
+    border-bottom: 1px solid var(--border-silver100);
+    position: sticky;
+    top: 0;
+    height: 3.5rem;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    min-width: max-content;
+    flex-wrap: wrap;
+}
+.navbar-container{
+    display: flex;
+    padding: 0 1rem;
+    justify-content: space-between;
+    min-width: 1024px;
+    max-width: 1280px;
+    height: 100%;
+    align-items: center;
+    background: var(--background100);
+}
+.navbar-right{
+    display: flex;
 }
 textarea {
-    width:100%;
+    /*width:100%;*/
 }
 
 input[type=submit] {
@@ -36,66 +90,147 @@ input[type=submit] {
     color: white;
     font-family: inherit;
 }
+footer {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+}
 /* 입력 필수 항목 */
 *:required {
-    /*background-color: gold;*/
+    background-color: gold;
 }
 /* 텍스트 입력창에 포커스가 왔을때 */
 .text-container:focus{
     background: floralwhite;
 }
-/* 게시판 리스트 */
-.table{
+.text-container{
+    border: solid 1px var(--border-silver100);
+}
+
+/* 인덱스 화면 */
+.index-container{
     width: 100%;
-    border-top: 1px solid #444444;
-    border-collapse: collapse;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.feed-width{
+    width: 632px;
+    max-width: 640px;
 }
 
-.table th, td {
-    border-bottom: 1px solid #444444;
-    padding: 10px;
+/* 피드 */
+.feed-container {
+    display: flex;
+    gap: 1.25rem;
+    flex-direction: column;
 }
-
-.table-head{
-    background: black;
-    color: white;
-    text-align: left;
+.feed{
+    background: white;
+    /*padding:1rem;*/
+    /*margin: 1rem 0;*/
+    border: solid 1px var(--border-silver100);
 }
+/* 피드의 상단 */
+.feed-header {
+    display: flex;
+    justify-content: space-between;
+}
+    .feed-header a {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .feed-profile-image{
 
-/* 게시글 페이지 */
-.content-container{
-    padding: 10px;
+    }
+
+    .feed-writer{
+
+    }
+    .feed-tag{
+        color: var(--text-subtitle);
+    }
+    .feed-timestamps{
+        color: var(--text-timestamps);
+    }
+.feed-body{
+
+}
+.feed-footer{
+    color: var(--text-timestamps);
+    display: flex;
+}
+/* 피드의 댓글 부분 */
+.answer-list {
     display: flex;
     flex-direction: column;
 }
 
-/* 내용 작성 부분 */
-.content-container h1 {
-    border-bottom: 1px solid silver;
-}
-
-.context-container{
-    border: 1px solid silver;
-    padding: 20px 10px;
-    border-radius: 8px;
-}
-
-/* 등록된 답변 부분 */
-.answer-container{
-    padding: 20px 10px;
-}
-.answer-container h2{
-    border-bottom: 1px solid silver;
+.answer-content{
+    color: var(--text-subtitle);
 }
 .answer{
     display: flex;
-    justify-content: space-between;
+    gap: 0.5rem;
+    /*justify-content: space-between;*/
+    border-bottom: 1px var(--border-silver200) dashed;
 }
-/* 답변 작성 부분 */
+.answer-count{
+
+}
+.answer-header{
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.answer:first-child{
+    border-top: 1px var(--border-silver200) solid;
+}
+.answer:last-child{
+    border-bottom: none;
+}
+
+
+/* 게시글 페이지 */
+/*.content-container{*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*}*/
+
+
+/*!* 내용 작성 부분 *!*/
+/*.content-container h1 {*/
+/*    border-bottom: 1px solid silver;*/
+/*}*/
+
+/*.context-container{*/
+/*    width: 720px;*/
+/*    border: 1px solid silver;*/
+/*    border-radius: 8px;*/
+/*}*/
+
 
 @media screen and (max-width: 768px) {
     /* 모바일에 사용될 스트일 시트를 여기에 작성합니다. */
     body {
-        background: #e6e6e6;
+        background: var(--background100);
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #0f172a;
+        text-align: left;
+    }
+    .navbar-container{
+        padding: 0 0.5rem;
+        min-width: unset;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .feed-width{
+        width: 100%;
+        max-width: 640px;
     }
 }

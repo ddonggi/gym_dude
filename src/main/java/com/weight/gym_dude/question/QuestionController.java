@@ -26,7 +26,8 @@ public class QuestionController {
     @GetMapping("/")
     public String list(Model model,
                        @RequestParam(value = "page",defaultValue = "0")int page, //spring boot의 페이징은 0부터
-                       QuestionForm questionForm
+                       QuestionForm questionForm,
+                       AnswerForm answerForm
     ) {
 //        List<Question> questionList = questionService.getList();
 //        Page<Question> paging = questionService.getList(page);

@@ -104,6 +104,16 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                     </div>
                 </div>
             </div> <!--comment-->
+            <!-- 답변 작성 -->
+            <!-- java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다 -->
+            <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post">
+                <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
+                <label for="content">답변</label>
+                <textarea th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" id="content"  rows="5" class="text-container" minlength="3"></textarea>
+                <textarea th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" id="content" rows="5" class="text-container" minlength="3"></textarea>
+                <input type="submit" value="답변등록"/>
+            </form>
+            <!-- 답변작성 -->
         </div> <!--feed -->
     </div>
 
@@ -139,4 +149,8 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 
 </div>
 <script layout:fragment="js" th:src="@{/js/index.js}"></script>
+<script>
+    let paging = [[${paging}}]];
+    console.log('paging:',paging);
+</script>
 </html>

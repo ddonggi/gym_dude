@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
-//import javax.validation.Valid;
 
 @RequestMapping("/")
 @Controller
@@ -25,7 +24,7 @@ public class QuestionController {
 
     @GetMapping("/")
     public String list(Model model,
-                       @RequestParam(value = "page",defaultValue = "0")int page, //spring boot의 페이징은 0부터
+                       @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
                        QuestionForm questionForm,
                        AnswerForm answerForm
     ) {
@@ -40,7 +39,7 @@ public class QuestionController {
     @GetMapping("/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
         Question question = questionService.getQuestion(id);
-        model.addAttribute("question",question);
+        model.addAttribute("question", question);
         return "question_detail";
     }
 
@@ -49,9 +48,9 @@ public class QuestionController {
     public String questionCreate(
             @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
             BindingResult bindingresult // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
-    ){
-        if(bindingresult.hasErrors()) {
-            logger.info("error>>:{}",bindingresult.getFieldError());
+    ) {
+        if (bindingresult.hasErrors()) {
+            logger.info("error>>:{}", bindingresult.getFieldError());
             return "index";
         }
         questionService.create(questionForm.getContent());
@@ -59,8 +58,8 @@ public class QuestionController {
     }
 
     @PostMapping("/delete/{id}")
-    public String questionDelete(@PathVariable("id") Integer id){
-        logger.info("to delete id : {}",id );
+    public String questionDelete(@PathVariable("id") Integer id) {
+        logger.info("to delete id : {}", id);
         questionService.delete(id);
 //        return "redirect:/question/list";
         return "redirect:/"; //질문 삭제 후 피드로 이동

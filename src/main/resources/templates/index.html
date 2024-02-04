@@ -1,5 +1,7 @@
 <html layout:decorate="~{layout/layout}">
 <div layout:fragment="content" class="index-container">
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+
 <!--피드 등록 폼-->
     <form th:action="@{/create}" method="post" th:object="${questionForm}" class="feed-width">
         <!--        오류를 표시하기 위해서는 타임리프의 th:object 속성이 반드시 필요하다.
@@ -118,7 +120,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
     </div>
 
     <!-- 페이징처리 시작 -->
-    <div th:if="${!paging.isEmpty()}">
+<!--    <div th:if="${!paging.isEmpty()}">
         <ul class="pagination justify-content-center">
             <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
                 <a class="page-link"
@@ -140,17 +142,23 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
         </ul>
     </div>
     <div th:unless="${!paging.isEmpty()}">
-    </div>
+    </div>-->
 
     <!-- 페이징처리 끝 -->
 <!--    <h2>홈페이지다</h2>-->
 <!--    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세용</button></a>-->
 <!--    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>-->
 
-</div>
-<script layout:fragment="js" th:src="@{/js/index.js}"></script>
-<script>
-    let paging = [[${paging}}]];
-    console.log('paging:',paging);
+
+
+<script th:inline="javascript">
+    let size = [[${paging.size}]];
+    let totalPages = [[${paging.totalPages}]];
+    let totalElements = [[${paging.totalElements}]];
+    let number = [[${paging.number}]];
+    let hasPrevious = [[${paging.hasPrevious}]];
+    let hasNext = [[${paging.hasNext}]];
 </script>
+<script layout:fragment="index_js" th:src="@{/js/index.js}"></script>
+</div>
 </html>

@@ -29,10 +29,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-spring security6'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'nz.net.ultraq.thymeleaf:thymeleaf-layout-dialect'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.thymeleaf.extras:thymeleaf-extras-spring security6'
     implementation 'org.springframework.boot:spring-boot-starter-validation'//화면에서 입력 받은 값을 검증하는데 필요
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.13' //rest api doc을 위해 필요(swagger)
     compileOnly 'org.projectlombok:lombok'

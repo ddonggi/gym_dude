@@ -57,6 +57,7 @@ html, body {
 .navbar{
     border-bottom: 1px solid var(--border-silver100);
     position: sticky;
+    /*position: fixed;*/
     top: 0;
     height: 3.5rem;
     display: flex;

@@ -1,9 +1,11 @@
 package com.weight.gym_dude.user;
 
+import com.weight.gym_dude.util.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.Optional;
 
 /**
@@ -62,5 +64,14 @@ public class UserService {
     public boolean emailExist(String email) {
         Optional<SiteUser> optionalUser = userRepository.findByEmail(email);
         return optionalUser.isPresent();
+    }
+
+    public SiteUser getUser(String username){
+        Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(username);
+        if(optionalSiteUser.isPresent()){
+            return optionalSiteUser.get();
+        }else{
+            throw new DataNotFoundException("site user not found");
+        }
     }
 }

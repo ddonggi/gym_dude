@@ -1,6 +1,7 @@
 package com.weight.gym_dude.question;
 
 import com.weight.gym_dude.answer.Answer;
+import com.weight.gym_dude.user.SiteUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class QuestionDTO {
     private Integer id;
     private String content;
     private LocalDateTime createDate;
+    private SiteUser author;
     private List<Answer> answerList;
 
 /*    public QuestionDTO(String title, String content, LocalDateTime createDate) {
@@ -26,6 +28,6 @@ public class QuestionDTO {
     }*/
 
     public Question toEntity(){
-        return new Question(this.content,this.createDate);
+        return new Question(this.content,this.createDate,this.author);
     }
 }

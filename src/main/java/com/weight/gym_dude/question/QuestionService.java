@@ -3,6 +3,7 @@ package com.weight.gym_dude.question;
  * Created by 이동기 on 2023-09-12
  */
 
+import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.util.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -61,11 +62,12 @@ public class QuestionService {
             throw new DataNotFoundException("question not found");
     }
 
-    public void create(String content){
+    public void create(String content, SiteUser author){
 //        QuestionDTO questionDTO = new QuestionDTO(title,content,LocalDateTime.now());
         QuestionDTO questionDTO = QuestionDTO.builder()
                 .content(content)
                 .createDate(LocalDateTime.now())
+                .author(author)
                 .build();
         Question question = questionDTO.toEntity();
         questionRepository.save(question);

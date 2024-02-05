@@ -4,6 +4,8 @@ package com.weight.gym_dude.question;
  */
 
 import com.weight.gym_dude.answer.AnswerForm;
+import com.weight.gym_dude.user.SiteUser;
+import com.weight.gym_dude.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +17,15 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import java.security.Principal;
+
 @RequestMapping("/")
 @Controller
 @RequiredArgsConstructor //final이 붙은 속성을 포함하는 생성자를 자동으로 생성하는 역할을 한다
 public class QuestionController {
     private final Logger logger = LoggerFactory.getLogger(QuestionController.class);
     private final QuestionService questionService;
+    private final UserService userService;
 
     @GetMapping("/")
     public String list(Model model,
@@ -47,13 +52,15 @@ public class QuestionController {
 //    public String questionCreate(@RequestParam String title, @RequestParam String content){
     public String questionCreate(
             @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
-            BindingResult bindingresult // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
+            BindingResult bindingresult, // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
+            Principal principal //현재 로그인한 사용자의 정보를 알려면 스프링 시큐리티가 제공하는 Principal 객체를 사용해야 한다.
     ) {
         if (bindingresult.hasErrors()) {
             logger.info("error>>:{}", bindingresult.getFieldError());
             return "index";
         }
-        questionService.create(questionForm.getContent());
+        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        questionService.create(questionForm.getContent(),author);
         return "redirect:/"; // 질문 저장 후 피드로 이동
     }
 

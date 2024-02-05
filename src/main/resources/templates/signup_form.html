@@ -1,55 +1,62 @@
 <html layout:decorate="~{layout/layout}">
 <div layout:fragment="content" class="signup-container">
-  <div class="my-3 border-bottom">
-    <div>
-      <h4>회원가입</h4>
-    </div>
-  </div>
-  <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post">
-<!--    <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
-    <div class="mb-3">
-      <label for="username" class="form-label">사용자ID</label>
-        <div th:if="${#fields.hasErrors('username')}" role="alert">
-<!--            <input type="text" th:field="*{username}" th:placeholder="${#fields.errors('username').get(0)}" class="text-container"/>-->
-            <input type="text" th:field="*{username}" th:errorclass="error" th:errors="*{username}" class="text-container"/>
-        </div>
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+    <div class="signup-block feed-width">
+        <h1>요즘 운동 커뮤니티</h1>
+        <h4>지금 짐프렌드에 가입하세요</h4>
 
-        <div th:unless="${#fields.hasErrors('username')}" role="alert">
-            <input type="text" th:field="*{username}" class="text-container"/>
-        </div>
-    </div>
+        <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post" class="signup-form">
+            <!--    <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
+            <div class="mb-3">
+                <label for="email" class="form-label">이메일</label>
+                <div th:if="${#fields.hasErrors('email')}" role="alert">
+                    <input type="email" th:field="*{email}" th:placeholder="${#fields.errors('email').get(0)}"
+                           class="text-container"/>
+                </div>
+                <div th:unless="${#fields.hasErrors('email')}" role="alert">
+                    <input type="email" th:field="*{email}" class="text-container"/>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="username" class="form-label">닉네임</label>
+                <div th:if="${#fields.hasErrors('username')}" role="alert">
+                    <!--            <input type="text" th:field="*{username}" th:placeholder="${#fields.errors('username').get(0)}" class="text-container"/>-->
+                    <input type="text" th:field="*{username}" th:errorclass="error" th:errors="*{username}"
+                           class="text-container"/>
+                </div>
 
-    <div class="mb-3">
-      <label for="password" class="form-label">비밀번호</label>
-        <div th:if="${#fields.hasErrors('password')}" role="alert">
-            <input type="password" th:field="*{password}" th:placeholder="${#fields.errors('password').get(0)}" class="text-container"/>
+                <div th:unless="${#fields.hasErrors('username')}" role="alert">
+                    <input type="text" th:field="*{username}" class="text-container"/>
+                </div>
+            </div>
 
-        </div>
-        <div th:unless="${#fields.hasErrors('password')}" role="alert">
-            <input type="password" th:field="*{password}" class="text-container"/>
-        </div>
-    </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">비밀번호</label>
+                <div th:if="${#fields.hasErrors('password')}" role="alert">
+                    <input type="password" th:field="*{password}" th:placeholder="${#fields.errors('password').get(0)}"
+                           class="text-container"/>
 
-    <div class="mb-3">
-      <label for="password2" class="form-label">비밀번호 확인</label>
-        <div th:if="${#fields.hasErrors('password2')}" role="alert">
-            <input type="password" th:field="*{password2}" th:placeholder="${#fields.errors('password2').get(0)}" class="text-container"/>
-        </div>
-        <div th:unless="${#fields.hasErrors('password2')}" role="alert">
-            <input type="password" th:field="*{password2}" class="text-container"/>
-        </div>
-    </div>
+                </div>
+                <div th:unless="${#fields.hasErrors('password')}" role="alert">
+                    <input type="password" th:field="*{password}" class="text-container"/>
+                </div>
+            </div>
 
-    <div class="mb-3">
-      <label for="email" class="form-label">이메일</label>
-        <div th:if="${#fields.hasErrors('email')}" role="alert">
-            <input type="email" th:field="*{email}" th:placeholder="${#fields.errors('email').get(0)}" class="text-container"/>
-        </div>
-        <div th:unless="${#fields.hasErrors('email')}" role="alert">
-            <input type="email" th:field="*{email}" class="text-container"/>
-        </div>
+            <div class="mb-3">
+                <label for="password2" class="form-label">비밀번호 확인</label>
+                <div th:if="${#fields.hasErrors('password2')}" role="alert">
+                    <input type="password" th:field="*{password2}"
+                           th:placeholder="${#fields.errors('password2').get(0)}"
+                           class="text-container"/>
+                </div>
+                <div th:unless="${#fields.hasErrors('password2')}" role="alert">
+                    <input type="password" th:field="*{password2}" class="text-container"/>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary">회원가입</button>
+        </form>
     </div>
-    <button type="submit" class="btn btn-primary">회원가입</button>
-  </form>
+    <th:block th:replace="~{fragment/footer::footer}"></th:block>
 </div>
 </html>

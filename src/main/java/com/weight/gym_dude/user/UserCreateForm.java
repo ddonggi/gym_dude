@@ -27,10 +27,10 @@ import jakarta.validation.constraints.*;
 @Setter
 public class UserCreateForm {
     @Size(min = 3, max = 10)
-    @NotEmpty(message = "사용자 ID는 필수 항목 입니다")
+    @NotEmpty(message = "닉네임은 필수 항목 입니다")
     private String username;
 
-    @Size(min = 3, max = 18)
+    @Size(min = 6, max = 18)
     @NotEmpty(message = "비밀번호는 필수 항목 입니다")
     private String password;
 
@@ -40,6 +40,5 @@ public class UserCreateForm {
     @NotEmpty(message = "이메일은 필수 항목 입니다")
     @Email(message = "이메일 양식에 맞지 않습니다")
     private String email;
-
 
 }

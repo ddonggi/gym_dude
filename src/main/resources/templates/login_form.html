@@ -4,7 +4,7 @@
     <div class="login-block feed-width">
     <h1>로그인</h1>
 
-    <form th:action="@{/user/login}" method="post" class="login-form feed-width">
+    <form th:action="@{/user/login}" method="post" class="login-form flex-column gap-half">
         <!--
         시큐리티의 로그인이 실패할 경우에는 로그인 페이지로 다시 리다이렉트 된다.
         이 때 페이지 파라미터로 error가 함께 전달된다. 따라서 로그인 페이지의 파라미터로 error가 전달될 경우
@@ -13,17 +13,18 @@
         -->
         <div th:if="${param.error}">
             <div class="alert alert-danger">
-                사용자ID 또는 비밀번호를 확인해 주세요.
+                이메일 또는 비밀번호를 확인해 주세요.
             </div>
         </div>
-        <div class="login-id">
-            <label for="username" class="form-label">사용자ID</label>
-            <input type="text" name="username" id="username" class="form-control" placeholder="이메일 입력">
+        <div class="login-email">
+            <label for="email" class="form-label">이메일</label>
+            <input type="text" name="email" id="email" class="input-block-sm" placeholder="이메일 입력">
         </div>
         <div class="login-password">
             <label for="password" class="form-label">비밀번호</label>
-            <input type="password" name="password" id="password" class="form-control" placeholder="비밀번호 입력">
+            <input type="password" name="password" id="password" class="input-block-sm" placeholder="비밀번호 입력">
         </div>
+
         <button type="submit" class="button">로그인</button>
     </form>
 </div>

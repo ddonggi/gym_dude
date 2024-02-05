@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 /**
  * PackageName : com.weight.gym_dude.user
  * FileName : SiteUserService
@@ -50,5 +52,15 @@ public class UserService {
         SiteUser user = userDTO.toEntity();
         userRepository.save(user);
         return user;
+    }
+
+    public boolean nicknameExist(String username) {
+        Optional<SiteUser> optionalUser = userRepository.findByUserName(username);
+        return optionalUser.isPresent();
+    }
+
+    public boolean emailExist(String email) {
+        Optional<SiteUser> optionalUser = userRepository.findByEmail(email);
+        return optionalUser.isPresent();
     }
 }

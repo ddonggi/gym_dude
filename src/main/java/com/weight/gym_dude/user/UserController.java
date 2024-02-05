@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 //import javax.validation.Valid;
@@ -36,6 +34,14 @@ public class UserController {
         return "signup_form"; // 회원가입을 위한 템플릿 렌더링
     }
 
+    @PostMapping("/name/check")
+    @ResponseBody
+    public String nicknameDuplicateCheck(@RequestBody String username){
+        boolean isNickNameExist = userService.nicknameExist(username);
+        if(isNickNameExist) return "이미 사용중인 닉네임 입니다";
+        return "사용 가능한 닉네임 입니다";
+    }
+
     @PostMapping("/signup")
     public String signup(@Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) return "signup_form";
@@ -46,15 +52,24 @@ public class UserController {
                     "2개의 패스워드가 일치하지 않습니다"); // rejectValue 오류 발생 시킴
             return "signup_form";
         }
-
+        if(userService.nicknameExist(userCreateForm.getUsername())){
+            bindingResult.rejectValue("username", "signupFailed", "이미 사용중인 닉네임 입니다.");
+            return "signup_form";
+        }
+        if(userService.emailExist(userCreateForm.getEmail())){
+            bindingResult.rejectValue("email", "signupFailed", "이미 사용중인 이메일 입니다.");
+            return "signup_form";
+        }
 
         try {
             userService.create(userCreateForm.getUsername(), userCreateForm.getPassword(),
                     userCreateForm.getEmail());
         } catch (DataIntegrityViolationException e) {
             e.printStackTrace();
-//            bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
-            bindingResult.rejectValue("username", "signupFailed", "이미 등록된 사용자입니다.");
+            bindingResult.reject("signupFailed", "이미 등록된 사용자입니다.");
+//            bindingResult.rejectValue("username", "signupFailed", "이미 등록된 닉네임 입니다.");
+//            bindingResult.rejectValue("email", "signupFailed", "이미 등록된 이메일 입니다.");
+//            bindingResult.rejectValue("password", "signupFailed", "이미 비밀번호 양식이랑 안맞습니다.");
             return "signup_form";
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<SiteUser, Long> { // SiteUser의 Pk는 Long이다
     Optional<SiteUser> findByUserName(String username); // username(site id)로 사용자 조회
+    Optional<SiteUser> findByEmail(String email);
 }

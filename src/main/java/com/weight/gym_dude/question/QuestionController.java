@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 @Controller
 @RequiredArgsConstructor //final이 붙은 속성을 포함하는 생성자를 자동으로 생성하는 역할을 한다
 public class QuestionController {
-    Logger logger = LoggerFactory.getLogger(QuestionController.class);
+    private final Logger logger = LoggerFactory.getLogger(QuestionController.class);
     private final QuestionService questionService;
 
     @GetMapping("/")

@@ -1,5 +1,8 @@
 package com.weight.gym_dude;
 
+import com.weight.gym_dude.user.SiteUser;
+import com.weight.gym_dude.user.UserRepository;
+import com.weight.gym_dude.user.UserRole;
 import org.junit.jupiter.api.Test;
 import com.weight.gym_dude.answer.Answer;
 import com.weight.gym_dude.answer.AnswerRepository;
@@ -7,9 +10,14 @@ import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.question.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +31,8 @@ class GymDudeApplicationTests {
     private QuestionRepository questionRepository;
     @Autowired
     private AnswerRepository answerRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     //데이터 입력(글쓰기)
     @Test
@@ -198,6 +208,41 @@ class GymDudeApplicationTests {
         assertEquals(2,answerList.size());
         for(Answer answer:answerList){
             System.out.println("answer.getContent() = " + answer.getContent());
+        }
+    }
+
+    //닉네임 중복 검사
+    @Test
+    void usernameCheck(){
+        String nickname = "ㅁㄴㅇㄹㅁㄴㅇㄹ";
+        Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(nickname);
+        if(optionalSiteUser.isPresent()){
+            System.out.println("nickname = " + optionalSiteUser.get().getUserName());
+        }else{
+            System.out.println(nickname+"을 찾을 수 없습니다.");
+        }
+    }
+
+    //로그인
+    @Test
+    void findByUserEmail(){
+        String email="test@test.com";
+//        String email="ldg6153@naver.com";
+        Optional<SiteUser> optionalSiteUser = userRepository.findByEmail(email);
+        if(optionalSiteUser.isPresent()){
+            SiteUser siteUser = optionalSiteUser.get();
+            List<GrantedAuthority> authorities = new ArrayList<>();
+            System.out.println("email = " + email);
+            if ("test@test.com".equals(email)) {
+                System.out.println("admin account");
+                authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
+            } else {
+                System.out.println("normal user account");
+                authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
+            }
+            new User(siteUser.getUserName(), siteUser.getPassword(), authorities);
+        }else{
+            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }
     }
 

@@ -89,16 +89,20 @@ public class SecurityConfig {
                         })
                         // CSRF 에 대한 설정
 //                    .csrf(AbstractHttpConfigurer::disable)// stateless한 rest api를 개발할 것이므로 csrf 공격에 대한 옵션은 꺼둔다.
-                        .formLogin((formLogin) -> {
+                        .csrf((csrf) -> csrf
+                                .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
+                        .formLogin(formLogin ->
                             /* 권한이 필요한 요청은 해당 url로 리다이렉트 */
-                            formLogin.loginPage("/user/login");
-                            formLogin.successForwardUrl("/");
-                        })
-                        .logout((logoutConfigurer) -> {
-                            logoutConfigurer.logoutUrl("/user/logout"); //로그아웃 url
-                            logoutConfigurer.logoutSuccessUrl("/");
-                            logoutConfigurer.deleteCookies("JSESSIONID");
-                            logoutConfigurer.invalidateHttpSession(true);// 사용자 세션 삭제
+                            formLogin
+                                    .loginPage("/user/login")
+                                    .usernameParameter("email")
+                                    .defaultSuccessUrl("/")
+                        )
+                        .logout((logout) -> {
+                            logout.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout")) //로그아웃 url
+                            .logoutSuccessUrl("/")
+//                            logoutConfigurer.deleteCookies("JSESSIONID");
+                            .invalidateHttpSession(true);// 사용자 세션 삭제
                         })
                         .build();
 

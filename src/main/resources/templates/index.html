@@ -20,11 +20,11 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
         <div class="question-content feed-width">
             <label for="content" class="form-label">내용</label>
             <div th:if="${#fields.hasErrors('content')}" role="alert">
-                <textarea rows="10" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="text-container"></textarea>
+                <textarea rows="10" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="feed-input" minlength="10" maxlength="600"></textarea>
 <!--                <div contenteditable="true" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="text-container"></div>-->
             </div>
             <div th:unless="${#fields.hasErrors('content')}" role="alert">
-                <textarea rows="10" th:field="*{content}" class="text-container" placeholder="운동해 대해 적어주세요."></textarea>
+                <textarea rows="10" th:field="*{content}" class="feed-input" placeholder="운동해 대해 적어주세요." minlength="10" maxlength="600"></textarea>
 <!--                <div contenteditable="true" th:field="*{content}" class="text-container"></div>-->
             </div>
             <!--            <textarea name="content" id="content" rows="10" th:field="*{content}"></textarea>-->
@@ -50,7 +50,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <div>팔로우</div>
 
             </div>
-            <div class="feed-body padding-default">
+            <div class="feed-body padding-default" th:text="${question.content}">
                 <!--게시물 번호(갯수로)-->
         <!--        <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>-->
                 <!--        <td th:if="${loop.first}" th:text="첫빠따"></td>-->
@@ -58,10 +58,10 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <!--        <td th:if="${!loop.first}" th:text="${question.title}"></td>-->
                 <!--        <td th:if="${!loop.first}" th:text="${question.createDate}"></td>-->
                 <!--                <td th:text="${loop.count}"></td>-->
-                <div>
+<!--                <div>-->
                     <!-- url 주소를 나타낼때는 @{} 을 써야 하고, java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다-->
                     <!--                <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.content}"></a>-->
-                    <a th:text="${question.content}"></a>
+<!--                    <div th:text="${question.content}"></div>-->
 
                     <!--답변 갯수 출력-->
 <!--                    <span class="answer-count"-->
@@ -71,7 +71,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 
                     <!--                    th:if="${#lists.size(question.answerList) > 0}"로 답변이 있는지 조사하고, th:text="${#lists.size(question.answerList)}"로 답변 개수를 표시했다.-->
                     <!--                    #list.size(이터러블객체)는 이터러블 객체의 사이즈를 반환하는 타임리프의 유틸리티이다.-->
-                </div>
+<!--                </div>-->
                 <!-- 삭제기능-->
 <!--                <form th:action="@{|/delete/${question.id}|}" method="post">
                     <input type="submit"  value="삭제하기" />
@@ -93,26 +93,26 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             <div class="answer-list">
                 <div class="answer padding-half" th:each="answer : ${question.answerList}" >
                     <div>
-                        <div>작성자 프사</div>
+                        <div class="answer-profile-image">작성자 프사</div>
                     </div>
                     <div>
                         <div class="answer-header">
                             <div class="text-sm">작성자 이름</div>
                             <div th:text="${#temporals.format(answer.createDate,'yyyy-MM-dd HH:mm')}" class="feed-timestamps text-xs"></div>
                         </div>
-                        <div>
-                            <div th:text="${answer.content}" class="answer-content"></div>
+                        <div class="answer-body">
+                            <div th:text="${answer.content}" class="answer-content text-sm"></div>
                         </div>
                     </div>
                 </div>
             </div> <!--comment-->
             <!-- 답변 작성 -->
             <!-- java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다 -->
-            <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post">
+            <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post" class="answer-form padding-half">
                 <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
                 <label for="content">답변</label>
-                <textarea th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" id="content"  rows="5" class="text-container" minlength="3"></textarea>
-                <textarea th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" id="content" rows="5" class="text-container" minlength="3"></textarea>
+                <textarea th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3"></textarea>
+                <textarea th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" ></textarea>
                 <input type="submit" value="답변등록"/>
             </form>
             <!-- 답변작성 -->

@@ -31,6 +31,9 @@ img, svg {
 .align-center{
     align-items: center;
 }
+.align-flex-start{
+    align-items: flex-start;
+}
 .align-flex-end{
     align-items: flex-end;
 }
@@ -66,6 +69,9 @@ img, svg {
 }
 .object-cover{
     object-fit: cover;
+}
+.rotate90{
+    rotate: 90deg;
 }
 @font-face {
     /*font-family: 'GmarketSansMedium';*/
@@ -250,12 +256,27 @@ input[type=submit] {
     background: none;
     height: fit-content;
 }
+.option-container{
+    height: fit-content;
+    gap: 0.3rem;
+}
 .option-button {
     cursor: pointer;
     border: none;
     background: none;
     font-size: 1.4rem;
     height: fit-content;
+    transition: all 0.3s;
+    text-align: center;
+}
+.option-menu{
+    display: none;
+    cursor: pointer;
+    height: fit-content;
+    gap:0.3rem;
+}
+.option-toggle{
+    display: flex;
 }
 .feed-body{
     white-space: pre-wrap;

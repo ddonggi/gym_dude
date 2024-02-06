@@ -60,7 +60,16 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 
                 <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
                 <!--현재 사용자가 인증되었다면 #authentication.getPrincipal()을 통해 principal을 확인할 수 있다 -->
-                <button sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}" class="option-button">⁝</button>
+                <div class="option-container flex align-center" th:id="${question.id}">
+                    <div class="option-menu">
+                        <button>수정</button>
+                        <button class="delete-button">삭제</button>
+                    </div>
+                    <button sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}" class="option-button flex justify-content-center align-center">
+                        ⁝
+                    </button>
+                </div>
+
                 <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.getUserName()}" class="follow-button">팔로우</button>
 
             </div>

@@ -4,6 +4,7 @@ package com.weight.gym_dude.answer;
  */
 
 import com.weight.gym_dude.question.Question;
+import com.weight.gym_dude.user.SiteUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,11 +15,15 @@ import java.time.LocalDateTime;
 public class AnswerService {
     private final AnswerRepository answerRepository;
 
-    public void create(Question question, String content){
+    public void create(Question question, String content, SiteUser author) {
 //        AnswerDTO answerDTO = new AnswerDTO(id, content, LocalDateTime.now(),question);
 //        AnswerDTO answerDTO = new AnswerDTO(id, content, LocalDateTime.now(),question);
         AnswerDTO answerDTO = AnswerDTO.builder()
-                .content(content).createDate(LocalDateTime.now()).question(question).build();
+                .content(content)
+                .createDate(LocalDateTime.now())
+                .question(question)
+                .author(author)
+                .build();
         Answer answer = answerDTO.toEntity();
         answerRepository.save(answer);
     }

@@ -4,6 +4,7 @@ package com.weight.gym_dude.answer;
  */
 
 import com.weight.gym_dude.question.Question;
+import com.weight.gym_dude.user.SiteUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +21,9 @@ public class AnswerDTO {
     private String content;
     private LocalDateTime createDate;
     private Question question;
+    private SiteUser author;
 
-    public Answer toEntity(){
-        return new Answer(this.content,this.createDate,this.question);
+    public Answer toEntity() {
+        return new Answer(this.content, this.createDate, this.question, this.author);
     }
 }

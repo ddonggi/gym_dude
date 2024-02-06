@@ -15,6 +15,9 @@
 img, svg {
     vertical-align: middle;
 }
+.border-full{
+    border-radius: 50%;
+}
 .flex{
     display: flex;
 }
@@ -28,6 +31,9 @@ img, svg {
 .align-center{
     align-items: center;
 }
+.align-flex-end{
+    align-items: flex-end;
+}
 .justify-content-center{
     justify-content: center;
 }
@@ -36,6 +42,9 @@ img, svg {
 }
 .gap-half{
     gap: 0.5rem;
+}
+.gap-rem{
+    gap: 1rem;
 }
 .font-bold {
     font-weight: 700;
@@ -51,6 +60,12 @@ img, svg {
 }
 .padding-half{
     padding: 0.5rem 1rem;
+}
+.width100{
+    width: 100%;
+}
+.object-cover{
+    object-fit: cover;
 }
 @font-face {
     /*font-family: 'GmarketSansMedium';*/
@@ -87,6 +102,10 @@ html, body {
     min-width: max-content;
     flex-wrap: wrap;
     background: white;
+    z-index: 5;
+}
+.navbar a {
+    text-decoration: none;
 }
 .navbar-container{
     display: flex;
@@ -99,18 +118,21 @@ html, body {
 }
 .navbar-right{
     display: flex;
+    gap: 0.5rem;
 }
 textarea {
-
+    outline: 1px solid transparent;
 }
 
 input[type=submit] {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background: black;
+    /*margin-top: 10px;*/
+    /*padding: 5px 10px;*/
+    background: coral;
     border-radius: 5px;
+    border:none;
     color: white;
     font-family: inherit;
+    outline-color: var(--border-silver100);
 }
 .footer {
     display: flex;
@@ -154,15 +176,31 @@ input[type=submit] {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    gap: 2.25rem;
 }
 .feed-width{
     width: 632px;
     max-width: 640px;
 }
 /* 피드 작성*/
+
 .question-content{
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+.question-container{
     background: white;
 }
+.question-input-container{
+    width: 100%;
+}
+.question-input{
+    width: 100%;
+    resize: none;
+    border: 1px solid transparent;
+}
+
 
 /* 작성된 피드 */
 .feed-container {
@@ -186,7 +224,12 @@ input[type=submit] {
         gap: 0.5rem;
     }
     .feed-profile-image{
-
+        position: relative;
+        /* w,h,radius 는 임시크기임*/
+        min-width: 2.5rem;
+        width: 2.5rem;
+        min-height: 2.5rem;
+        height: 2.5rem;
     }
 
     .feed-writer{
@@ -202,7 +245,7 @@ input[type=submit] {
     display: block;
     white-space: pre-wrap;
     font-size: 1rem;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     word-break: auto-phrase;
 }
 .feed-footer{
@@ -218,9 +261,9 @@ input[type=submit] {
 .answer-content{
     color: var(--text-subtitle);
     white-space: pre-wrap;
-    overflow-wrap: break-word;
+    overflow-wrap: anywhere;
     word-break: auto-phrase;
-    padding: 0.5rem 0;
+    padding: 0.5rem 0 0 0;
 }
 .answer{
     display: flex;
@@ -232,7 +275,30 @@ input[type=submit] {
 
 }
 .answer-profile-image{
-    width: 3rem;
+    /* 임시 크기임*/
+    min-width: 33px;
+    width: 2rem;
+    min-height: 33px;
+    height: 2rem;
+    position: relative;
+}
+.img{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    box-sizing: border-box;
+    padding: 0;
+    border: none;
+    margin: auto;
+    display: block;
+    width: 0;
+    height: 0;
+    min-width: 100%;
+    max-width: 100%;
+    min-height: 100%;
+    max-height: 100%;
 }
 .answer-header{
     display: flex;
@@ -242,9 +308,11 @@ input[type=submit] {
 .answer-input{
     width: 100%;
     resize: none;
+    border: 1px solid transparent;
 }
 .answer-form{
     border-top: 1px solid var(--border-silver100);
+    gap: 0.3rem;
 }
 .answer:first-child{
     border-top: 1px var(--border-silver200) solid;

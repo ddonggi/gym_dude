@@ -4,7 +4,7 @@
     <div class="login-block feed-width">
     <h1>로그인</h1>
 
-    <form th:action="@{/user/login}" method="post" class="login-form flex-column gap-half">
+    <form th:action="@{/user/login}" method="post" class="login-form flex-column gap-rem">
         <!--
         시큐리티의 로그인이 실패할 경우에는 로그인 페이지로 다시 리다이렉트 된다.
         이 때 페이지 파라미터로 error가 함께 전달된다. 따라서 로그인 페이지의 파라미터로 error가 전달될 경우
@@ -25,7 +25,7 @@
             <input type="password" name="password" id="password" class="input-block-sm" placeholder="비밀번호 입력">
         </div>
 
-        <button type="submit" class="button">로그인</button>
+        <input type="submit" class="button padding-default" value="로그인"></input>
     </form>
 </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>

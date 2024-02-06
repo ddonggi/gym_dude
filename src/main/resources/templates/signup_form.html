@@ -5,7 +5,7 @@
         <h1>요즘 운동 커뮤니티</h1>
         <h4>지금 짐프렌드에 가입하세요</h4>
 
-        <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post" class="signup-form flex-column gap-half">
+        <form th:action="@{/user/signup}" th:object="${userCreateForm}" method="post" class="signup-form flex-column gap-rem">
             <!--    <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
             <div class="signup-name">
                 <label for="username" class="form-label">닉네임</label>
@@ -54,7 +54,7 @@
                 </div>
             </div>
 
-            <button type="submit" class="button">회원가입</button>
+            <input type="submit" class="button padding-default" value="회원가입"></input>
         </form>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>

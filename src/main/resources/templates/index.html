@@ -3,7 +3,7 @@
     <th:block th:replace="~{fragment/header::header}"></th:block>
 
 <!--피드 등록 폼-->
-    <form th:action="@{/create}" method="post" th:object="${questionForm}" class="feed-width">
+    <form th:action="@{/create}" method="post" th:object="${questionForm}" class="question-container feed-width flex-column align-flex-end padding-default">
         <!--        오류를 표시하기 위해서는 타임리프의 th:object 속성이 반드시 필요하다.
 th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구성된다는 점을 타임리프 엔진에 알려줘야 하기 때문이다.  -->
         <!--        <div th:if="${#fields.hasAnyErrors()}" role="alert">-->
@@ -17,61 +17,53 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
         <div th:replace="~{form_errors :: formErrorsFragment}"></div> 의 의미는 div 엘리먼트를
         form_errors.html 파일의 th:fragment 속성명이 formErrorsFragment인 엘리먼트로 교체하라는 의미이다.
         -->
-        <div class="question-content feed-width">
-            <label for="content" class="form-label">내용</label>
-            <div th:if="${#fields.hasErrors('content')}" role="alert">
-                <textarea rows="10" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="feed-input" minlength="10" maxlength="600"></textarea>
+        <div class="question-content">
+
+            <div sec:authorize="isAnonymous()" th:unless="${siteUser}" class="feed-profile-image">
+                <img class="img object-cover border-full" alt="피드프로필" src="https://previews.123rf.com/images/triken/triken1608/triken160800029/61320775-%EB%82%A8%EC%84%B1-%EC%95%84%EB%B0%94%ED%83%80-%ED%94%84%EB%A1%9C%ED%95%84-%EC%82%AC%EC%A7%84-%EA%B8%B0%EB%B3%B8-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%95%84%EB%B0%94%ED%83%80-%EA%B2%8C%EC%8A%A4%ED%8A%B8-%EC%95%84%EB%B0%94%ED%83%80-%EB%8B%A8%EC%88%9C%ED%9E%88-%EC%9D%B8%EA%B0%84%EC%9D%98-%EB%A8%B8%EB%A6%AC-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4-%EC%85%98-%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90.jpg"/>
+            </div>
+            <div sec:authorize="isAuthenticated()" th:if="${siteUser}" class="feed-profile-image">
+                <img class="img object-cover border-full" alt="피드프로필" src="https://careerly.co.kr/_next/image?url=https%3A%2F%2Fpubly.imgix.net%2Fuser-uploaded%2F488438%2F2023.07%2Faa5af5f69c1d42ea1c8598da2951b698f6a90928437873597a8f0aedea03547a.jpeg%3Fw%3D200%26h%3D200%26auto%3Dformat%26fm%3Djpeg&w=256&q=75"/>
+            </div>
+
+<!--            <label for="content" class="form-label">내용</label>-->
+            <div th:if="${#fields.hasErrors('content')}" class="question-input-container">
+                <textarea rows="1" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="question-input" minlength="5" maxlength="600"></textarea>
 <!--                <div contenteditable="true" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="text-container"></div>-->
             </div>
-            <div th:unless="${#fields.hasErrors('content')}" role="alert">
-                <textarea rows="10" th:field="*{content}" class="feed-input" placeholder="운동해 대해 적어주세요." minlength="10" maxlength="600"></textarea>
+            <div th:unless="${#fields.hasErrors('content')}" class="question-input-container">
+                <textarea sec:authorize="isAnonymous()" disabled rows="3" th:field="*{content}" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+                <textarea sec:authorize="isAuthenticated()" rows="3" th:field="*{content}" class="question-input" placeholder="운동해 대해 적어주세요" minlength="5" maxlength="600"></textarea>
 <!--                <div contenteditable="true" th:field="*{content}" class="text-container"></div>-->
             </div>
             <!--            <textarea name="content" id="content" rows="10" th:field="*{content}"></textarea>-->
             <!--            <textarea rows="10" th:field="*{content}" required></textarea>-->
         </div>
-        <input type="submit" value="저장하기">
+        <input type="submit" class="padding-half" value="저장하기">
     </form>
 
 <!--피드 리스트 -->
     <div class="feed-container feed-width">
-        <div th:each="question,loop : ${paging}" class="feed">
+        <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${paging}" class="feed">
             <div class="feed-header padding-default">
-                <a aria-label="{User}의 프로필">
-                    <div class="feed-profile-image">프로필사진</div>
+                <a th:if="${question.author}" th:aria-label="|${question.author.getUserName()}의 프로필|">
+                    <div class="feed-profile-image">
+                        <img alt="피드프로필" class="img object-cover border-full" src="https://careerly.co.kr/_next/image?url=https%3A%2F%2Fpubly.imgix.net%2Fuser-uploaded%2F488438%2F2023.07%2Faa5af5f69c1d42ea1c8598da2951b698f6a90928437873597a8f0aedea03547a.jpeg%3Fw%3D200%26h%3D200%26auto%3Dformat%26fm%3Djpeg&w=256&q=75">
+                    </div>
                     <div>
-                        <div class="feed-writer text-sm font-bold">글쓴이</div>
+                        <div class="feed-writer text-sm font-bold" th:text="${question.author.getUserName()}">글쓴이</div>
                         <div class="feed-tag text-xs">태그</div>
                         <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
                         <div class="feed-timestamps text-xs" th:text="${#temporals.format(question.createDate,'yyyy-MM-dd HH:mm')}"></div>
                     </div>
                 </a>
+
                 <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
-                <div>팔로우</div>
+                <div sec:authorize="isAuthenticated()" th:if="${siteUser.getUserName()==question.author.getUserName()}">수정</div>
+                <div sec:authorize="isAuthenticated()" th:unless="${siteUser.getUserName()==question.author.getUserName()}">팔로우</div>
 
             </div>
             <div class="feed-body padding-default" th:text="${question.content}">
-                <!--게시물 번호(갯수로)-->
-        <!--        <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>-->
-                <!--        <td th:if="${loop.first}" th:text="첫빠따"></td>-->
-                <!--        <td th:if="${loop.first}" th:text="내가처음임"></td>-->
-                <!--        <td th:if="${!loop.first}" th:text="${question.title}"></td>-->
-                <!--        <td th:if="${!loop.first}" th:text="${question.createDate}"></td>-->
-                <!--                <td th:text="${loop.count}"></td>-->
-<!--                <div>-->
-                    <!-- url 주소를 나타낼때는 @{} 을 써야 하고, java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다-->
-                    <!--                <a th:href="@{|/question/detail/${question.id}|}" th:text="${question.content}"></a>-->
-<!--                    <div th:text="${question.content}"></div>-->
-
-                    <!--답변 갯수 출력-->
-<!--                    <span class="answer-count"-->
-<!--                          th:if="${#lists.size(question.answerList) > 0}"-->
-<!--                          th:text="${#lists.size(question.answerList)}">-->
-<!--                    </span>-->
-
-                    <!--                    th:if="${#lists.size(question.answerList) > 0}"로 답변이 있는지 조사하고, th:text="${#lists.size(question.answerList)}"로 답변 개수를 표시했다.-->
-                    <!--                    #list.size(이터러블객체)는 이터러블 객체의 사이즈를 반환하는 타임리프의 유틸리티이다.-->
-<!--                </div>-->
                 <!-- 삭제기능-->
 <!--                <form th:action="@{|/delete/${question.id}|}" method="post">
                     <input type="submit"  value="삭제하기" />
@@ -92,12 +84,17 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             <!-- 댓글 반복 -->
             <div class="answer-list">
                 <div class="answer padding-half" th:each="answer : ${question.answerList}" >
-                    <div>
-                        <div class="answer-profile-image">작성자 프사</div>
+                    <div th:if="${answer.author}" class="answer-profile-image">
+                        <img class="img object-cover border-full" alt="댓글프로필" src="https://publy.imgix.net/user-uploaded/508499/2024.01/a420dce4c56844501ac6734d009101d7100eee8712e10a6a0b8ee25ac395706c.jpeg?w=200&h=200&auto=format&fm=jpeg"/>
                     </div>
-                    <div>
+                    <div th:unless="${answer.author}" class="answer-profile-image">
+                        <img class="img object-cover border-full" alt="게스트댓글프로필" src="https://previews.123rf.com/images/triken/triken1608/triken160800029/61320775-%EB%82%A8%EC%84%B1-%EC%95%84%EB%B0%94%ED%83%80-%ED%94%84%EB%A1%9C%ED%95%84-%EC%82%AC%EC%A7%84-%EA%B8%B0%EB%B3%B8-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%95%84%EB%B0%94%ED%83%80-%EA%B2%8C%EC%8A%A4%ED%8A%B8-%EC%95%84%EB%B0%94%ED%83%80-%EB%8B%A8%EC%88%9C%ED%9E%88-%EC%9D%B8%EA%B0%84%EC%9D%98-%EB%A8%B8%EB%A6%AC-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4-%EC%85%98-%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90.jpg"/>
+                    </div>
+
+                    <!-- 가입한 유저가 쓴 댓글 -->
+                    <div th:if="${answer.author}">
                         <div class="answer-header">
-                            <div class="text-sm">작성자 이름</div>
+                            <div class="text-sm" th:text="${answer.author.getUserName()}">작성자 이름</div>
                             <div th:text="${#temporals.format(answer.createDate,'yyyy-MM-dd HH:mm')}" class="feed-timestamps text-xs"></div>
                         </div>
                         <div class="answer-body">
@@ -108,12 +105,25 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             </div> <!--comment-->
             <!-- 답변 작성 -->
             <!-- java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다 -->
-            <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post" class="answer-form padding-half">
+            <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post" class="answer-form padding-default flex">
                 <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
-                <label for="content">답변</label>
-                <textarea th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3"></textarea>
-                <textarea th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" ></textarea>
-                <input type="submit" value="답변등록"/>
+<!--                <label for="content">댓글</label>-->
+                <div sec:authorize="isAnonymous()" class="answer-profile-image">
+                    <img class="img object-cover border-full" alt="게스트댓글프로필" src="https://previews.123rf.com/images/triken/triken1608/triken160800029/61320775-%EB%82%A8%EC%84%B1-%EC%95%84%EB%B0%94%ED%83%80-%ED%94%84%EB%A1%9C%ED%95%84-%EC%82%AC%EC%A7%84-%EA%B8%B0%EB%B3%B8-%EC%82%AC%EC%9A%A9%EC%9E%90-%EC%95%84%EB%B0%94%ED%83%80-%EA%B2%8C%EC%8A%A4%ED%8A%B8-%EC%95%84%EB%B0%94%ED%83%80-%EB%8B%A8%EC%88%9C%ED%9E%88-%EC%9D%B8%EA%B0%84%EC%9D%98-%EB%A8%B8%EB%A6%AC-%EB%B2%A1%ED%84%B0-%EC%9D%BC%EB%9F%AC%EC%8A%A4%ED%8A%B8-%EB%A0%88%EC%9D%B4-%EC%85%98-%ED%9D%B0%EC%83%89-%EB%B0%B0%EA%B2%BD%EC%97%90.jpg"/>
+                </div>
+                <div sec:authorize="isAuthenticated()" class="answer-profile-image">
+                    <img class="img object-cover border-full" alt="댓글프로필" src="https://publy.imgix.net/user-uploaded/508499/2024.01/a420dce4c56844501ac6734d009101d7100eee8712e10a6a0b8ee25ac395706c.jpeg?w=200&h=200&auto=format&fm=jpeg"/>
+                </div>
+                <div sec:authorize="isAnonymous()" class="flex-column width100 align-flex-end">
+                    <textarea placeholder="로그인 후 작성해 주세요" disabled th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <textarea placeholder="로그인 후 작성해 주세요" disabled th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <input type="submit" class="padding-half" value="등록"/>
+                </div>
+                <div sec:authorize="isAuthenticated()" class="flex-column width100 align-flex-end">
+                    <textarea placeholder="여러분의 생각을 적어주세요" th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <textarea placeholder="여러분의 생각을 적어주세요" th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <input type="submit" class="padding-half" value="등록"/>
+                </div>
             </form>
             <!-- 답변작성 -->
         </div> <!--feed -->
@@ -158,6 +168,8 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
     let number = [[${paging.number}]];
     let hasPrevious = [[${paging.hasPrevious}]];
     let hasNext = [[${paging.hasNext}]];
+    let siteUser = [[${siteUser}]];
+    console.log('siteUser:',siteUser)
 </script>
 <script layout:fragment="index_js" th:src="@{/js/index.js}"></script>
 </div>

@@ -1,4 +1,4 @@
-<html layout:decorate="~{layout/layout}">
+<html layout:decorate="~{layout/layout}" >
 <div layout:fragment="content" class="index-container">
     <th:block th:replace="~{fragment/header::header}"></th:block>
 
@@ -33,7 +33,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             </div>
             <div th:unless="${#fields.hasErrors('content')}" class="question-input-container">
                 <textarea sec:authorize="isAnonymous()" disabled rows="3" th:field="*{content}" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
-                <textarea sec:authorize="isAuthenticated()" rows="3" th:field="*{content}" class="question-input" placeholder="운동해 대해 적어주세요" minlength="5" maxlength="600"></textarea>
+                <textarea sec:authorize="isAuthenticated()" rows="3" th:field="*{content}" class="question-input" placeholder="운동에 대해 적어주세요" minlength="5" maxlength="600"></textarea>
 <!--                <div contenteditable="true" th:field="*{content}" class="text-container"></div>-->
             </div>
             <!--            <textarea name="content" id="content" rows="10" th:field="*{content}"></textarea>-->
@@ -59,11 +59,14 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 </a>
 
                 <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
-                <div sec:authorize="isAuthenticated()" th:if="${siteUser.getUserName()==question.author.getUserName()}">수정</div>
-                <div sec:authorize="isAuthenticated()" th:unless="${siteUser.getUserName()==question.author.getUserName()}">팔로우</div>
+                <!--현재 사용자가 인증되었다면 #authentication.getPrincipal()을 통해 principal을 확인할 수 있다 -->
+                <button sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}" class="option-button">⁝</button>
+                <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.getUserName()}" class="follow-button">팔로우</button>
 
             </div>
-            <div class="feed-body padding-default" th:text="${question.content}">
+            <div class="feed-body padding-default flex-column" >
+                <div class="feed-content" th:text="${question.content}"></div>
+                <input type="checkbox" class="more-btn"/>
                 <!-- 삭제기능-->
 <!--                <form th:action="@{|/delete/${question.id}|}" method="post">
                     <input type="submit"  value="삭제하기" />
@@ -168,8 +171,6 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
     let number = [[${paging.number}]];
     let hasPrevious = [[${paging.hasPrevious}]];
     let hasNext = [[${paging.hasNext}]];
-    let siteUser = [[${siteUser}]];
-    console.log('siteUser:',siteUser)
 </script>
 <script layout:fragment="index_js" th:src="@{/js/index.js}"></script>
 </div>

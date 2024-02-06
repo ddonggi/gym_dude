@@ -9,6 +9,8 @@ import lombok.*;
 
 //import javax.persistence.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -39,11 +41,18 @@ public class Question {
     //mappedBy 는 "참조 엔티티의 속성명"을 의미한다 ( Answer 엔티티에서 Question 엔티티를 참조한 속성명)
     //Question 입장에서, 하나의 질문에 많은 답변
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    @OrderBy("createDate asc")
     private List<Answer> answerList;
 
-    public Question(String content, LocalDateTime createDate, SiteUser author) {
+    private LocalDateTime modifiedDate;
+
+    @ColumnDefault("false")
+    private Boolean isHide;
+
+    public Question(String content, LocalDateTime createDate, SiteUser author, Boolean isHide) {
         this.content=content;
         this.createDate=createDate;
         this.author=author;
+        this.isHide=isHide;
     }
 }

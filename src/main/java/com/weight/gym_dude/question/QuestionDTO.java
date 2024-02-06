@@ -20,6 +20,7 @@ public class QuestionDTO {
     private LocalDateTime createDate;
     private SiteUser author;
     private List<Answer> answerList;
+    private Boolean isHide;
 
 /*    public QuestionDTO(String title, String content, LocalDateTime createDate) {
         this.title=title;
@@ -28,6 +29,6 @@ public class QuestionDTO {
     }*/
 
     public Question toEntity(){
-        return new Question(this.content,this.createDate,this.author);
+        return new Question(this.content,this.createDate,this.author,this.isHide);
     }
 }

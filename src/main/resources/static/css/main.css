@@ -133,6 +133,7 @@ input[type=submit] {
     color: white;
     font-family: inherit;
     outline-color: var(--border-silver100);
+    cursor: pointer;
 }
 .footer {
     display: flex;
@@ -191,6 +192,7 @@ input[type=submit] {
 }
 .question-container{
     background: white;
+    border: solid 1px var(--border-silver100);
 }
 .question-input-container{
     width: 100%;
@@ -207,6 +209,7 @@ input[type=submit] {
     display: flex;
     gap: 2.25rem;
     flex-direction: column;
+    margin-bottom: 2rem;
 }
 .feed{
     background: white;
@@ -241,13 +244,53 @@ input[type=submit] {
     .feed-timestamps{
         color: var(--text-timestamps);
     }
+.follow-button{
+    cursor: pointer;
+    border: none;
+    background: none;
+    height: fit-content;
+}
+.option-button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-size: 1.4rem;
+    height: fit-content;
+}
 .feed-body{
-    display: block;
     white-space: pre-wrap;
     font-size: 1rem;
     overflow-wrap: anywhere;
     word-break: auto-phrase;
 }
+.feed-content{
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+/*더보기 글자*/
+.more-btn {
+    appearance: none;
+    width: 3rem;
+    border: none;
+    /*padding: 0.5em;*/
+    cursor: pointer;
+    color: var(--text-silver100);
+}
+
+.more-btn::before {
+    content: '더보기';
+}
+
+.more-btn:checked::before {
+    content: '닫기';
+}
+
+.feed-content:has(+ .more-btn:checked) {
+    -webkit-line-clamp:unset
+}
+
 .feed-footer{
     color: var(--text-timestamps);
     display: flex;

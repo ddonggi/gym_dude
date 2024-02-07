@@ -113,6 +113,9 @@ html, body {
 .navbar a {
     text-decoration: none;
 }
+.hide{
+    display: none;
+}
 .navbar-container{
     display: flex;
     padding: 0 1rem;

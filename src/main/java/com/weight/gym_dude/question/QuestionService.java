@@ -68,4 +68,10 @@ public class QuestionService {
             questionRepository.deleteById(id);
         }
     }
+
+    public void modify(Question question, String content) {
+        question.setContent(content);
+        question.setModifiedDate(LocalDateTime.now());
+        questionRepository.save(question);
+    }
 }

@@ -45,6 +45,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 <!--피드 리스트 -->
     <div class="feed-container feed-width">
         <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${paging}" class="feed" th:id="${question.id}">
+            <form th:action="@{|/modify/${question.id}|}" method="post" th:object="${questionForm}">
             <div class="feed-header padding-default">
                 <a th:if="${question.author}" th:aria-label="|${question.author.getUserName()}의 프로필|">
                     <div class="feed-profile-image">
@@ -60,11 +61,11 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 
                 <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
                 <!--현재 사용자가 인증되었다면 #authentication.getPrincipal()을 통해 principal을 확인할 수 있다 -->
-                <div class="option-container flex align-center">
+                <div class="option-container flex align-center" sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}">
                     <!--CSRF값을 수동으로라도 추가해야 되는 이유는 스프링 시큐리티(Spring Security)를 사용할 때 CSRF 값이 반드시 필요하기 때문이다.-->
 <!--                    <input type="hidden" th:name="${_csrf.headerName}" th:value="${_csrf.token}"/>-->
                     <div class="option-menu">
-                        <button>수정</button>
+                        <button class="modify-button">수정</button>
                         <button class="delete-button">삭제</button>
                         <!--javascript:와 void(0)의 결합
                         때에 따라 링크를 클릭했을 때, 다른 페이지로 이동하거나 페이지가 다시 로딩되는 것을 원하지 않을 때가 있습니다.
@@ -79,15 +80,16 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.getUserName()}" class="follow-button">팔로우</button>
 
             </div>
-            <div class="feed-body padding-default flex-column" >
-                <div class="feed-content" th:text="${question.content}"></div>
-                <input type="checkbox" class="more-btn"/>
-                <!-- 삭제기능-->
-<!--                <form th:action="@{|/delete/${question.id}|}" method="post">
-                    <input type="submit"  value="삭제하기" />
-                </form>-->
-                <!-- 삭제기능 끝-->
-            </div><!--feed-body-->
+                <div class="feed-body padding-default flex-column" >
+                    <div class="feed-content" th:text="${question.content}"></div>
+                    <input type="checkbox" class="more-btn"/>
+                    <!-- 삭제기능-->
+    <!--                <form th:action="@{|/delete/${question.id}|}" method="post">
+                        <input type="submit"  value="삭제하기" />
+                    </form>-->
+                    <!-- 삭제기능 끝-->
+                </div><!--feed-body-->
+            </form>
             <div class="feed-footer padding-half text-xs"><!--feed-footer-->
                 <div class="like" th:text="|좋아요n개|"></div>
                 <!--답변 갯수 출력-->

@@ -83,23 +83,21 @@ public class QuestionController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/modify/{id}")
-    public String questionModify(QuestionForm questionForm,@PathVariable("id") Integer id,Principal principal){
+    @PostMapping("/modify/{id}")
+    public String questionModify(@Valid QuestionForm questionForm,BindingResult bindingResult,
+                                 @PathVariable("id") Integer id,Principal principal){
+        logger.info("id:{}",id);
+        if(bindingResult.hasErrors()) {
+            return "redirect:/";
+        }
         Question question = questionService.getQuestion(id);
         if(!question.getAuthor().getUserName().equals(principal.getName())){ //현재 로그인한 사람과 글의 작성자가 다를 경우
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"수정 권한이 없습니다.");
         }
-        questionForm.setContent(question.getContent());
-        return "index";
+        questionService.modify(question,questionForm.getContent());
+        return "redirect:/";
     }
 
-/*    @PostMapping("/delete/{id}")
-    public String questionDelete(@PathVariable("id") Integer id) {
-        logger.info("to delete id : {}", id);
-        questionService.delete(id);
-//        return "redirect:/question/list";
-        return "redirect:/"; //질문 삭제 후 피드로 이동
-    }*/
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/delete/question/{id}")

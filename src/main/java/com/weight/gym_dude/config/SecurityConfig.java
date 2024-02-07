@@ -92,7 +92,9 @@ public class SecurityConfig {
                         // CSRF 에 대한 설정
 //                    .csrf(AbstractHttpConfigurer::disable)// stateless한 rest api를 개발할 것이므로 csrf 공격에 대한 옵션은 꺼둔다.
                         .csrf((csrf) -> csrf
-                                .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**")))
+                                .ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
+//                                .ignoringRequestMatchers(new AntPathRequestMatcher("/delet/**"))
+                        )
                         .formLogin(formLogin ->
                             /* 권한이 필요한 요청은 해당 url로 리다이렉트 */
                             formLogin

@@ -4,6 +4,7 @@ package com.weight.gym_dude.question;
  */
 
 import com.weight.gym_dude.answer.AnswerForm;
+import com.weight.gym_dude.etc.CsrfVO;
 import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.user.UserService;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -91,11 +93,24 @@ public class QuestionController {
         return "index";
     }
 
-    @PostMapping("/delete/{id}")
+/*    @PostMapping("/delete/{id}")
     public String questionDelete(@PathVariable("id") Integer id) {
         logger.info("to delete id : {}", id);
         questionService.delete(id);
 //        return "redirect:/question/list";
         return "redirect:/"; //질문 삭제 후 피드로 이동
+    }*/
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/delete/question/{id}")
+    @ResponseBody
+    public ResponseEntity<String> questionDelete2(@PathVariable("id") Integer id, Principal principal){
+        logger.info("to delete id : {}", id);
+        if(!principal.getName().equals(questionService.getQuestion(id).getAuthor().getUserName()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
+        questionService.delete(id);
+
+        return ResponseEntity.ok(id.toString());
     }
+
 }

@@ -27,7 +27,7 @@ window.onload = () => {
     }
 
     /* 게시물 삭제 이벤트 등록 */
-    let setDeleteEvent = (deleteButton,id,feed) =>{
+    let setDeleteEvent = (deleteButton,id) =>{
         deleteButton.addEventListener('click',(e)=> {
             e.preventDefault();
             if (confirm("정말 삭제 하시겠습니까? 삭제 후엔 되돌릴 수 없습니다")) {
@@ -47,25 +47,89 @@ window.onload = () => {
         })
     }
 
-    let setModifyEvent = (modifyButton,id,feed) =>{
+    let setModifyFormEvent = (modifyButton,id,feed) =>{
         let content = feed.querySelector(".feed-content");
-        let optionMenu = feed.querySelector(".option-menu");
+        // let optionMenu = feed.querySelector(".option-menu");
         /* 현재 피드를 수정을 위한 폼으로 바꾸기 */
-        modifyButton.addEventListener('click',()=> {
-            console.log("modify button click")
+        modifyButton.addEventListener('click',(e)=> {
+            e.preventDefault();
+            console.log("modify button click");
+            let originText = content.innerText;
             // content.innerHtml="<input>'${content.innerText}'</input>";
-            content.innerHTML = `<textarea rows="5" class="question-input" minLength="5" maxLength="600" name="content">${content.innerText}</textarea>`;
             console.log('text:', content.innerText);
+            content.innerHTML = `<textarea rows="5" class="question-input" minLength="8" maxLength="600" name="content">${content.innerText}</textarea>`;
             // content.innerText='떼잉';
             //수정버튼 숨김
-            modifyButton.classList.toggle("hide")
+            // modifyButton.classList.toggle("hide");
+            feed.querySelector(".modify-button").classList.toggle("hide");
             //삭제버튼 숨김
             feed.querySelector(".delete-button").classList.toggle("hide");
-            //저장버튼 생성
-            //취소버튼 생성
-            optionMenu.innerHTML += `<input type="submit" value="저장"></input><button class="edit-cancel-button">취소</button>`;
-
+            //저장, 취소버튼 생성 => todo : 토글
+            //optionMenu.innerHTML += `<input type="submit" value="저장" class="edit-save-button"></input><a class="edit-cancel-button">취소</a>`;
+            feed.querySelector(".edit-save-button").classList.toggle("hide");
+            feed.querySelector(".edit-cancel-button").classList.toggle("hide");
+            console.log('originText:',originText);
         })
+    }
+    let toggleOptionMenu = (feed) =>{
+
+    }
+    let setModifySaveEvent = (feed,id) =>{
+        let url = `/modify/${id}`;
+        let saveButton = feed.querySelector(".edit-save-button");
+        saveButton.addEventListener('click',(e)=>{
+            e.preventDefault();
+            let input = feed.querySelector(".question-input");
+            console.log('modified text:',input.value);
+            let data = {"content":`${input.value}`};
+            console.log('글자 수:',input.value.length);
+            if(input.value.length<5){
+                alert("최소 5글자 이상으로 작성해 주세요");
+            }else {
+                postData(url, data, csrf_header, csrf_token).then((resData) => {
+                    // let response = JSON.parse(resData)
+                    console.log('res data:', resData);
+                    console.log('res data:', resData.content);
+                    // console.log('res data:', resData);
+                    feed.querySelector(".feed-content").innerText = resData.content;
+                    feed.querySelector(".modify-button").classList.toggle("hide");
+                    feed.querySelector(".delete-button").classList.toggle("hide");
+                    feed.querySelector(".edit-save-button").classList.toggle("hide");
+                    feed.querySelector(".edit-cancel-button").classList.toggle("hide");
+                    feed.querySelector(".option-menu").classList.toggle("option-toggle");
+                    // location.reload();
+                    // feed.remove();
+                    // location.href="/";
+                });
+            }
+        })
+    }
+    let setModifyCancelEvent = (modifyButton,id,feed) =>{
+        let optionMenu = feed.querySelector(".option-menu");
+        let content = feed.querySelector(".feed-content");
+        let originText = content.innerText;
+        //아직 수정버튼 클릭하기 전엔 없음;
+        let cancelButton = optionMenu.querySelector(".edit-cancel-button");
+
+        cancelButton.addEventListener('click',(e)=> {
+                e.preventDefault();
+                content.innerText = `${originText}`;
+                //옵션버튼 토글
+                feed.querySelector(".option-menu").classList.toggle("option-toggle");
+                //수정버튼 나타냄
+                feed.querySelector(".modify-button").classList.toggle("hide");
+                //삭제버튼 나타냄
+                feed.querySelector(".delete-button").classList.toggle("hide");
+                //수정,삭제 이벤트 재등록
+                // setModifyEvent(modifyButton,id,feed);
+                // 저장,취소버튼 삭제 => 숨기기
+                let saveButton = optionMenu.querySelector(".edit-save-button");
+                // saveButton.remove();
+                // cancelButton.remove();
+                saveButton.classList.toggle("hide");
+                cancelButton.classList.toggle("hide");
+            }
+        )
     }
 
     /* 게시물 옵션 버튼 토글 이벤트 (수정,삭제버튼 노출비노출 토글)*/
@@ -88,13 +152,18 @@ window.onload = () => {
             let deleteButton = feed.querySelector(".delete-button");
             let modifyButton =feed.querySelector(".modify-button");
             setOptionEvent(optionButton,optionMenu);
-            setModifyEvent(modifyButton,id,feed);
+            setModifyFormEvent(modifyButton,id,feed);
+            setModifyCancelEvent(modifyButton,id,feed);
+            setModifySaveEvent(feed,id);
             setDeleteEvent(deleteButton,id,feed);
             // console.log('게시물 id:', id);
         }
         /* 타인 게시물 : 팔로우 이벤트 등록*/
         if(feed.querySelector(".follow-button")){
-
+            let followButton = feed.querySelector(".follow-button");
+            followButton.addEventListener('click',(e)=>{
+              e.preventDefault();
+            })
         }
     })
 
@@ -104,7 +173,7 @@ window.onload = () => {
             feedBody.querySelector(".more-btn").style.display="none";
         }
     })
-}
+}//window.onload
 
 // console.log('page test');
 // let size = [[${paging.size}]];

@@ -115,6 +115,7 @@ html, body {
 }
 .hide{
     display: none;
+    /*visibility: hidden;*/
 }
 .navbar-container{
     display: flex;

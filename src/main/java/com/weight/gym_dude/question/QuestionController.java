@@ -24,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.text.html.Option;
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.Optional;
 
 @RequestMapping("/")
@@ -82,7 +83,7 @@ public class QuestionController {
         return "redirect:/"; // 질문 저장 후 피드로 이동
     }
 
-    @PreAuthorize("isAuthenticated()")
+/*    @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String questionModify(@Valid QuestionForm questionForm,BindingResult bindingResult,
                                  @PathVariable("id") Integer id,Principal principal){
@@ -96,6 +97,26 @@ public class QuestionController {
         }
         questionService.modify(question,questionForm.getContent());
         return "redirect:/";
+    }*/
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify/{id}")
+    @ResponseBody
+    public ResponseEntity<Object> questionModifyRest(@RequestBody @Valid QuestionForm questionForm, BindingResult bindingResult,
+                                 @PathVariable("id") Integer id,Principal principal){
+        logger.info("컨텐츠 내용:{}",questionForm.getContent());
+        logger.info("id:{}",id);
+        if(bindingResult.hasErrors()) {
+            ResponseEntity.badRequest();
+        }
+        Question question = questionService.getQuestion(id);
+        if(!question.getAuthor().getUserName().equals(principal.getName())){ //현재 로그인한 사람과 글의 작성자가 다를 경우
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"수정 권한이 없습니다.");
+        }
+        questionService.modify(question,questionForm.getContent());
+        HashMap<String,String> questionContent = new HashMap<>();
+        questionContent.put("content",question.getContent());
+        return ResponseEntity.status(HttpStatus.OK).body(questionContent);
     }
 
 

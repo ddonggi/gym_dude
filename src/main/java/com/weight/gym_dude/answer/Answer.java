@@ -30,6 +30,7 @@ public class Answer {
     // 답변 추가 (question_id)
     // 여러개의 답변은 하나의 질문에 달릴 수 있다
     @ManyToOne
+    //@JoinColumn(name = "question_id") // column name 을 바꿀 것이 아니라면 생략 가능
     private Question question;
 
     //글쓴이 속성 추가

@@ -4,9 +4,11 @@ package com.weight.gym_dude.question;
  */
 
 import com.weight.gym_dude.answer.AnswerForm;
-import com.weight.gym_dude.etc.CsrfVO;
+import com.weight.gym_dude.file.FileRequest;
+import com.weight.gym_dude.file.FileRequestService;
 import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.user.UserService;
+import com.weight.gym_dude.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +22,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.swing.text.html.Option;
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.Optional;
+import java.util.List;
 
 @RequestMapping("/")
 @Controller
@@ -34,6 +36,8 @@ public class QuestionController {
     private final Logger logger = LoggerFactory.getLogger(QuestionController.class);
     private final QuestionService questionService;
     private final UserService userService;
+    private final FileUtils fileUtils;
+    private final FileRequestService fileService;
 
     @GetMapping("/")
     public String list(Model model,
@@ -58,28 +62,35 @@ public class QuestionController {
         return "index";
     }
 
-    @GetMapping("/detail/{id}")
+/*    @GetMapping("/detail/{id}")
     public String detail(Model model, @PathVariable("id") Integer id, AnswerForm answerForm) {
         Question question = questionService.getQuestion(id);
         model.addAttribute("question", question);
         return "question_detail";
-    }
+    }*/
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/create")
 //    public String questionCreate(@RequestParam String title, @RequestParam String content){
     public String questionCreate(
+            @RequestParam(value = "files") List<MultipartFile> files,
+//            QuestionDTO questionDTO,
             @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
             BindingResult bindingresult, // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
             Principal principal //현재 로그인한 사용자의 정보를 알려면 스프링 시큐리티가 제공하는 Principal 객체를 사용해야 한다.
     ) {
-    logger.info("feed content size:{}",questionForm.getContent().length());
+        logger.info("feed content length:{}",questionForm.getContent().length());
         if (bindingresult.hasErrors()) {
             logger.info("error>>:{}", bindingresult.getFieldError());
             return "index";
         }
         SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
         questionService.create(questionForm.getContent(),author,false);
+        logger.info("question create complete");
+        Integer questionId = questionService.getId(questionForm.getContent());
+        logger.info("question Id:{}",questionId);
+        List<FileRequest> fileRequestList = fileUtils.uploadFiles(files); //파일 저장소 업로드
+        fileService.saveFiles(fileRequestList);
         return "redirect:/"; // 질문 저장 후 피드로 이동
     }
 

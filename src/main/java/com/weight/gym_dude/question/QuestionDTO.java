@@ -1,11 +1,13 @@
 package com.weight.gym_dude.question;
 
 import com.weight.gym_dude.answer.Answer;
+import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.user.SiteUser;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,6 +22,7 @@ public class QuestionDTO {
     private LocalDateTime createDate;
     private SiteUser author;
     private List<Answer> answerList;
+    private List<MultipartFile> fileReuqestList;
     private Boolean isHide;
 
 /*    public QuestionDTO(String title, String content, LocalDateTime createDate) {

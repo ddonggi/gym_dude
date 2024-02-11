@@ -4,6 +4,7 @@ package com.weight.gym_dude.question;
  */
 
 import com.weight.gym_dude.answer.Answer;
+import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.user.SiteUser;
 import lombok.*;
 
@@ -38,13 +39,19 @@ public class Question {
     @ManyToOne
     private SiteUser author;
 
-    //mappedBy 는 "참조 엔티티의 속성명"을 의미한다 ( Answer 엔티티에서 Question 엔티티를 참조한 속성명)
-    //Question 입장에서, 하나의 질문에 많은 답변
+    //Answer의 ManyToOne 의 양방향 매핑. mappedBy 는 "참조 엔티티의 속성명"을 의미한다
+    // ( Answer 엔티티에서 Question 엔티티를 참조한 속성명) => Answer Entity 의 question 정보를 참조
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @OrderBy("createDate asc")
     private List<Answer> answerList;
 
+    //File 의 ManyToOne 의 양방향 매핑
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
+    @OrderBy("createDate asc")
+    private List<FileRequest> fileList;
+
     private LocalDateTime modifiedDate;
+
 
     @ColumnDefault("false")
     private Boolean isHide;

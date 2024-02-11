@@ -60,6 +60,12 @@ public class QuestionService {
         Question question = questionDTO.toEntity();
         questionRepository.save(question);
     }
+    public Integer getId(String content){
+        if(questionRepository.findByContent(content).isPresent()){
+            return questionRepository.findByContent(content).get().getId();
+        }
+        else return null;
+    }
 
     public void delete(Integer id) {
 //        Question question = Question.builder().build();

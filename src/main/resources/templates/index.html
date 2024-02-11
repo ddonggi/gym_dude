@@ -3,7 +3,8 @@
     <th:block th:replace="~{fragment/header::header}"></th:block>
 
 <!--피드 등록 폼-->
-    <form th:action="@{/create}" method="post" th:object="${questionForm}" class="question-container feed-width flex-column align-flex-end padding-default">
+<!--    <form th:action="@{/create}" method="post" th:object="${questionForm}" class="question-container feed-width flex-column align-flex-end padding-default">-->
+    <form enctype="multipart/form-data" th:action="@{/create}" method="post" th:object="${questionForm}" class="question-container feed-width flex-column align-flex-end padding-default">
         <!--        오류를 표시하기 위해서는 타임리프의 th:object 속성이 반드시 필요하다.
 th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구성된다는 점을 타임리프 엔진에 알려줘야 하기 때문이다.  -->
         <!--        <div th:if="${#fields.hasAnyErrors()}" role="alert">-->
@@ -32,7 +33,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             <div class="feed-profile-image">
                 <img class="img object-cover border-full" alt="피드프로필" src="https://careerly.co.kr/_next/image?url=https%3A%2F%2Fpubly.imgix.net%2Fuser-uploaded%2F488438%2F2023.07%2Faa5af5f69c1d42ea1c8598da2951b698f6a90928437873597a8f0aedea03547a.jpeg%3Fw%3D200%26h%3D200%26auto%3Dformat%26fm%3Djpeg&w=256&q=75"/>
             </div>
-            <input type="file"></input>
+            <input type="file" name="files" multiple class="file-input"></input>
 <!--            <p><video id="cameraview" width="720" height="480"></video></p>
             <button id="openBtn">카메라 켜기</button>
             <button id="closeBtn">카메라 끄기</button>-->

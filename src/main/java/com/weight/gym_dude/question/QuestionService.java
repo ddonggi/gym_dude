@@ -49,7 +49,7 @@ public class QuestionService {
             throw new DataNotFoundException("question not found");
     }
 
-    public void create(String content, SiteUser author, Boolean isHide){
+    public Question create(String content, SiteUser author, Boolean isHide){
 //        QuestionDTO questionDTO = new QuestionDTO(title,content,LocalDateTime.now());
         QuestionDTO questionDTO = QuestionDTO.builder()
                 .content(content)
@@ -58,13 +58,7 @@ public class QuestionService {
                 .isHide(isHide)
                 .build();
         Question question = questionDTO.toEntity();
-        questionRepository.save(question);
-    }
-    public Integer getId(String content){
-        if(questionRepository.findByContent(content).isPresent()){
-            return questionRepository.findByContent(content).get().getId();
-        }
-        else return null;
+        return questionRepository.save(question);
     }
 
     public void delete(Integer id) {

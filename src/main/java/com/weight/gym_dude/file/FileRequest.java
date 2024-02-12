@@ -31,6 +31,8 @@ public class FileRequest {
 
     private String saveName;        // 저장 파일명
 
+    private String fileType;
+
     private Long size;              // 파일 크기
 
     private LocalDateTime createDate;
@@ -39,9 +41,10 @@ public class FileRequest {
     @ManyToOne
     private Question question;
 
-    public FileRequest(String originalName, String saveName, Long size, LocalDateTime createDate,Question question) {
+    public FileRequest(String originalName, String saveName, String fileType, Long size, LocalDateTime createDate,Question question) {
         this.originalName = originalName;
         this.saveName=saveName;
+        this.fileType=fileType;
         this.size=size;
         this.createDate=createDate;
         this.question=question;

@@ -50,7 +50,6 @@ public class QuestionController {
 //        Page<Question> paging = questionService.getList(page);
         Page<Question> paging = questionService.getFeedList(page);
 //        model.addAttribute("questionList", questionList);
-//        logger.info("paging:{}",paging.stream().toList());
         model.addAttribute("paging", paging);
 //        if(principal!=null) {
 //            SiteUser siteUser = userService.getUser(principal.getName());
@@ -85,12 +84,11 @@ public class QuestionController {
             return "index";
         }
         SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-        questionService.create(questionForm.getContent(),author,false);
+        Question question = questionService.create(questionForm.getContent(),author,false);
         logger.info("question create complete");
-        Integer questionId = questionService.getId(questionForm.getContent());
-        logger.info("question Id:{}",questionId);
-        List<FileRequest> fileRequestList = fileUtils.uploadFiles(files); //파일 저장소 업로드
-        fileService.saveFiles(fileRequestList);
+        logger.info("question Id:{}",question.getId());
+        List<FileRequest> fileRequestList = fileUtils.uploadFiles(files,question); //파일 저장소 업로드
+        fileService.saveFiles(fileRequestList);//파일 정보 DB 저장
         return "redirect:/"; // 질문 저장 후 피드로 이동
     }
 

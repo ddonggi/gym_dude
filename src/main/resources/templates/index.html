@@ -33,7 +33,10 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             <div class="feed-profile-image">
                 <img class="img object-cover border-full" alt="피드프로필" src="https://careerly.co.kr/_next/image?url=https%3A%2F%2Fpubly.imgix.net%2Fuser-uploaded%2F488438%2F2023.07%2Faa5af5f69c1d42ea1c8598da2951b698f6a90928437873597a8f0aedea03547a.jpeg%3Fw%3D200%26h%3D200%26auto%3Dformat%26fm%3Djpeg&w=256&q=75"/>
             </div>
-            <input type="file" name="files" multiple class="file-input"></input>
+            <label for="files">
+                <div class="upload-button">파일 업로드하기</div>
+            </label>
+            <input type="file" name="files" id="files" multiple class="file-input" accept="image/*,video/*"></input>
 <!--            <p><video id="cameraview" width="720" height="480"></video></p>
             <button id="openBtn">카메라 켜기</button>
             <button id="closeBtn">카메라 끄기</button>-->
@@ -89,15 +92,18 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 
             </div>
                 <div class="feed-body padding-default flex-column" >
+                    <!--피드 영상 출력 -->
+                    <div th:if="${question.fileList}"class="feed-media-container">
+<!--                        <div th:text="${file.saveName}"></div>-->
+<!--                        <div th:text="${#temporals.format(file.createDate,'yyMMdd')}"></div>-->
+                        <img th:if="${file.getFileType()=='image'}" th:src="${file.saveName}" th:each="file,loop : ${question.fileList}" th:alt="${file.originalName}"/>
+                        <video th:if="${file.getFileType()=='video'}" th:src="${file.saveName}" th:each="file,loop : ${question.fileList}" th:alt="${file.originalName}" controls></video>
+                    </div>
+                    <!--피드 글 출력-->
                     <div class="feed-content" th:text="${question.content}"></div>
                     <input type="checkbox" class="more-btn"/>
-                    <!-- 삭제기능-->
-    <!--                <form th:action="@{|/delete/${question.id}|}" method="post">
-                        <input type="submit"  value="삭제하기" />
-                    </form>-->
-                    <!-- 삭제기능 끝-->
                 </div><!--feed-body-->
-<!--            </form>-->
+            <!--feed footer -->
             <div class="feed-footer padding-half text-xs"><!--feed-footer-->
                 <div class="like" th:text="|좋아요n개|"></div>
                 <!--답변 갯수 출력-->

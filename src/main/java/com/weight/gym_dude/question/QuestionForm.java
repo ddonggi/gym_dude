@@ -16,6 +16,6 @@ import jakarta.validation.constraints.*;
 @Setter
 public class QuestionForm {
     @NotEmpty(message = "내용을 입력해 주세요") // null 및 "" 을 허용하지 않는다.
-    @Size(max=650,min = 8)
+    @Size(max=650,min = 5)
     private String content;
 }

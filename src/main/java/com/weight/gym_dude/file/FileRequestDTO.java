@@ -29,12 +29,14 @@ public class FileRequestDTO {
 
     private LocalDateTime createDate;
     private Question question;
+    private String fileType;
 
 
     public FileRequest toEntity(){
         return new FileRequest(
                 this.originalName,
                 this.saveName,
+                this.fileType,
                 this.size,
                 this.createDate,
                 this.question);

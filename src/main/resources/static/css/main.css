@@ -212,6 +212,20 @@ input[type=submit] {
     resize: none;
     border: 1px solid transparent;
 }
+/* 파일 업로드 부분 */
+.upload-button{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: coral;
+    border-radius: 5px;
+    border: none;
+    color: white;
+}
+.file-input{
+    display: none;
+}
 
 
 /* 작성된 피드 */
@@ -226,6 +240,10 @@ input[type=submit] {
     /*padding:1rem;*/
     /*margin: 1rem 0;*/
     border: solid 1px var(--border-silver100);
+}
+.feed-media-container {
+    display: flex;
+    flex-direction: column;
 }
 /* 피드의 상단 */
 .feed-header {

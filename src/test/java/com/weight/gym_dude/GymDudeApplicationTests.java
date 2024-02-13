@@ -1,8 +1,11 @@
 package com.weight.gym_dude;
 
+import com.weight.gym_dude.file.FileRequest;
+import com.weight.gym_dude.file.FileRequestRepository;
 import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.user.UserRepository;
 import com.weight.gym_dude.user.UserRole;
+import com.weight.gym_dude.util.FileUtils;
 import org.junit.jupiter.api.Test;
 import com.weight.gym_dude.answer.Answer;
 import com.weight.gym_dude.answer.AnswerRepository;
@@ -10,6 +13,7 @@ import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.question.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -33,6 +37,10 @@ class GymDudeApplicationTests {
     private AnswerRepository answerRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private FileRequestRepository fileRequestRepository;
+    @Autowired
+    private FileUtils fileUtils;
 
     //데이터 입력(글쓰기)
     @Test
@@ -243,6 +251,15 @@ class GymDudeApplicationTests {
             new User(siteUser.getUserName(), siteUser.getPassword(), authorities);
         }else{
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+        }
+    }
+
+    @Test
+    void fileReadTest(){
+        List<FileRequest> files = fileRequestRepository.findAllByQuestionId(90);
+        for(FileRequest file:files) {
+            Resource resource = fileUtils.readFileAsResource(file);
+            System.out.println("resource = " + resource);
         }
     }
 

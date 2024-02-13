@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<!--반복되는 내용을 담아 기본 틀이 되는 템플릿-->
 <html lang="ko">
+<!--반복되는 내용을 담아 기본 틀이 되는 템플릿-->
 <th:block th:replace="~{fragment/head::head}"></th:block>
 <body>
 <!-- 기본 템플릿 안에 삽입될 내용 Start -->
@@ -11,7 +11,7 @@
 <!--layout:fragment 는 layout을 사용하는 fragment의 내용을 불러오겠다는 의미 입니다. 만약에 없으면 안불러 옵니다-->
 <th:block layout:fragment="content"></th:block>
 <!--<th:block th:replace="~{fragment/footer::footer}"></th:block>-->
-<th:block layout:fragment="index_js"></th:block>
+<!--<th:block layout:fragment="index_js"></th:block>-->
 <!--<th:block layout:fragment="dglee"></th:block>-->
 
 <!-- 기본 템플릿 안에 삽입될 내용 End -->

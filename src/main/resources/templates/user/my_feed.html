@@ -1,0 +1,25 @@
+<html layout:decorate="~{layout/layout}">
+<div layout:fragment="content" class="my-feed-container">
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+    <div class="my-feed-block feed-width">
+        <h2>내 피드</h2>
+        <div class="my-feed-wrapper flex flex-wrap padding-default">
+            <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${feedPaging}" class="my-feed" th:id="${question.id}">
+                <!--썸네일 부분 -->
+                <div th:if="${question.fileList.size>0}">
+                    <div th:if="${question.fileList.get(0).getFileType()=='image'}" class="my-feed-media-wrapper">
+                        <img th:src="|http://localhost:8080/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"/>
+                    </div>
+                    <div th:if="${question.fileList.get(0).getFileType()=='video'}" class="my-feed-media-wrapper">
+                        <video th:src="|http://localhost:8080/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"></video>
+                    </div>
+                </div>
+                <!-- 미디어가 없다면 텍스만 -->
+                <div th:text="${question.content}"></div>
+            </div>
+        </div>
+    </div>
+    <th:block th:replace="~{fragment/footer::footer}"></th:block>
+    <script layout:fragment="feed_js" th:src="@{/js/myFeed.js}" type="module"></script>
+</div>
+</html>

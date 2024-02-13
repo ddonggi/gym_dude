@@ -1,5 +1,6 @@
 package com.weight.gym_dude.question;
 
+import com.weight.gym_dude.user.SiteUser;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,7 +17,12 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
 
     Optional<Question> findByContent(String content);
     Optional<List<Question>> findByContentLike(String content);
+
 //    Pageable 객체를 입력으로 받아 Page<Question> 타입 객체를 리턴하는 findAll 메서드를 생성
     @NonNull
     Page<Question> findAll(Pageable pageable);
+
+    //User 와 일치하는 Question 데이터를 찾는다. 파라미터에 Pageable 을 같이 넣어주면 Page 객체로 리턴할 수 있다.
+    Page<Question> findAllByAuthor(SiteUser siteUser,
+                                   Pageable pageable);
 }

@@ -41,6 +41,8 @@ public class SiteUser {
     @Email
     private String email;
 
+    private String category;
+
     public SiteUser(String userName, String password, String email) {
         this.userName=userName;
         this.password=password;

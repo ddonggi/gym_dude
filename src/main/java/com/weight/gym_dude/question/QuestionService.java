@@ -49,6 +49,13 @@ public class QuestionService {
             throw new DataNotFoundException("question not found");
     }
 
+    public Page<Question> getMyFeedList(int page,SiteUser siteUser){
+        List<Sort.Order> sortedList = new ArrayList<>();
+        sortedList.add(Sort.Order.desc("id")); //작성날짜순 -> 글 번호순??
+        Pageable pageable = PageRequest.of(page,9,Sort.by(sortedList));
+        return questionRepository.findAllByAuthor(siteUser,pageable);
+    }
+
     public Question create(String content, SiteUser author, Boolean isHide){
 //        QuestionDTO questionDTO = new QuestionDTO(title,content,LocalDateTime.now());
         QuestionDTO questionDTO = QuestionDTO.builder()

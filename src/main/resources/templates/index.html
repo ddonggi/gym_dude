@@ -97,10 +97,10 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                         <div class="flex carousel-wrapper">
                             <!--캐러셀 미디어 삽입-->
                             <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
-                                <img th:src="${file.saveName}"  th:alt="${file.originalName}"/>
+                                <img th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}"/>
                             </div>
                             <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
-                                <video th:src="${file.saveName}"  th:alt="${file.originalName}" controls></video>
+                                <video th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}" controls></video>
                             </div>
                         </div>
                         <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
@@ -230,6 +230,6 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
     let hasPrevious = [[${paging.hasPrevious}]];
     let hasNext = [[${paging.hasNext}]];
 </script>
-<script layout:fragment="index_js" th:src="@{/js/index.js}"></script>
+<script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>
 </div>
 </html>

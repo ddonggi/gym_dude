@@ -1,12 +1,19 @@
 package com.weight.gym_dude.user;
 
+import com.weight.gym_dude.question.Question;
+import com.weight.gym_dude.question.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.security.Principal;
 //import javax.validation.Valid;
 
 /**
@@ -22,6 +29,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/user")
 public class UserController {
     private final UserService userService;
+    private final QuestionService questionService;
 
     @GetMapping("/login")
     public String login() {
@@ -78,5 +86,30 @@ public class UserController {
         }
 
         return "redirect:/";
+    }
+
+    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @GetMapping("/my_profile")
+    public String myProfile(Principal principal) {
+        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+
+        return "user/my_profile";
+    }
+
+    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @GetMapping("/my_feed")
+    public String myFeed(Model model,
+                         @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
+                         Principal principal) {
+        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        Page<Question> feedPaging = questionService.getMyFeedList(page,author);
+        model.addAttribute("feedPaging", feedPaging);
+        return "user/my_feed";
+    }
+
+    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @PostMapping("/modify")
+    public String modify(){
+        return "redirect:/my_page";
     }
 }

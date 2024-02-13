@@ -15,5 +15,6 @@ import java.util.Optional;
  **/
 
 public interface FileRequestRepository extends JpaRepository<FileRequest,Integer> {
+    FileRequest findByQuestionId(Integer questionId);
     List<FileRequest> findAllByQuestionId(Integer questionId);
 }

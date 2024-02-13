@@ -92,12 +92,36 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
 
             </div>
                 <div class="feed-body padding-default flex-column" >
-                    <!--피드 영상 출력 -->
-                    <div th:if="${question.fileList}"class="feed-media-container">
-<!--                        <div th:text="${file.saveName}"></div>-->
-<!--                        <div th:text="${#temporals.format(file.createDate,'yyMMdd')}"></div>-->
-                        <img th:if="${file.getFileType()=='image'}" th:src="${file.saveName}" th:each="file,loop : ${question.fileList}" th:alt="${file.originalName}"/>
-                        <video th:if="${file.getFileType()=='video'}" th:src="${file.saveName}" th:each="file,loop : ${question.fileList}" th:alt="${file.originalName}" controls></video>
+                    <div  th:if="${question.fileList.size>0}" class="carousel-main">
+                        <!--피드 영상 출력 -->
+                        <div class="flex carousel-wrapper">
+                            <!--캐러셀 미디어 삽입-->
+                            <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
+                                <img th:src="${file.saveName}"  th:alt="${file.originalName}"/>
+                            </div>
+                            <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
+                                <video th:src="${file.saveName}"  th:alt="${file.originalName}" controls></video>
+                            </div>
+                        </div>
+                        <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
+                        <div th:if="${question.fileList.size>1}" class="carousel-button-container">
+                            <button type="button" class="carousel-prev">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                    <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                </svg>
+                            </button>
+                            <button type="button" class="carousel-next">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                    <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <!-- 캐러셀 중앙 버튼 -->
+                        <div th:if="${question.fileList.size>1}" class="carousel-pagination">
+                            <div th:each="file,loop : ${question.fileList}" class="carousel-circle"></div>
+                        </div>
                     </div>
                     <!--피드 글 출력-->
                     <div class="feed-content" th:text="${question.content}"></div>

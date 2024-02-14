@@ -8,6 +8,7 @@
     --text-silver100:#94a3b8;
     --text-timestamps:#64748b;
     --text-partition:#cbd5e1;
+    --text-header:#0f172a;
 }
 *{
     box-sizing: border-box;
@@ -112,6 +113,7 @@ html, body {
 }
 .navbar a {
     text-decoration: none;
+    color: var(--text-header);
 }
 .hide{
     display: none;
@@ -138,6 +140,9 @@ html, body {
     border: 1px solid var(--border-silver100);
     padding: 1rem;
     border-radius: 3px;
+}
+.feed-profile-image{
+    cursor: pointer;
 }
 textarea {
     outline: 1px solid transparent;
@@ -527,21 +532,33 @@ input[type=submit] {
 .my-feed {
     background: white;
     border: 1px solid var(--border-silver100);
-    border-radius: 2px;
-    width: 120px;
-    max-width: 120px;
-    height: 120px;
-    max-height: 120px;
+    border-radius: 4px;
+    min-width: 180px;
+    max-width: 180px;
+    min-height: 180px;
+    max-height: 180px;
+    cursor: pointer;
+}
+.my-feed-wrapper{
+    gap: 0.7rem;
 }
 .my-feed-media-wrapper {
-    height: 100px;
+    flex-grow: 1;
+    max-height: 100%;
 }
 .my-feed img, .my-feed video{
+    border-radius: 4px;
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
 }
-
+.my-feed-content-wrapper{
+    text-overflow:ellipsis;
+    word-break: keep-all;
+    overflow: hidden;
+    padding: 0.5rem;
+    flex-grow: 1;
+}
 /*------회원 가입,로그인 공통------*/
 .signup-container,.login-container,.my-feed-container,.my-profile-container{
     display: flex;
@@ -631,6 +648,13 @@ input[type=submit] {
     }
     .carousel-main:hover .carousel-button-container,.carousel-main:hover .carousel-pagination{
         display: none;
+    }
+
+    .my-feed {
+        min-width: 160px;
+        max-width: 160px;
+        min-height: 160px;
+        max-height: 160px;
     }
 
 }

@@ -3,6 +3,9 @@ package com.weight.gym_dude.question;
  * Created by 이동기 on 2022-11-10
  */
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.weight.gym_dude.answer.Answer;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.user.SiteUser;
@@ -19,8 +22,8 @@ import java.util.List;
 @Entity
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@ToString
 @Setter
 public class Question {
 
@@ -37,21 +40,27 @@ public class Question {
     //글쓴이 속성 추가
     //Question 입장에서, 여러개의 질문들은 하나의 사용자(=사용자 한 명이 질문을 여러 개 작성)
     @ManyToOne
+    @JsonBackReference
     private SiteUser author;
 
     //Answer의 ManyToOne 의 양방향 매핑. mappedBy 는 "참조 엔티티의 속성명"을 의미한다
     // ( Answer 엔티티에서 Question 엔티티를 참조한 속성명) => Answer Entity 의 question 정보를 참조
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @OrderBy("createDate asc")
+    @JsonManagedReference
+    @JsonIgnore
+//    @ToString.Exclude
     private List<Answer> answerList;
 
     //File 의 ManyToOne 의 양방향 매핑
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @OrderBy("createDate asc")
+    @JsonManagedReference
+    @JsonIgnore
+//    @ToString.Exclude
     private List<FileRequest> fileList;
 
     private LocalDateTime modifiedDate;
-
 
     @ColumnDefault("false")
     private Boolean isHide;

@@ -3,6 +3,7 @@ package com.weight.gym_dude.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -89,6 +90,7 @@ public class SecurityConfig {
                             authorizeRequests.requestMatchers(new AntPathRequestMatcher("/**")).permitAll(); // 인증되지 않은 모든 url에 대해 승인
 //                        authorizeRequests.anyRequest().permitAll();
                         })
+                        .cors(Customizer.withDefaults())
                         // CSRF 에 대한 설정
 //                    .csrf(AbstractHttpConfigurer::disable)// stateless한 rest api를 개발할 것이므로 csrf 공격에 대한 옵션은 꺼둔다.
                         .csrf((csrf) -> csrf

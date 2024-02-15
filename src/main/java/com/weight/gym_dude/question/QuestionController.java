@@ -7,6 +7,7 @@ import com.weight.gym_dude.answer.AnswerForm;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestService;
 import com.weight.gym_dude.user.SiteUser;
+import com.weight.gym_dude.user.SiteUserDTO;
 import com.weight.gym_dude.user.UserService;
 import com.weight.gym_dude.util.FileUtils;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,26 @@ public class QuestionController {
     private final UserService userService;
     private final FileUtils fileUtils;
     private final FileRequestService fileService;
+    @GetMapping("/question")
+    @CrossOrigin
+    @ResponseBody
+    public ResponseEntity<Object> index(
+                       @RequestParam(value = "page",defaultValue = "0") int page){
+        logger.info("page testtt:{}",page);
+        Page<QuestionDTO> paging = questionService.getFeedList(page);
+//        model.addAttribute("questionList", questionList);
+//        model.addAttribute("paging", paging);
+//        logger.info("add to model");
+//        logger.info("model:{}",model);
+//        if(principal!=null) {
+//            SiteUser siteUser = userService.getUser(principal.getName());
+//            logger.info("siteUser:{}", siteUser);
+//            model.addAttribute("siteUser", siteUser);
+//        }else{
+//            logger.info("Guest User");
+//        }
+        return ResponseEntity.status(HttpStatus.OK).body(paging);
+    }
 
     @GetMapping("/")
     public String list(Model model,
@@ -48,16 +69,18 @@ public class QuestionController {
     ) {
 //        List<Question> questionList = questionService.getList();
 //        Page<Question> paging = questionService.getList(page);
-        Page<Question> paging = questionService.getFeedList(page);
+        logger.info("page:{}",page);
+        Page<QuestionDTO> paging = questionService.getFeedList(page);
 //        model.addAttribute("questionList", questionList);
         model.addAttribute("paging", paging);
-//        if(principal!=null) {
-//            SiteUser siteUser = userService.getUser(principal.getName());
-//            logger.info("siteUser:{}", siteUser);
-//            model.addAttribute("siteUser", siteUser);
-//        }else{
-//            logger.info("Guest User");
-//        }
+        if(principal!=null) {
+            SiteUser siteUser = userService.getUser(principal.getName());
+            SiteUserDTO siteUserDTO = userService.toUserDTO(siteUser);
+            logger.info("siteUser:{}", siteUserDTO);
+            model.addAttribute("siteUser", siteUserDTO);
+        }else{
+            logger.info("Guest User");
+        }
         return "index";
     }
 
@@ -83,8 +106,8 @@ public class QuestionController {
             logger.info("error>>:{}", bindingresult.getFieldError());
             return "index";
         }
-        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-        Question question = questionService.create(questionForm.getContent(),author,false);
+        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        Question question = questionService.create(questionForm.getContent(),siteUser,false);
         logger.info("question create complete");
         logger.info("question Id:{}",question.getId());
         List<FileRequest> fileRequestList = fileUtils.uploadFiles(files,question); //파일 저장소 업로드

@@ -1,10 +1,7 @@
 package com.weight.gym_dude.user;
 
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import jakarta.persistence.*;
 //import javax.persistence.*;
@@ -21,7 +18,8 @@ import jakarta.persistence.*;
 @Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+//@ToString
 @Entity
 public class SiteUser {
 
@@ -43,9 +41,23 @@ public class SiteUser {
 
     private String category;
 
+    private String introduce;
+
+    private Boolean hasProfile;
+
+    //회원가입
     public SiteUser(String userName, String password, String email) {
         this.userName=userName;
         this.password=password;
         this.email=email;
+    }
+    //정보 조회용
+    public SiteUser(Long id, String userName, String category, String email, String introduce, Boolean hasProfile) {
+        this.id=id;
+        this.userName=userName;
+        this.category=category;
+        this.email=email;
+        this.introduce=introduce;
+        this.hasProfile=hasProfile;
     }
 }

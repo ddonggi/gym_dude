@@ -4,6 +4,7 @@ package com.weight.gym_dude.question;
  */
 
 import com.weight.gym_dude.user.SiteUser;
+import com.weight.gym_dude.user.SiteUserDTO;
 import com.weight.gym_dude.util.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -27,11 +28,28 @@ public class QuestionService {
         return this.questionRepository.findAll();
     }*/
     // List -> Page
-    public Page<Question> getFeedList(int page){
+    public Page<QuestionDTO> getFeedList(int page){
         List<Sort.Order> sortedList = new ArrayList<>();
         sortedList.add(Sort.Order.desc("id")); //작성날짜순 -> 글 번호순??
         Pageable pageable = PageRequest.of(page,10,Sort.by(sortedList));
-        return questionRepository.findAll(pageable);
+/*        return questionRepository.findAll(pageable).map(question -> QuestionDTO.builder()
+                .id(question.getId())
+                .content(question.getContent())
+                .author(SiteUserDTO.builder()
+                        .userName(question.getAuthor().getUserName())
+                        .email(question.getAuthor().getEmail())
+                        .id(question.getAuthor().getId())
+                        .category(question.getAuthor().getCategory())
+                        .introduce(question.getAuthor().getIntroduce())
+                        .hasProfile(question.getAuthor().getHasProfile()).build().toEntity())
+                .isHide(question.getIsHide())
+                .answerList(question.getAnswerList())
+                .fileList(question.getFileList())
+                .createDate(question.getCreateDate())
+                .modifiedDate(question.getModifiedDate())
+                .build());*/
+        Page<QuestionDTO> QuestionDTOList = questionRepository.findAll(pageable).map(QuestionDTO::toDto);
+        return QuestionDTOList;
         /*
          * 게시물을 역순으로 조회하기 위해서는 위와 같이 PageRequest.of 메서드의 세번째 파라미터로 Sort 객체를 전달해야 한다.
          * Sort.Order 객체로 구성된 리스트에 Sort.Order 객체를 추가하고 Sort.by(소트리스트)로 소트 객체를 생성할 수 있다.
@@ -56,12 +74,12 @@ public class QuestionService {
         return questionRepository.findAllByAuthor(siteUser,pageable);
     }
 
-    public Question create(String content, SiteUser author, Boolean isHide){
+    public Question create(String content, SiteUser siteUser, Boolean isHide){
 //        QuestionDTO questionDTO = new QuestionDTO(title,content,LocalDateTime.now());
         QuestionDTO questionDTO = QuestionDTO.builder()
                 .content(content)
                 .createDate(LocalDateTime.now())
-                .author(author)
+                .author(siteUser)
                 .isHide(isHide)
                 .build();
         Question question = questionDTO.toEntity();

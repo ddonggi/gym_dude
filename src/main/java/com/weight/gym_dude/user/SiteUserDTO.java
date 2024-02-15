@@ -1,9 +1,6 @@
 package com.weight.gym_dude.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * PackageName : com.weight.gym_dude.user
@@ -17,13 +14,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+//@ToString
 public class SiteUserDTO {
     private Long id;
     private String userName;
     private String password;
     private String email;
+    private String category;
+    private String introduce;
+    private Boolean hasProfile;
 
     public SiteUser toEntity(){
-        return new SiteUser(this.userName,this.password,this.email);
+        return new SiteUser(this.id,this.userName,this.category,this.email,this.introduce,this.hasProfile);
     }
 }

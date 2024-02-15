@@ -74,4 +74,15 @@ public class UserService {
             throw new DataNotFoundException("site user not found");
         }
     }
+
+    public SiteUserDTO toUserDTO(SiteUser siteUser) {
+        //DTO
+        return SiteUserDTO.builder()
+                .category(siteUser.getCategory())
+                .hasProfile(siteUser.getHasProfile())
+                .id(siteUser.getId())
+                .userName(siteUser.getUserName())
+                .email(siteUser.getEmail())
+                .build();
+    }
 }

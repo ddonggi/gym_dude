@@ -131,6 +131,7 @@ html, body {
 .navbar-right{
     display: flex;
     gap: 0.5rem;
+    align-items: center;
 }
 .my-menu-wrapper {
     position: absolute;
@@ -138,8 +139,14 @@ html, body {
     gap: 0.2rem;
     background: white;
     border: 1px solid var(--border-silver100);
-    padding: 1rem;
+    /*padding: 1rem;*/
     border-radius: 3px;
+}
+.my-menu-wrapper div{
+    padding: 0.5rem 1rem;
+}
+.my-menu-wrapper div:hover{
+    background: var(--background-silver100);
 }
 .feed-profile-image{
     cursor: pointer;
@@ -227,6 +234,9 @@ input[type=submit] {
     border: 1px solid transparent;
 }
 /* 파일 업로드 부분 */
+.feed-upload-label {
+    width: fit-content;
+}
 .upload-button{
     cursor: pointer;
     display: flex;
@@ -236,6 +246,7 @@ input[type=submit] {
     border-radius: 5px;
     border: none;
     color: white;
+    width: 30px;
 }
 .file-input{
     display: none;
@@ -339,12 +350,12 @@ input[type=submit] {
 }
 /* 캐러셀 중앙 버튼 */
 .carousel-pagination {
-    position: absolute;
-    bottom: 10px;
+    position: relative;
+    /* bottom: 10px; */
     left: 50%;
     transform: translateX(-50%);
-    /*display: flex;*/
-    display: none;
+    display: flex;
+    justify-content: center;
 }
 
 .carousel-circle {
@@ -364,10 +375,6 @@ input[type=submit] {
     display: flex;
     justify-content: space-between;
 }
-    .feed-header a {
-        display: flex;
-        gap: 0.5rem;
-    }
     .feed-profile-image{
         position: relative;
         /* w,h,radius 는 임시크기임*/
@@ -422,7 +429,7 @@ input[type=submit] {
 }
 .feed-content{
     display: -webkit-box;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 5;
     -webkit-box-orient: vertical;
     overflow: hidden;
     white-space: pre-wrap;
@@ -453,6 +460,26 @@ input[type=submit] {
     color: var(--text-timestamps);
     display: flex;
 }
+/* 좋아요, 댓글 개수*/
+.like{
+    cursor: pointer;
+    gap: 0.2rem;
+}
+.answer-count{
+    cursor: pointer;
+    gap: 0.2rem;
+}
+.chat-img{
+    width: 21px;
+    border-radius: 50%;
+}
+.like-text-color{
+    color: palevioletred;
+}
+.like-img{
+    width: 23px;
+    border-radius: 50%;
+}
 /* 피드의 댓글 부분 */
 .answer-list {
     display: flex;
@@ -472,9 +499,7 @@ input[type=submit] {
     /*justify-content: space-between;*/
     border-bottom: 1px var(--border-silver200) dashed;
 }
-.answer-count{
 
-}
 .answer-profile-image{
     /* 임시 크기임*/
     min-width: 33px;
@@ -491,7 +516,7 @@ input[type=submit] {
     right: 0;
     box-sizing: border-box;
     padding: 0;
-    border: none;
+    border: 1px solid var(--border-silver100);
     margin: auto;
     display: block;
     width: 0;
@@ -538,6 +563,9 @@ input[type=submit] {
     min-height: 180px;
     max-height: 180px;
     cursor: pointer;
+}
+.my-feed:hover{
+    background: var(--background-silver100);
 }
 .my-feed-wrapper{
     gap: 0.7rem;

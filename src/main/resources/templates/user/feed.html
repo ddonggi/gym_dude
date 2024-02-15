@@ -2,7 +2,8 @@
 <div layout:fragment="content" class="my-feed-container">
     <th:block th:replace="~{fragment/header::header}"></th:block>
     <div class="my-feed-block feed-width">
-        <h2>내 피드</h2>
+        <h2 th:if="${#authentication.getName()==siteUser.getUserName()}" th:text="|내 피드|"></h2>
+        <h2 th:if="${#authentication.getName()!=siteUser.getUserName()}" th:text="|${siteUser.userName}님의 피드|"></h2>
         <div class="padding-default">
             <div class="my-feed-wrapper flex flex-wrap justify-content-center">
                 <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${feedPaging}" class="my-feed flex-column" th:id="${question.id}">

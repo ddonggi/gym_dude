@@ -3,6 +3,8 @@
     <th:block th:replace="~{fragment/header::header}"></th:block>
     <div class="my-profile-block feed-width">
         <h2>내 프로필</h2>
+        <div th:text="|${siteUser.userName} 님|"></div>
+        <div th:text="${siteUser.category}"></div>
         <div>정보 수정하기</div>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>

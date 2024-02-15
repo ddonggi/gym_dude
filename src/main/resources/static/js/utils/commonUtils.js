@@ -18,6 +18,27 @@ let postData = async (url, data = {}, csrf_header, csrf_token) => {
     });
     return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
 }
+/* 비동기통신을 위한 fetch API */
+let getData = async (url, page_, csrf_header, csrf_token) => {
+    // 옵션 기본 값은 *로 강조
+    const response = await fetch(url, {
+        method: "GET", // *GET, POST, PUT, DELETE 등
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+            "Content-Type": "application/json",
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            header: csrf_header,
+            'X-CSRF-Token': csrf_token,
+            page:page_
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        // body: JSON.stringify(data), // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
+    });
+    return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
+}
 /* 게시물 삭제 이벤트 등록 */
 let setDeleteEvent = (feed) => {
     let id = feed.id;
@@ -222,7 +243,7 @@ let setFollowEvent = (feed) => {
         let followButton = feed.querySelector(".follow-button");
         followButton.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('follow button:',feed.id)
+            console.log('follow button:',feed.querySelector(".follow-button").value)
         })
     }
 }
@@ -231,12 +252,58 @@ let setFollowEvent = (feed) => {
 let setFeedContentHeight = () => {
     if (document.querySelectorAll(".feed-body")) {
         document.querySelectorAll(".feed-body").forEach((feedBody) => {
-            if (feedBody.querySelector(".feed-content").offsetHeight < 96) {
+            if (feedBody.querySelector(".feed-content").offsetHeight < 120) {
                 feedBody.querySelector(".more-btn").style.display = "none";
             }
         })
     }
 }
+
+let setCommentToggleEvent = (feed) =>{
+    let answerContainer = feed.querySelector(".answer-container");
+    if(feed.querySelector(".answer-count")){
+        feed.querySelector(".answer-count").addEventListener('click',()=>{
+            answerContainer.classList.toggle("hide");
+        })
+    }else{
+        answerContainer.classList.remove("hide");
+    }
+}
+
+let setLikeToggleEvent = (feed) => {
+    let likeButton = feed.querySelector(".like");
+    likeButton.addEventListener('click',()=>{
+        likeButton.classList.toggle("like-text-color");
+        likeButton.querySelectorAll(".like-img").forEach(button=>{
+            button.classList.toggle("hide");
+        })
+    })
+}
+
+const ioCallback = (entries, io) => {
+    let page=0;
+    entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+            console.log('is observed!!!')
+            io.unobserve(entry.target);//옵저빙했던 아이템 해제
+            // postData("/question",{page:page}).then(response=>{
+            getData("question?page="+page).then(response=>{
+                console.log('response:',response)
+                //피드 불러오기
+                observeLastItem(io, document.querySelectorAll('.feed'));// 옵저빙할 아이템 선정
+            })
+
+        }
+    });
+};
+
+const observeLastItem = (io, items) => {
+    const lastItem = items[items.length - 4];
+    io.observe(lastItem);
+};
+
+const io = new IntersectionObserver(ioCallback, { threshold: 0.7 });
+
 
 /* 비동기 통신에 쓰일 보안용 CSRF 정보 */
 let csrf_header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
@@ -256,5 +323,9 @@ export {
     setHeaderProfileEvent,
     setCarouselEvent,
     setFollowEvent,
-    setFeedContentHeight
+    setFeedContentHeight,
+    setCommentToggleEvent,
+    setLikeToggleEvent,
+    io,
+    observeLastItem
 };

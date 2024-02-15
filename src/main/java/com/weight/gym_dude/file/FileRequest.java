@@ -1,5 +1,6 @@
 package com.weight.gym_dude.file;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.weight.gym_dude.question.Question;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,9 +18,9 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-@ToString
+//@ToString
 @AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FileRequest {
 
     @Id
@@ -38,6 +39,7 @@ public class FileRequest {
     private LocalDateTime createDate;
 
     //하나의 게시글은 여러 파일을 첨부할 수 있다.
+    @JsonBackReference
     @ManyToOne
     private Question question;
 

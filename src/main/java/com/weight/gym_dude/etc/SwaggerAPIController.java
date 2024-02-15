@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class SwaggerAPIController {
 
     private final QuestionService questionService;
-
+/*
     @Operation(summary = "get question list", description = "게시판 질문 리스트 가져오기")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = QuestionDTO.class))),
@@ -49,7 +49,7 @@ public class SwaggerAPIController {
 //            @Parameter(name = "hashtag", description = "검색한 해시태그", example = "['#자장면', '#중국집']")
     })
     @ResponseBody
-    @GetMapping("/question/list")
+    @GetMapping("/feed/list")
     public Page<Question> getQuestions(
             @RequestParam(value = "page", defaultValue = "0") int page
 //            @RequestParam(value = "city") String city,
@@ -60,6 +60,7 @@ public class SwaggerAPIController {
         System.out.println("questionList = " + questionList);
         return paging;
     }
+
 
     @Operation(summary = "get test", description = "게시판 제목들을 가져오는 API")
     @ApiResponses({
@@ -86,5 +87,5 @@ public class SwaggerAPIController {
             questionList.add(iterator.next().getTitle());
         }
         return questionList;
-    }
+    }*/
 }

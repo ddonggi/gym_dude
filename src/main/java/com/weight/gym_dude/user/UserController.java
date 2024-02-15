@@ -1,8 +1,11 @@
 package com.weight.gym_dude.user;
 
 import com.weight.gym_dude.question.Question;
+import com.weight.gym_dude.question.QuestionController;
 import com.weight.gym_dude.question.QuestionService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.security.Principal;
+import java.util.Optional;
 //import javax.validation.Valid;
 
 /**
@@ -30,6 +34,8 @@ import java.security.Principal;
 public class UserController {
     private final UserService userService;
     private final QuestionService questionService;
+    private final UserRepository userRepository;
+    private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/login")
     public String login() {
@@ -90,11 +96,28 @@ public class UserController {
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/my_profile")
-    public String myProfile(Principal principal) {
+    public String myProfile(Model model,Principal principal) {
         SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-
+        model.addAttribute("siteUser",author);
         return "user/my_profile";
     }
+    @GetMapping("/feed/{id}")
+    public String feed(Model model,
+                         @PathVariable(value = "id") Long id,
+                         @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
+                         Principal principal) {
+        logger.info("feed request");
+//        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        Optional<SiteUser> optionalAuthor = userRepository.findById(id);
+        if(optionalAuthor.isPresent()){
+            SiteUser author = optionalAuthor.get();
+            Page<Question> feedPaging = questionService.getMyFeedList(page,author);
+            model.addAttribute("feedPaging", feedPaging);
+            model.addAttribute("siteUser",author);
+        }
+        return "user/feed";
+    }
+
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/my_feed")
@@ -104,7 +127,8 @@ public class UserController {
         SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
         Page<Question> feedPaging = questionService.getMyFeedList(page,author);
         model.addAttribute("feedPaging", feedPaging);
-        return "user/my_feed";
+        model.addAttribute("siteUser",author);
+        return "feed";
     }
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다

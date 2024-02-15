@@ -239,6 +239,8 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
     let number = [[${paging.number}]];
     let hasPrevious = [[${paging.hasPrevious}]];
     let hasNext = [[${paging.hasNext}]];
+    let siteUser = [[${#authentication.getName()}]];
+    console.log('siteUser:',siteUser)
 </script>
 <script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>
 </div>

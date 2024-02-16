@@ -111,10 +111,18 @@ html, body {
     background: white;
     z-index: 5;
 }
-.navbar a {
-    text-decoration: none;
-    color: var(--text-header);
+.navbar-left{
+    width: 80px;
+    height: 90%;
 }
+.navbar-left img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
 .hide{
     display: none;
     /*visibility: hidden;*/

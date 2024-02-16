@@ -52,7 +52,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 </div>
             </div>
         </div>
-        <input type="submit" class="padding-half" value="저장하기">
+        <input sec:authorize="isAuthenticated()" type="submit" class="padding-half" value="저장하기">
     </form>
 
 <!--피드 리스트 -->
@@ -151,8 +151,8 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             <div class="answer-container hide">
                 <!-- 댓글 반복 -->
                 <div class="answer-list">
-                    <div class="answer padding-half" th:each="answer : ${question.answerList}" >
-                        <div th:if="${answer.author}" class="answer-profile-image">
+                    <div class="answer padding-half" th:each="answer : ${question.answerList}">
+                        <div th:if="${answer.author}" class="answer-profile-image" th:onclick="|location.href='@{/user/feed/}${answer.author.id}'|">
                             <img th:if="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${answer.author.id}.png|">
                             <img th:unless="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
                         </div>
@@ -187,7 +187,6 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                     <div sec:authorize="isAnonymous()" class="flex-column width100 align-flex-end">
                         <textarea placeholder="로그인 후 작성해 주세요" disabled th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
                         <textarea placeholder="로그인 후 작성해 주세요" disabled th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
-                        <input type="submit" class="padding-half" value="등록"/>
                     </div>
                     <div sec:authorize="isAuthenticated()" class="flex-column width100 align-flex-end">
                         <textarea placeholder="여러분의 생각을 적어주세요" th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>

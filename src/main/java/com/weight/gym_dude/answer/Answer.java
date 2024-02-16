@@ -36,7 +36,7 @@ public class Answer {
     //글쓴이 속성 추가
     // 여러개의 답변은 여러 사용자가 달 수 있다??
     @ManyToOne
-    @JsonBackReference
+//    @JsonBackReference
     private SiteUser author;
 
     private LocalDateTime modifiedDate;

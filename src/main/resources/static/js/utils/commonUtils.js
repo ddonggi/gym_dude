@@ -3,7 +3,7 @@ let csrf_header = document.querySelector("meta[name='_csrf_header']").getAttribu
 let csrf_token = document.querySelector("meta[name='_csrf']").getAttribute("content");
 // console.log('header:',csrf_header)
 // console.log('token:',csrf_token)
-
+let siteURL = "http://localhost:8080";
 /* 비동기통신을 위한 fetch API */
 let postData = async (url, data = {}, csrf_header, csrf_token) => {
     // 옵션 기본 값은 *로 강조
@@ -277,13 +277,15 @@ let setCommentToggleEvent = (feed) => {
 }
 
 let setLikeToggleEvent = (feed) => {
-    let likeButton = feed.querySelector(".like");
-    likeButton.addEventListener('click', () => {
-        likeButton.classList.toggle("like-text-color");
-        likeButton.querySelectorAll(".like-img").forEach(button => {
-            button.classList.toggle("hide");
+    if(siteUser!=='anonymousUser'){
+        let likeButton = feed.querySelector(".like");
+        likeButton.addEventListener('click', () => {
+            likeButton.classList.toggle("like-text-color");
+            likeButton.querySelectorAll(".like-img").forEach(button => {
+                button.classList.toggle("hide");
+            })
         })
-    })
+    }
 }
 
 let page = 0;
@@ -314,6 +316,7 @@ let renderFeedList = (response) => {
     //피드 불러오기
     let feedContainer = document.querySelector(".feed-container");
     let feedList = response.content;
+    console.log('feedlist length;',feedList.length);
     feedList.forEach((feed) => {
         let author = feed.author;
         console.log('author.userName:', author.userName)
@@ -321,35 +324,35 @@ let renderFeedList = (response) => {
         let answerList = feed.answerList;
         feedContainer.innerHTML +=
             `<div class="feed" id="${feed.id}">
-    <!--피드 헤더-->
-    <div class="feed-header padding-default">
-        <div class="flex gap-half" aria-label="${author.userName}의 프로필">
-            <a class="feed-profile-image" href='/user/feed/${author.id}'>
-                <img alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
-            </a>
-            <div>
-                <div class="feed-writer text-sm font-bold">${author.userName}</div>
-                <div class="feed-tag text-xs">${author.category}</div>
-                <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
-                <div class="feed-timestamps text-xs">${feed.createDate}</div>
-            </div>
-        </div>
-    </div>
-    <!--피드 헤더-->
+                <!--피드 헤더-->
+                <div class="feed-header padding-default">
+                    <div class="flex gap-half" aria-label="${author.userName}의 프로필">
+                        <a class="feed-profile-image" href='/user/feed/${author.id}'>
+                            <img alt="피드프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                        </a>
+                        <div>
+                            <div class="feed-writer text-sm font-bold">${author.userName}</div>
+                            <div class="feed-tag text-xs">${author.category}</div>
+                            <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
+                            <div class="feed-timestamps text-xs">${feed.createDate}</div>
+                        </div>
+                    </div>
+                </div>
+                <!--피드 헤더-->
             
-    <!--피드 바디-->
-    <div class="feed-body padding-default flex-column gap-half">
-        <!--피드 글 출력-->
-        <div class="feed-content">${feed.content}</div>
-        <input type="checkbox" class="more-btn">
-    </div>
-    <!--피드 바디-->
-    
-    <!--피드 푸터-->
-    <!--피드 푸터-->
-    <!--댓글-->
-    <!--댓글-->
-</div>`;
+                <!--피드 바디-->
+                <div class="feed-body padding-default flex-column gap-half">
+                    <!--피드 글 출력-->
+                    <div class="feed-content">${feed.content}</div>
+                    <input type="checkbox" class="more-btn">
+                </div>
+                <!--피드 바디-->
+                
+                <!--피드 푸터-->
+                <!--피드 푸터-->
+                <!--댓글-->
+                <!--댓글-->
+            </div>`;
 
         let currentFeed = document.querySelector(".feed:last-child");
         //프로필
@@ -357,7 +360,7 @@ let renderFeedList = (response) => {
             console.log(author.hasProfile)
             console.log('has profile')
             console.log('current feed:', currentFeed)
-            currentFeed.querySelector(".feed-profile-image").innerHTML = `<img alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/userProfiles/${author.id}.png">`;
+            currentFeed.querySelector(".feed-profile-image").innerHTML = `<img alt="피드프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${author.id}.png">`;
         }
 
         // 더보기 | 팔로우
@@ -382,95 +385,164 @@ let renderFeedList = (response) => {
         //피드 미디어 출력
         if (fileList.length > 0) {
             let feedBody = currentFeed.querySelector(".feed-body");
-            // const fragment = document.createDocumentFragment();
+            // let fragment = document.createDocumentFragment();
 
             let carouselMain = document.createElement('div');
             carouselMain.classList.add("carousel-main");
             let carouselWrapper = document.createElement('div');
-            carouselWrapper.classList.add("flex","carousel-wrapper");
+            carouselWrapper.classList.add("flex", "carousel-wrapper");
+            // let carouselButtonContainer = document.createElement('div');
+            // let carouselPagination = document.createElement('div');
+            // carousel
 
-            fileList.forEach(file=> {
+            fileList.forEach(file => {
                 let date = new Date(file.createDate);
                 let formatDate = getFormatDate(date);
                 if (file.fileType === "image") {
                     console.log('fileType is image')
 
-                    carouselWrapper.innerHTML+=`
+                    carouselWrapper.innerHTML += `
                         <div class="carousel-slide">
                             <img
-                                src="http://localhost:8080/resource/${formatDate}/${file.saveName}"
+                                src="${siteURL}/resource/${formatDate}/${file.saveName}"
                                 alt="${file.originalName}"/>
                         </div>`;
                 } else if (file.fileType === "video") {
                     console.log('filetype video')
-                    carouselWrapper.innerHTML+=`
+                    carouselWrapper.innerHTML += `
                         <div class="carousel-slide">
                             <video
-                                th:src="http://localhost:8080/resource/${formatDate}/${file.saveName}"
+                                th:src="${siteURL}/resource/${formatDate}/${file.saveName}"
                                 th:alt="${file.originalName}" controls></video>
                         </div>`;
                 }
-/*
-                let originHTML = `<div th:if="${question.fileList.size>0}" class="carousel-main">
-                    <!--피드 영상 출력 -->
-                    <div class="flex carousel-wrapper">
-                        <!--캐러셀 미디어 삽입-->
-                        <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}"
-                             class="carousel-slide">
-                            <img
-                                th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"
-                                th:alt="${file.originalName}"/>
-                        </div>
-                        <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}"
-                             class="carousel-slide">
-                            <video
-                                th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"
-                                th:alt="${file.originalName}" controls></video>
-                        </div>
-                    </div>
-                    <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
-                    <div th:if="${question.fileList.size>1}" class="carousel-button-container">
-                        <button type="button" class="carousel-prev">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                 class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                      d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-                                <path fill-rule="evenodd"
-                                      d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-                            </svg>
-                        </button>
-                        <button type="button" class="carousel-next">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                                 class="bi bi-chevron-double-right" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd"
-                                      d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
-                                <path fill-rule="evenodd"
-                                      d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                <!-- 캐러셀 중앙 버튼 -->
-                <div th:if="${question.fileList.size>1}" class="carousel-pagination">
-                    <div th:each="file,loop : ${question.fileList}" class="carousel-circle"></div>
-                </div>
-                `;
-                */
-
             })
+            if (fileList.length > 1) {
+                carouselMain.innerHTML +=
+                    `<div class="carousel-button-container">
+                    <button type="button" class="carousel-prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                            <path fill-rule="evenodd"
+                                  d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="carousel-next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            <path fill-rule="evenodd"
+                                  d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>`;
+
+                //캐러셀 중앙 버튼
+                feedBody.innerHTML += `<div class="carousel-pagination"></div>`;
+                let carouselCircle = currentFeed.querySelector(".carousel-pagination");
+                fileList.forEach(() => {
+                    carouselCircle.innerHTML += `
+                    <div class="carousel-circle"></div>
+                    `;
+                })
+            }
             carouselMain.appendChild(carouselWrapper);
+            // carouselMain.appendChild(carouselButtonContainer);
+            // feedBody.appendChild(carouselPagination);
             feedBody.appendChild(carouselMain);
         }
+        //피드 푸터 출력(좋아요, 댓글)
+        currentFeed.innerHTML += `
+        <div class="feed-footer padding-half text-xs gap-half">
+            <div class="like flex align-center">
+                <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                <img class="like-img hide" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
+                좋아요 N
+            </div>
+        </div>`;
+        if (answerList.length > 0) {
+            let feedFooter = currentFeed.querySelector(".feed-footer");
+                feedFooter.innerHTML += `
+                            <span class="answer-count flex align-center">
+                    <img class="chat-img" src="${siteURL}/resource/apps/chat.png" alt="채팅이미지"/>
+                댓글 <strong>${answerList.length}</strong>
+                </span>`;
+        }
+
+        //댓글 영역
+        currentFeed.innerHTML += `<div class="answer-container hide"></div>`;
+        currentFeed.innerHTML += `<!--<div class="answer-container"></div>-->`;
+        console.log('answer conatainer?:',currentFeed.querySelector(".answer-container"));
+        let answerContainer = currentFeed.querySelector(".answer-container");
+
 
         //댓글 출력
         if (answerList.length > 0) {
-
+            answerContainer.innerHTML += `<div class="answer-list"></div>`;
+            let answerListContainer = answerContainer.querySelector(".answer-list");
+            answerList.forEach((answer) => {
+                let answerAuthor = answer.author;
+                answerListContainer.innerHTML += `
+                <div class="answer padding-half">
+                    <div class="answer-profile-image" onclick="location.href='/user/feed/${answerAuthor.id}'">
+                        <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                    </div>
+                    <div>
+                        <div class="answer-header">
+                            <div class="text-sm">${answerAuthor.userName}</div>
+                            <div class="feed-timestamps text-xs">${answer.createDate}</div>
+                        </div>
+                        <div class="answer-body">
+                            <div class="answer-content text-sm">${answer.content}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+                if (answerAuthor.hasProfile) {
+                    currentFeed.querySelector(".answer-profile-image").innerHTML = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${answerAuthor.id}.png">`;
+                }
+                if (answer.modifiedDate !== null) {
+                    console.log('answer modified date:',answer.modifiedDate);
+                    currentFeed.querySelector(".answer-header div:last-child").innerHTML = `<div class="feed-timestamps text-xs">${answer.modifiedDate} (수정됨)</div>`;
+                }
+            })
+        }
+        //댓글 폼
+        if (siteUser === 'anonymousUser') {
+            answerContainer.innerHTML += `
+            <form action="/answer/create/${currentFeed.id}" method="post" class="answer-form padding-default flex">
+                <div class="answer-profile-image">
+                    <img class="img object-cover border-full" alt="게스트댓글프로필" src="${siteURL}/resource/apps/defaultProfile.png">
+                </div>
+                <div class="flex-column width100 align-flex-end">
+                    <textarea placeholder="로그인 후 작성해 주세요" disabled name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <input type="submit" class="padding-half" value="등록"/>
+                </div>
+            </form>`;
+        } else {
+            answerContainer.innerHTML += `
+            <form action="/answer/create/${currentFeed.id}" method="post" class="answer-form padding-default flex">
+                <div class="answer-profile-image">
+                    <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                </div>
+                <div class="flex-column width100 align-flex-end">
+                    <textarea placeholder="여러분의 생각을 적어주세요" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <input type="submit" class="padding-half" value="등록"/>
+                </div>
+            </form>`;
+            if (siteUser.hasProfile) {
+                document.querySelector(".answer-profile-image").innerHTML =
+                    `<img alt="댓글프로필" class="img object-cover border-full" th:src="${siteURL}/resource/userProfiles/${siteUser.id}.png">`;
+            }
         }
     })
 }
 
 const observeLastItem = (io, items) => {
-    const lastItem = items[items.length - 4]; //관찰 대상
+    const lastItem = items[items.length - 5]; //관찰 대상
     io.observe(lastItem); // 관찰 대상 등록
 };
 

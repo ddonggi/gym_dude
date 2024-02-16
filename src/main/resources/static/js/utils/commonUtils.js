@@ -296,19 +296,26 @@ const ioCallback = (entries, io) => {
         console.log('is observed!!!')
         io.unobserve(entry.target);//옵저빙했던 아이템 해제
         // postData("/question",{page:page}).then(response=>{
-        getData("question?page=" + (++page)).then(response => {
-            console.log("target page:", page)
-            console.log('response:', response)
-            renderFeedList(response);
-            // 마지막 페이지가 아닐때만
-            console.log('콘텐츠 길이:', response.content.length)
-            if (response.content.length === 10)
-                observeLastItem(io, document.querySelectorAll('.feed'));
+        if(siteUser==='anonymousUser'&&page>=1){
+            let signInContainer = document.createElement("div");
+            signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
+            signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
+            document.querySelector(".index-container").append(signInContainer);
+            setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
+        }else {
+            getData("question?page=" + (++page)).then(response => {
+                console.log("target page:", page)
+                console.log('response:', response)
+                renderFeedList(response);
+                // 마지막 페이지가 아닐때만
+                console.log('콘텐츠 길이:', response.content.length)
+                if (response.content.length === 10)
+                    observeLastItem(io, document.querySelectorAll('.feed'));
 
-            setFeedEvent();
-            setFeedContentHeight();
-        });
-        // }
+                setFeedEvent();
+                setFeedContentHeight();
+            });
+        }
     });
 };
 
@@ -417,6 +424,10 @@ let renderFeedList = (response) => {
                         </div>`;
                 }
             })
+            carouselMain.appendChild(carouselWrapper);
+            feedBody.appendChild(carouselMain);
+            // carouselMain.appendChild(carouselButtonContainer);
+            // feedBody.appendChild(carouselPagination);
             if (fileList.length > 1) {
                 carouselMain.innerHTML +=
                     `<div class="carousel-button-container">
@@ -449,10 +460,6 @@ let renderFeedList = (response) => {
                     `;
                 })
             }
-            carouselMain.appendChild(carouselWrapper);
-            // carouselMain.appendChild(carouselButtonContainer);
-            // feedBody.appendChild(carouselPagination);
-            feedBody.appendChild(carouselMain);
         }
         //피드 푸터 출력(좋아요, 댓글)
         currentFeed.innerHTML += `
@@ -513,26 +520,26 @@ let renderFeedList = (response) => {
         //댓글 폼
         if (siteUser === 'anonymousUser') {
             answerContainer.innerHTML += `
-            <form action="/answer/create/${currentFeed.id}" method="post" class="answer-form padding-default flex">
+            <div class="answer-form padding-default flex">
                 <div class="answer-profile-image">
                     <img class="img object-cover border-full" alt="게스트댓글프로필" src="${siteURL}/resource/apps/defaultProfile.png">
                 </div>
                 <div class="flex-column width100 align-flex-end">
                     <textarea placeholder="로그인 후 작성해 주세요" disabled name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
-                    <input type="submit" class="padding-half" value="등록"/>
                 </div>
-            </form>`;
+            </div>`;
         } else {
             answerContainer.innerHTML += `
-            <form action="/answer/create/${currentFeed.id}" method="post" class="answer-form padding-default flex">
+            <div class="answer-form padding-default flex">
+                <input type="hidden" name="${csrf_header}" value="${csrf_token}"/>
                 <div class="answer-profile-image">
                     <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
                 </div>
                 <div class="flex-column width100 align-flex-end">
                     <textarea placeholder="여러분의 생각을 적어주세요" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
-                    <input type="submit" class="padding-half" value="등록"/>
+                    <input type="submit" class="padding-half comment-submit-button" value="등록"/>
                 </div>
-            </form>`;
+            </div>`;
             if (siteUser.hasProfile) {
                 document.querySelector(".answer-profile-image").innerHTML =
                     `<img alt="댓글프로필" class="img object-cover border-full" th:src="${siteURL}/resource/userProfiles/${siteUser.id}.png">`;
@@ -564,6 +571,55 @@ let setFeedEvent = () => {
             setCarouselEvent(feed);
             setLikeToggleEvent(feed);
             setCommentToggleEvent(feed);
+            setCommentConfirmEvent(feed);
+        })
+    }
+}
+
+let setCommentConfirmEvent = (currentFeed)=>{
+    if(currentFeed.querySelector(".comment-submit-button")){
+        let submitButton = currentFeed.querySelector(".comment-submit-button");
+        submitButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('comment-submit-button clicked')
+            let url = `/answer/create/${currentFeed.id}`;
+            let input = currentFeed.querySelector(".answer-input");
+            console.log('comment text:', input.value);
+            if (input.value.length < 5) {
+                alert("최소 5글자 이상으로 작성해 주세요");
+            } else {
+                let data = {"content": `${input.value}`};
+                postData(url, data, csrf_header, csrf_token).then((resData) => {
+                    console.log('comment res data:', resData);
+                    input.value='';
+                    let content=resData.content;
+                    let author=resData.author;
+                        let responseComment=`<div class="answer padding-half">
+                        <div class="answer-profile-image" onclick="location.href='/user/feed/${author.id}'">
+                            <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                        </div>
+                        <div>
+                            <div class="answer-header">
+                                <div class="text-sm">${author.userName}</div>
+                                <div class="feed-timestamps text-xs">${resData.createDate}</div>
+                            </div>
+                            <div class="answer-body">
+                                <div class="answer-content text-sm">${content}</div>
+                            </div>
+                        </div>
+                    </div>`;
+                        if(author.hasProfile){
+                            currentFeed.querySelector(".amswer-profile-image").innerHTML=`<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${author.id}.png">`;
+                        }
+
+                        if(currentFeed.querySelector(".answer-list")){
+                            currentFeed.querySelector(".answer-list").innerHTML+=responseComment;
+                        }else{
+                            currentFeed.querySelector(".answer-container").insertAdjacentHTML("afterbegin",`<div class="answer-list">${responseComment}</div>`);
+                        }
+
+                })
+            }
         })
     }
 }

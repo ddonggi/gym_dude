@@ -27,6 +27,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             </div>
             <div th:unless="${#fields.hasErrors('content')}" class="question-input-container">
                 <textarea  disabled rows="3" th:field="*{content}" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+                <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
             </div>
         </div>
         <div sec:authorize="isAuthenticated()" class="question-content">

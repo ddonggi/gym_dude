@@ -3,6 +3,7 @@ package com.weight.gym_dude.question;
  * Created by 이동기 on 2022-11-11
  */
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.weight.gym_dude.answer.AnswerForm;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestService;
@@ -29,6 +30,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/")
 @Controller
@@ -81,7 +83,32 @@ public class QuestionController {
         }else{
             logger.info("Guest User");
         }
-        return "index";
+        return "new_index";
+    }
+
+    //    @GetMapping("/")
+    @GetMapping("/new_index")
+    public String newFeed(Model model,
+                       @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
+                       QuestionForm questionForm,
+                       AnswerForm answerForm,
+                       Principal principal
+    ) {
+//        List<Question> questionList = questionService.getList();
+//        Page<Question> paging = questionService.getList(page);
+        logger.info("page:{}",page);
+        Page<QuestionDTO> paging = questionService.getFeedList(page);
+//        model.addAttribute("questionList", questionList);
+        model.addAttribute("paging", paging);
+        if(principal!=null) {
+            SiteUser siteUser = userService.getUser(principal.getName());
+            SiteUserDTO siteUserDTO = userService.toUserDTO(siteUser);
+            logger.info("siteUser:{}", siteUserDTO);
+            model.addAttribute("siteUser", siteUserDTO);
+        }else{
+            logger.info("Guest User");
+        }
+        return "new_index";
     }
 
 /*    @GetMapping("/detail/{id}")
@@ -91,7 +118,7 @@ public class QuestionController {
         return "question_detail";
     }*/
 
-    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+/*    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/create")
 //    public String questionCreate(@RequestParam String title, @RequestParam String content){
     public String questionCreate(
@@ -113,6 +140,41 @@ public class QuestionController {
         List<FileRequest> fileRequestList = fileUtils.uploadFiles(files,question); //파일 저장소 업로드
         fileService.saveFiles(fileRequestList);//파일 정보 DB 저장
         return "redirect:/"; // 질문 저장 후 피드로 이동
+    }*/
+
+    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @PostMapping("/create")
+    @ResponseBody
+//    public String questionCreate(@RequestParam String title, @RequestParam String content){
+    public ResponseEntity<Object> questionCreateRest(
+            @RequestPart(name = "files",required = false) Optional<List<MultipartFile>> optionalFiles,
+//            QuestionDTO questionDTO,
+            @RequestPart(name="content") @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
+//            @RequestPart(name="content") @JsonProperty("content") @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
+//            @RequestPart(name="content") @Valid String content, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
+            BindingResult bindingresult, // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
+            Principal principal //현재 로그인한 사용자의 정보를 알려면 스프링 시큐리티가    제공하는 Principal 객체를 사용해야 한다.
+    ) {
+        logger.info("feed content length:{}",questionForm.getContent().length());
+        logger.info("feed content:{}",questionForm.getContent());
+        if (bindingresult.hasErrors()) {
+            logger.info("error>>:{}", bindingresult.getFieldError());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingresult);
+        }
+        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        Question question = questionService.create(questionForm.getContent(),siteUser,false);
+        logger.info("question create complete");
+        logger.info("question Id:{}",question.getId());
+        if(optionalFiles.isPresent()) {
+            List<MultipartFile> files = optionalFiles.get();
+//        if(files!=null) {
+            logger.info("files size:{}", files.size());
+            List<FileRequest> fileRequestList = fileUtils.uploadFiles(files, question); //파일 저장소 업로드
+            fileService.saveFiles(fileRequestList);//파일 정보 DB 저장
+        }
+//        }
+        return ResponseEntity.status(HttpStatus.OK).body(questionForm);
+//        return ResponseEntity.status(HttpStatus.OK).body(content);
     }
 
 /*    @PreAuthorize("isAuthenticated()")

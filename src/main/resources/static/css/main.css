@@ -278,7 +278,15 @@ input[type=submit] {
 .file-input{
     display: none;
 }
-
+.file-thumbnail-container{
+    max-width: 80px;
+}
+.file-thumbnail-image{
+    width: 30px;
+    height: 30px;
+    object-fit: cover;
+    border-radius: 5px;
+}
 
 /* 작성된 피드 */
 .feed-container {

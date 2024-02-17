@@ -1,0 +1,223 @@
+<html layout:decorate="~{layout/layout}" >
+<div layout:fragment="content" class="index-container">
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+    <form enctype="multipart/form-data" th:action="@{/create}" method="post" class="question-container feed-width flex-column align-flex-end padding-default" id="feed-form">
+        <div sec:authorize="isAnonymous()" class="question-content">
+            <div class="feed-profile-image">
+                <img alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+            </div>
+            <div class="question-input-container">
+                <textarea  disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+                <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
+            </div>
+        </div>
+        <div sec:authorize="isAuthenticated()" class="question-content">
+            <div class="feed-profile-image">
+                <img th:if="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${siteUser.id}.png|">
+                <img th:unless="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+            </div>
+            <div class="flex-column width100 gap-half">
+                <div class="flex gap-default">
+                    <label for="files" class="feed-upload-label">
+                        <img src="http://localhost:8080/resource/apps/feedCamera.png" class="upload-button" alt="카메라이미지"/>
+                    </label>
+                    <input type="file" name="files" id="files" multiple class="file-input" accept="image/*,video/*"/>
+                    <div class="file-thumbnail-container flex"></div>
+                </div>
+                <div class="question-input-container">
+                    <textarea rows="3" class="question-input" placeholder="운동에 대해 적어주세요" name="content" minlength="5" maxlength="600"></textarea>
+                </div>
+            </div>
+        </div>
+        <input sec:authorize="isAuthenticated()" type="submit" class="padding-half feed-save-button" value="저장하기"></input>
+    </form>
+
+    <!--피드 리스트 -->
+    <div class="feed-container feed-width">
+        <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${paging}" class="feed" th:id="${question.id}">
+            <!--            <form th:action="@{|/modify/${question.id}|}" method="post" th:object="${questionForm}">-->
+            <div class="feed-header padding-default">
+                <div class="flex gap-half" th:if="${question.author}" th:aria-label="|${question.author.getUserName()}의 프로필|">
+                    <a class="feed-profile-image" th:href="|@{/user/feed/}${question.author.id}|">
+                        <img th:if="${question.author.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${question.author.id}.png|">
+                        <img th:unless="${question.author.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                    </a>
+                    <div>
+                        <div class="feed-writer text-sm font-bold" th:text="${question.author.getUserName()}">글쓴이</div>
+                        <div class="feed-tag text-xs" th:if="${question.author.category}" th:text="${question.author.category}">카테고리</div>
+                        <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
+                        <div th:if="${question.modifiedDate}" class="feed-timestamps text-xs" th:text="|${#temporals.format(question.modifiedDate,'yyyy-MM-dd HH:mm')} (수정됨)|"></div>
+                        <div th:unless="${question.modifiedDate}" class="feed-timestamps text-xs" th:text="${#temporals.format(question.createDate,'yyyy-MM-dd HH:mm')}"></div>
+                    </div>
+                </div>
+
+                <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
+                <!--현재 사용자가 인증되었다면 #authentication.getPrincipal()을 통해 principal을 확인할 수 있다 -->
+                <div class="option-container flex align-center" sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}">
+                    <!--CSRF값을 수동으로라도 추가해야 되는 이유는 스프링 시큐리티(Spring Security)를 사용할 때 CSRF 값이 반드시 필요하기 때문이다.-->
+                    <!--                    <input type="hidden" th:name="${_csrf.headerName}" th:value="${_csrf.token}"/>-->
+                    <div class="option-menu">
+                        <button class="modify-button">수정</button>
+                        <button class="delete-button">삭제</button>
+                        <button class="edit-save-button hide">저장</button>
+                        <button class="edit-cancel-button hide">취소</button>
+                        <!--javascript:와 void(0)의 결합
+                        때에 따라 링크를 클릭했을 때, 다른 페이지로 이동하거나 페이지가 다시 로딩되는 것을 원하지 않을 때가 있습니다.
+                        javascript:을 사용하면 현재 페이지에 아무런 변화 없이 코드를 실행할 수 있습니다.
+                        void(0)를 사용하는 것은 아무것도 하지 말라는 뜻입니다. 즉, 다시 로딩하지 않고, 경로를 이동하지 않고, 어떤 코드도 실행하지 말라는 것과 같습니다. -->
+                    </div>
+                    <button sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}" class="option-button flex justify-content-center align-center">
+                        ⁝
+                    </button>
+                </div>
+
+                <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.getUserName()}" class="follow-button" th:value="${question.author.id}">팔로우</button>
+
+            </div>
+            <div class="feed-body padding-default flex-column gap-half" >
+                <div  th:if="${question.fileList.size>0}" class="carousel-main">
+                    <!--피드 영상 출력 -->
+                    <div class="flex carousel-wrapper">
+                        <!--캐러셀 미디어 삽입-->
+                        <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
+                            <img th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}"/>
+                        </div>
+                        <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
+                            <video th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}" controls></video>
+                        </div>
+                    </div>
+                    <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
+                    <div th:if="${question.fileList.size>1}" class="carousel-button-container">
+                        <button type="button" class="carousel-prev">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="carousel-next">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- 캐러셀 중앙 버튼 -->
+                <div th:if="${question.fileList.size>1}" class="carousel-pagination">
+                    <div th:each="file,loop : ${question.fileList}" class="carousel-circle"></div>
+                </div>
+                <!--피드 글 출력-->
+                <div class="feed-content" th:text="${question.content}"></div>
+                <input type="checkbox" class="more-btn"/>
+            </div><!--feed-body-->
+            <!--feed footer -->
+            <div class="feed-footer padding-half text-xs gap-half"><!--feed-footer-->
+                <div class="like flex align-center">
+                    <img class="like-img" src="http://localhost:8080/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                    <img class="like-img hide" src="http://localhost:8080/resource/apps/heart.png" alt="좋아요이미지"/>
+                    좋아요 N
+                </div>
+                <!--답변 갯수 출력-->
+                <span th:if="${#lists.size(question.answerList) > 0}" class="answer-count flex align-center">
+                    <img class="chat-img" src="http://localhost:8080/resource/apps/chat.png" alt="채팅이미지"/>
+                    <!--                      th:text="|댓글 ${#lists.size(question.answerList)}개|">-->
+                    댓글 <strong>[[${#lists.size(question.answerList)}]]</strong>
+                </span>
+            </div><!--feed-footer-->
+
+            <div class="answer-container hide">
+                <!-- 댓글 반복 -->
+                <div class="answer-list">
+                    <div class="answer padding-half" th:each="answer : ${question.answerList}">
+                        <div th:if="${answer.author}" class="answer-profile-image" th:onclick="|location.href='@{/user/feed/}${answer.author.id}'|">
+                            <img th:if="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${answer.author.id}.png|">
+                            <img th:unless="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                        </div>
+
+                        <!-- 가입한 유저가 쓴 댓글 -->
+                        <div th:if="${answer.author}">
+                            <div class="answer-header">
+                                <div class="text-sm" th:text="${answer.author.getUserName()}">작성자 이름</div>
+
+                                <!--수정된 날짜가 있을때-->
+                                <div th:if="${answer.modifiedDate}" th:text="|${#temporals.format(answer.modifiedDate,'yyyy-MM-dd HH:mm')} (수정됨)|" class="feed-timestamps text-xs"></div>
+                                <div th:unless="${answer.modifiedDate}" th:text="${#temporals.format(answer.createDate,'yyyy-MM-dd HH:mm')}" class="feed-timestamps text-xs"></div>
+                            </div>
+                            <div class="answer-body">
+                                <div th:text="${answer.content}" class="answer-content text-sm"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!--comment-->
+                <!-- 답변 작성 -->
+                <!-- java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다 -->
+                <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post" class="answer-form padding-default flex">
+                    <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
+                    <!--                <label for="content">댓글</label>-->
+                    <div sec:authorize="isAnonymous()" class="answer-profile-image">
+                        <img class="img object-cover border-full" alt="게스트댓글프로필" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                    </div>
+                    <div sec:authorize="isAuthenticated()" class="answer-profile-image">
+                        <img th:if="${siteUser.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${siteUser.id}.png|">
+                        <img th:unless="${siteUser.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                    </div>
+                    <div sec:authorize="isAnonymous()" class="flex-column width100 align-flex-end">
+                        <textarea placeholder="로그인 후 작성해 주세요" disabled th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                        <textarea placeholder="로그인 후 작성해 주세요" disabled th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    </div>
+                    <div sec:authorize="isAuthenticated()" class="flex-column width100 align-flex-end">
+                        <textarea placeholder="여러분의 생각을 적어주세요" th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                        <textarea placeholder="여러분의 생각을 적어주세요" th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                        <input type="submit" class="padding-half" value="등록"/>
+                    </div>
+                </form>
+                <!-- 답변작성 -->
+            </div><!--answer container-->
+        </div> <!--feed -->
+    </div>
+
+    <!-- 페이징처리 시작 -->
+    <!--    <div th:if="${!paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{|?page=${paging.number-1}|}">
+                        <span>이전</span>
+                    </a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-2 and page <= paging.number+2}"
+                    th:classappend="${page == paging.number} ? 'active'"
+                    class="page-item">
+                    <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                        <span>다음</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div th:unless="${!paging.isEmpty()}">
+        </div>-->
+
+    <!-- 페이징처리 끝 -->
+    <!--    <h2>홈페이지다</h2>-->
+    <!--    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세용</button></a>-->
+    <!--    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>-->
+
+
+
+    <script th:inline="javascript">
+        let size = [[${paging.size}]];
+        let totalPages = [[${paging.totalPages}]];
+        let totalElements = [[${paging.totalElements}]];
+        let number = [[${paging.number}]];
+        let hasPrevious = [[${paging.hasPrevious}]];
+        let hasNext = [[${paging.hasNext}]];
+        let siteUser = [[${#authentication.getName()}]];
+        console.log('siteUser:',siteUser)
+    </script>
+    <script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>
+</div>
+</html>

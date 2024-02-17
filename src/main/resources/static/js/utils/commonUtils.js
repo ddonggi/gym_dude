@@ -24,6 +24,25 @@ let postData = async (url, data = {}, csrf_header, csrf_token) => {
     });
     return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
 }
+let postFileData = async (url, data = {}, csrf_header, csrf_token) => {
+    // 옵션 기본 값은 *로 강조
+    const response = await fetch(url, {
+        method: "POST", // *GET, POST, PUT, DELETE 등
+        mode: "cors", // no-cors, *cors, same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        credentials: "same-origin", // include, *same-origin, omit
+        headers: {
+            // 'Content-Type': 'application/x-www-form-urlencoded',
+            // "Content-Type": "multipart/form-data",
+            header: csrf_header,
+            'X-CSRF-Token': csrf_token
+        },
+        redirect: "follow", // manual, *follow, error
+        referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+        body: data // body의 데이터 유형은 반드시 "Content-Type" 헤더와 일치해야 함
+    });
+    return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
+}
 /* 비동기통신을 위한 fetch API */
 let getData = async (url, page_, csrf_header, csrf_token) => {
     // 옵션 기본 값은 *로 강조
@@ -635,6 +654,101 @@ let getFormatDate = (date)=> {
         ((date.getDate()) < 9 ? "0" + (date.getDate()) : (date.getDate()));
 }
 
+let setFeedSaveEvent = ()=>{
+    const form = document.querySelector('#feed-form');
+    // console.log('form:',form)
+/*    let handleSubmit = (e) => {
+        e.preventDefault();
+        const form = e.currentTarget;
+        console.log('target form:',form)
+        const url = new URL(form.action);
+        console.log('url:',url)
+        const formData = new FormData(form);
+        console.log('formData:',formData)
+        let content = document.querySelector(".question-input-container .question-input").value;
+        console.log('content:',content)
+
+        const fileInput = document.getElementById("files");
+        const selectedFile = [...fileInput.files];
+        console.log('selectedFile',selectedFile)
+
+        if(content.length<5){
+            alert('최소5자 이상은 써주세요')
+            return
+        }
+        const fetchOptions = {
+            method: form.method,
+            body: formData,
+        };
+        fetch(url, fetchOptions);
+        e.preventDefault();
+    }
+    form.addEventListener('submit', handleSubmit);*/
+
+    if(document.querySelector(".feed-save-button")) {
+        // let saveButton = document.querySelector(".feed-save-button");
+        form.addEventListener('submit', (e) => {
+            console.log('save click')
+            e.preventDefault();
+
+            const form = e.currentTarget;
+            const url = new URL(form.action);
+
+            // console.log('target action:',form.action)
+            // console.log('target method:',form.method)
+            // console.log('target enctype:',form.enctype)
+
+            let content = form.querySelector(".question-input").value;
+            if(content.length<5){
+                alert('최소5자 이상은 써주세요')
+                return
+            }
+            if(confirm("제출하시겠습니까?")){
+                console.log('content:',content)
+                const formData = new FormData();
+                if(document.querySelector("#files").files.length>0) {
+                    let files = document.querySelector("#files").files;
+                    for(let file of files) {
+                        formData.append("files", file);
+                    }
+                }
+                formData.append("content",new Blob([JSON.stringify({"content":content})],{type: "application/json"}));
+                postFileData(url,formData,csrf_header,csrf_token).then((response)=>{
+                    console.log('response:',response)
+                }).then(()=>alert("정상적으로 제출되었습니다")).then(()=>location.reload())
+            }
+        })
+    }
+}
+let setFileThumbnailEvent = () =>{
+    const fileInput = document.getElementById("files");
+    const handleFiles = (e) => {
+        document.querySelector(".file-thumbnail-container").innerHTML='';
+        const selectedFile = [...fileInput.files];
+        // console.log('selectedFile',selectedFile)
+
+        // fileReader.readAsDataURL(selectedFile[0]);
+
+        selectedFile.forEach((file)=>{
+            const fileReader = new FileReader();
+            fileReader.readAsDataURL(file);
+            fileReader.onload = ()=> {
+                let fileThumbnails = document.querySelector(".file-thumbnail-container");
+                if(file.type.indexOf('video')===0){
+                    fileThumbnails.innerHTML += `
+            <video class="file-thumbnail-image" alt="파일썸네일" src ='${fileReader.result}'/>
+            `;
+                }else {
+                    fileThumbnails.innerHTML += `
+            <img class="file-thumbnail-image" alt="파일썸네일" src ='${fileReader.result}'/>
+            `;
+                }
+            };
+        })
+    };
+    if(fileInput)fileInput.addEventListener("change", handleFiles);
+}
+
 export {
     postData,
     csrf_token,
@@ -652,5 +766,7 @@ export {
     setLikeToggleEvent,
     io,
     setFeedEvent,
-    observeLastItem
+    observeLastItem,
+    setFeedSaveEvent,
+    setFileThumbnailEvent
 };

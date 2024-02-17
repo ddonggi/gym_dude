@@ -4,6 +4,66 @@ let csrf_token = document.querySelector("meta[name='_csrf']").getAttribute("cont
 // console.log('header:',csrf_header)
 // console.log('token:',csrf_token)
 let siteURL = "http://localhost:8080";
+
+// internationalization API
+// let formatter = new Intl.NumberFormat('ko'); // 한국어 지정
+/* 숫자 */
+// let views = 9744642
+// let formatter = new Intl.NumberFormat('ko'); // 한국어 지정
+// formatter.format(view)  >>> 9,744,642 (콤마 찍힘)
+// let formatter = new Intl.NumberFormat('ko',{notation:'compact'}); | en | navigator.language
+// formatter.format(view)  >>> 974만 | 974m | 언어별 |
+/* 가격 */
+/* 날짜 */
+let formatter = new Intl.RelativeTimeFormat('ko'); // 한국어 지정
+console.log(formatter.format(1,'day'));
+console.log(formatter.format(2,'day'));
+console.log(formatter.format(3,'day'));
+console.log(formatter.format(-1,'day'));
+console.log(formatter.format(-2,'day'));
+console.log(formatter.format(-3,'day'));
+formatter = new Intl.RelativeTimeFormat('ko',{numeric:'auto'});
+console.log(formatter.format(0,'day')); //오늘
+console.log(formatter.format(1,'day')); //내일
+console.log(formatter.format(2,'day')); //모레
+console.log(formatter.format(3,'day')); //3일 후
+console.log(formatter.format(-1,'day')); //어제
+console.log(formatter.format(-2,'day')); //그저께
+console.log(formatter.format(-3,'day')); // 3일 전
+console.log('-----')
+console.log(formatter.format(-3,'hour')); // 3일 전
+console.log(formatter.format(-2,'hour')); // 3일 전
+console.log(formatter.format(-1,'hour')); // 3일 전
+console.log(formatter.format(0,'hour')); // 3일 전
+console.log(formatter.format(1,'hour')); // 3일 전
+console.log(formatter.format(2,'hour')); // 3일 전
+console.log(formatter.format(3,'hour')); // 3일 전
+console.log('-----')
+console.log(formatter.format(-3,'minute')); // 3일 전
+console.log(formatter.format(-2,'minute')); // 3일 전
+console.log(formatter.format(-1,'minute')); // 3일 전
+console.log(formatter.format(0,'minute')); // 3일 전
+console.log(formatter.format(1,'minute')); // 3일 전
+console.log(formatter.format(2,'minute')); // 3일 전
+console.log(formatter.format(3,'minute')); // 3일 전
+console.log('-----')
+console.log(formatter.format(-3,'minutes')); // 3일 전
+console.log(formatter.format(0,'minutes')); // 3일 전
+console.log(formatter.format(3,'minutes')); // 3일 전
+formatter = new Intl.RelativeTimeFormat('en');
+console.log(formatter.format(1,'day'));
+console.log(formatter.format(2,'day'));
+console.log(formatter.format(3,'day'));
+console.log(formatter.format(-1,'day'));
+console.log(formatter.format(-2,'day'));
+console.log(formatter.format(-3,'day'));
+formatter = new Intl.RelativeTimeFormat('en',{numeric:'auto'});
+console.log(formatter.format(1,'day'));
+console.log(formatter.format(2,'day'));
+console.log(formatter.format(3,'day'));
+console.log(formatter.format(-1,'day'));
+console.log(formatter.format(-2,'day'));
+console.log(formatter.format(-3,'day'));
 /* 비동기통신을 위한 fetch API */
 let postData = async (url, data = {}, csrf_header, csrf_token) => {
     // 옵션 기본 값은 *로 강조
@@ -113,7 +173,7 @@ let setModifyFormEvent = (feed) => {
     })
 }
 
-let setModifySaveEvent = (feed) => {
+let setFeedModifySaveEvent = (feed) => {
     let id = feed.id;
     let url = `/modify/${id}`;
     let saveButton = feed.querySelector(".edit-save-button");
@@ -127,11 +187,15 @@ let setModifySaveEvent = (feed) => {
             alert("최소 5글자 이상으로 작성해 주세요");
         } else {
             postData(url, data, csrf_header, csrf_token).then((resData) => {
+                //수정된 내용 반영
                 // let response = JSON.parse(resData)
                 console.log('res data:', resData);
-                console.log('res data:', resData.content);
-                // console.log('res data:', resData);
-                feed.querySelector(".feed-content").innerText = resData.content;
+                console.log('res content:', resData.content);
+                console.log('res date:', resData.modifiedDate);
+                //날짜 변경
+                // feed.
+                feed.querySelector(".feed-timestamps").innerHTML = `${resData.modifiedDate} (수정됨)`; //날짜 변경
+                feed.querySelector(".feed-content").innerText = resData.content; //내용 변경
                 feed.querySelector(".modify-button").classList.toggle("hide");
                 feed.querySelector(".delete-button").classList.toggle("hide");
                 feed.querySelector(".edit-save-button").classList.toggle("hide");
@@ -296,7 +360,7 @@ let setCommentToggleEvent = (feed) => {
 }
 
 let setLikeToggleEvent = (feed) => {
-    if(siteUser!=='anonymousUser'){
+    if(principalName!=='anonymousUser'){
         let likeButton = feed.querySelector(".like");
         likeButton.addEventListener('click', () => {
             likeButton.classList.toggle("like-text-color");
@@ -315,7 +379,7 @@ const ioCallback = (entries, io) => {
         console.log('is observed!!!')
         io.unobserve(entry.target);//옵저빙했던 아이템 해제
         // postData("/question",{page:page}).then(response=>{
-        if(siteUser==='anonymousUser'&&page>=1){
+        if(principalName==='anonymousUser'&&page>=1){
             let signInContainer = document.createElement("div");
             signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
             signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
@@ -390,7 +454,7 @@ let renderFeedList = (response) => {
         }
 
         // 더보기 | 팔로우
-        if (siteUser === author.userName) {
+        if (principalName === author.userName) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 다를 경우
             currentFeed.querySelector(".feed-header").innerHTML += `
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -401,7 +465,7 @@ let renderFeedList = (response) => {
                         <button class="option-button flex justify-content-center align-center">
                             ⁝
                         </button>`;
-        } else if (siteUser === 'anonymousUser') {
+        } else if (principalName === 'anonymousUser') {
 
         } else {
             currentFeed.querySelector(".feed-header").innerHTML += `
@@ -511,6 +575,7 @@ let renderFeedList = (response) => {
             let answerListContainer = answerContainer.querySelector(".answer-list");
             answerList.forEach((answer) => {
                 let answerAuthor = answer.author;
+
                 answerListContainer.innerHTML += `
                 <div class="answer padding-half">
                     <div class="answer-profile-image" onclick="location.href='/user/feed/${answerAuthor.id}'">
@@ -537,32 +602,36 @@ let renderFeedList = (response) => {
             })
         }
         //댓글 폼
-        if (siteUser === 'anonymousUser') {
+        let profileImage ="";
+        if (principalName === 'anonymousUser') { // 방문자
+            profileImage="/apps/defaultProfile";
             answerContainer.innerHTML += `
             <div class="answer-form padding-default flex">
                 <div class="answer-profile-image">
-                    <img class="img object-cover border-full" alt="게스트댓글프로필" src="${siteURL}/resource/apps/defaultProfile.png">
+                    <img class="img object-cover border-full" alt="게스트댓글프로필" src="${siteURL}/resource${profileImage}.png">
                 </div>
                 <div class="flex-column width100 align-flex-end">
                     <textarea placeholder="로그인 후 작성해 주세요" disabled name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
                 </div>
             </div>`;
-        } else {
+        } else { //접속자
+            console.log('접속자:',principalName)
+            if(siteUser.hasProfile)
+                profileImage="/userProfiles/"+siteUser.id; //프로필 있는사람
+            else
+                profileImage = "/apps/defaultProfile"; //없는사람
+
             answerContainer.innerHTML += `
             <div class="answer-form padding-default flex">
                 <input type="hidden" name="${csrf_header}" value="${csrf_token}"/>
                 <div class="answer-profile-image">
-                    <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                    <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource${profileImage}.png">
                 </div>
                 <div class="flex-column width100 align-flex-end">
                     <textarea placeholder="여러분의 생각을 적어주세요" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
                     <input type="submit" class="padding-half comment-submit-button" value="등록"/>
                 </div>
             </div>`;
-            if (siteUser.hasProfile) {
-                document.querySelector(".answer-profile-image").innerHTML =
-                    `<img alt="댓글프로필" class="img object-cover border-full" th:src="${siteURL}/resource/userProfiles/${siteUser.id}.png">`;
-            }
         }
     })
 }
@@ -583,7 +652,7 @@ let setFeedEvent = () => {
                 setOptionToggleEvent(feed);
                 setModifyFormEvent(feed);
                 setModifyCancelEvent(feed);
-                setModifySaveEvent(feed);
+                setFeedModifySaveEvent(feed);
                 setDeleteEvent(feed);
             }
             setFollowEvent(feed);
@@ -613,9 +682,15 @@ let setCommentConfirmEvent = (currentFeed)=>{
                     input.value='';
                     let content=resData.content;
                     let author=resData.author;
-                        let responseComment=`<div class="answer padding-half">
+                    let profileImage ="";
+                    if(author.hasProfile){ // 댓글 작성자 정보
+                        profileImage="/userProfiles/"+author.id;
+                    }else{
+                        profileImage="/apps/defaultProfile";
+                    }
+                    let responseComment=`<div class="answer padding-half">
                         <div class="answer-profile-image" onclick="location.href='/user/feed/${author.id}'">
-                            <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                            <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource${profileImage}.png">
                         </div>
                         <div>
                             <div class="answer-header">
@@ -627,9 +702,6 @@ let setCommentConfirmEvent = (currentFeed)=>{
                             </div>
                         </div>
                     </div>`;
-                        if(author.hasProfile){
-                            currentFeed.querySelector(".amswer-profile-image").innerHTML=`<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${author.id}.png">`;
-                        }
 
                         if(currentFeed.querySelector(".answer-list")){
                             currentFeed.querySelector(".answer-list").innerHTML+=responseComment;
@@ -641,6 +713,10 @@ let setCommentConfirmEvent = (currentFeed)=>{
             }
         })
     }
+}
+
+let easyDate = (formatter) =>{
+    console.log('');
 }
 
 let getFormatDate = (date)=> {
@@ -739,7 +815,7 @@ export {
     setModifyFormEvent,
     setOptionToggleEvent,
     setModifyCancelEvent,
-    setModifySaveEvent,
+    setFeedModifySaveEvent,
     setHeaderProfileEvent,
     setCarouselEvent,
     setFollowEvent,

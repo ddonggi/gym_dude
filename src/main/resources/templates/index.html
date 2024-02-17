@@ -1,32 +1,13 @@
 <html layout:decorate="~{layout/layout}" >
 <div layout:fragment="content" class="index-container">
     <th:block th:replace="~{fragment/header::header}"></th:block>
-
-<!--피드 등록 폼-->
-<!--    <form th:action="@{/create}" method="post" th:object="${questionForm}" class="question-container feed-width flex-column align-flex-end padding-default">-->
-    <form enctype="multipart/form-data" th:action="@{/create}" method="post" th:object="${questionForm}" class="question-container feed-width flex-column align-flex-end padding-default">
-        <!--        오류를 표시하기 위해서는 타임리프의 th:object 속성이 반드시 필요하다.
-th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구성된다는 점을 타임리프 엔진에 알려줘야 하기 때문이다.  -->
-        <!--        <div th:if="${#fields.hasAnyErrors()}" role="alert">-->
-        <!--            <div th:each="err:${#fields.allErrors()}" th:text="${err}"> </div>-->
-        <!--        </div>-->
-
-
-        <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
-        <!--
-        타임리프의 th:replace 속성을 사용하면 공통 템플릿을 템플릿 내에 삽입할수 있다.
-        <div th:replace="~{form_errors :: formErrorsFragment}"></div> 의 의미는 div 엘리먼트를
-        form_errors.html 파일의 th:fragment 속성명이 formErrorsFragment인 엘리먼트로 교체하라는 의미이다.
-        -->
+    <form enctype="multipart/form-data" th:action="@{/create}" method="post" class="question-container feed-width flex-column align-flex-end padding-default" id="feed-form">
         <div sec:authorize="isAnonymous()" class="question-content">
             <div class="feed-profile-image">
                 <img alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
             </div>
-            <div th:if="${#fields.hasErrors('content')}" class="question-input-container">
-                <textarea rows="1" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="question-input" minlength="5" maxlength="600"></textarea>
-            </div>
-            <div th:unless="${#fields.hasErrors('content')}" class="question-input-container">
-                <textarea  disabled rows="3" th:field="*{content}" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+            <div class="question-input-container">
+                <textarea  disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
                 <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
             </div>
         </div>
@@ -34,32 +15,27 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
             <div class="feed-profile-image">
                 <img th:if="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${siteUser.id}.png|">
                 <img th:unless="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
-
             </div>
             <div class="flex-column width100 gap-half">
-                <label for="files" class="feed-upload-label">
-    <!--                <div class="upload-button">파일 업로드하기</div>-->
-                    <img src="http://localhost:8080/resource/apps/feedCamera.png" class="upload-button" alt="카메라버튼"/>
-                </label>
-                <input type="file" name="files" id="files" multiple class="file-input" accept="image/*,video/*"></input>
-    <!--            <p><video id="cameraview" width="720" height="480"></video></p>
-                <button id="openBtn">카메라 켜기</button>
-                <button id="closeBtn">카메라 끄기</button>-->
-                <div th:if="${#fields.hasErrors('content')}" class="question-input-container">
-                    <textarea rows="1" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" class="question-input" minlength="5" maxlength="600"></textarea>
+                <div class="flex gap-default">
+                    <label for="files" class="feed-upload-label">
+                        <img src="http://localhost:8080/resource/apps/feedCamera.png" class="upload-button" alt="카메라이미지"/>
+                    </label>
+                    <input type="file" name="files" id="files" multiple class="file-input" accept="image/*,video/*"/>
+                    <div class="file-thumbnail-container flex"></div>
                 </div>
-                <div th:unless="${#fields.hasErrors('content')}" class="question-input-container">
-                    <textarea rows="3" th:field="*{content}" class="question-input" placeholder="운동에 대해 적어주세요" minlength="5" maxlength="600"></textarea>
+                <div class="question-input-container">
+                    <textarea rows="3" class="question-input" placeholder="운동에 대해 적어주세요" name="content" minlength="5" maxlength="600"></textarea>
                 </div>
             </div>
         </div>
-        <input sec:authorize="isAuthenticated()" type="submit" class="padding-half" value="저장하기">
+        <input sec:authorize="isAuthenticated()" type="submit" class="padding-half feed-save-button" value="저장하기"></input>
     </form>
 
-<!--피드 리스트 -->
+    <!--피드 리스트 -->
     <div class="feed-container feed-width">
         <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${paging}" class="feed" th:id="${question.id}">
-<!--            <form th:action="@{|/modify/${question.id}|}" method="post" th:object="${questionForm}">-->
+            <!--            <form th:action="@{|/modify/${question.id}|}" method="post" th:object="${questionForm}">-->
             <div class="feed-header padding-default">
                 <div class="flex gap-half" th:if="${question.author}" th:aria-label="|${question.author.getUserName()}의 프로필|">
                     <a class="feed-profile-image" th:href="|@{/user/feed/}${question.author.id}|">
@@ -79,7 +55,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <!--현재 사용자가 인증되었다면 #authentication.getPrincipal()을 통해 principal을 확인할 수 있다 -->
                 <div class="option-container flex align-center" sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.getUserName()}">
                     <!--CSRF값을 수동으로라도 추가해야 되는 이유는 스프링 시큐리티(Spring Security)를 사용할 때 CSRF 값이 반드시 필요하기 때문이다.-->
-<!--                    <input type="hidden" th:name="${_csrf.headerName}" th:value="${_csrf.token}"/>-->
+                    <!--                    <input type="hidden" th:name="${_csrf.headerName}" th:value="${_csrf.token}"/>-->
                     <div class="option-menu">
                         <button class="modify-button">수정</button>
                         <button class="delete-button">삭제</button>
@@ -98,42 +74,42 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.getUserName()}" class="follow-button" th:value="${question.author.id}">팔로우</button>
 
             </div>
-                <div class="feed-body padding-default flex-column gap-half" >
-                    <div  th:if="${question.fileList.size>0}" class="carousel-main">
-                        <!--피드 영상 출력 -->
-                        <div class="flex carousel-wrapper">
-                            <!--캐러셀 미디어 삽입-->
-                            <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
-                                <img th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}"/>
-                            </div>
-                            <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
-                                <video th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}" controls></video>
-                            </div>
+            <div class="feed-body padding-default flex-column gap-half" >
+                <div  th:if="${question.fileList.size>0}" class="carousel-main">
+                    <!--피드 영상 출력 -->
+                    <div class="flex carousel-wrapper">
+                        <!--캐러셀 미디어 삽입-->
+                        <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
+                            <img th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}"/>
                         </div>
-                        <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
-                        <div th:if="${question.fileList.size>1}" class="carousel-button-container">
-                            <button type="button" class="carousel-prev">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-                                    <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
-                                </svg>
-                            </button>
-                            <button type="button" class="carousel-next">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
-                                    <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
-                                </svg>
-                            </button>
+                        <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
+                            <video th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}" controls></video>
                         </div>
                     </div>
-                    <!-- 캐러셀 중앙 버튼 -->
-                    <div th:if="${question.fileList.size>1}" class="carousel-pagination">
-                        <div th:each="file,loop : ${question.fileList}" class="carousel-circle"></div>
+                    <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
+                    <div th:if="${question.fileList.size>1}" class="carousel-button-container">
+                        <button type="button" class="carousel-prev">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                                <path fill-rule="evenodd" d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                            </svg>
+                        </button>
+                        <button type="button" class="carousel-next">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
+                                <path fill-rule="evenodd" d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </button>
                     </div>
-                    <!--피드 글 출력-->
-                    <div class="feed-content" th:text="${question.content}"></div>
-                    <input type="checkbox" class="more-btn"/>
-                </div><!--feed-body-->
+                </div>
+                <!-- 캐러셀 중앙 버튼 -->
+                <div th:if="${question.fileList.size>1}" class="carousel-pagination">
+                    <div th:each="file,loop : ${question.fileList}" class="carousel-circle"></div>
+                </div>
+                <!--피드 글 출력-->
+                <div class="feed-content" th:text="${question.content}"></div>
+                <input type="checkbox" class="more-btn"/>
+            </div><!--feed-body-->
             <!--feed footer -->
             <div class="feed-footer padding-half text-xs gap-half"><!--feed-footer-->
                 <div class="like flex align-center">
@@ -144,7 +120,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <!--답변 갯수 출력-->
                 <span th:if="${#lists.size(question.answerList) > 0}" class="answer-count flex align-center">
                     <img class="chat-img" src="http://localhost:8080/resource/apps/chat.png" alt="채팅이미지"/>
-<!--                      th:text="|댓글 ${#lists.size(question.answerList)}개|">-->
+                    <!--                      th:text="|댓글 ${#lists.size(question.answerList)}개|">-->
                     댓글 <strong>[[${#lists.size(question.answerList)}]]</strong>
                 </span>
             </div><!--feed-footer-->
@@ -177,7 +153,7 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                 <!-- java 의 question 객체값을 더하는 것이기 때문에 (문자열 연결 :양쪽에 | | 로 )감싸 준다 -->
                 <form th:action="@{|/answer/create/${question.id}|}"  th:object="${answerForm}" method="post" class="answer-form padding-default flex">
                     <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
-    <!--                <label for="content">댓글</label>-->
+                    <!--                <label for="content">댓글</label>-->
                     <div sec:authorize="isAnonymous()" class="answer-profile-image">
                         <img class="img object-cover border-full" alt="게스트댓글프로필" src="http://localhost:8080/resource/apps/defaultProfile.png">
                     </div>
@@ -192,7 +168,8 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
                     <div sec:authorize="isAuthenticated()" class="flex-column width100 align-flex-end">
                         <textarea placeholder="여러분의 생각을 적어주세요" th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
                         <textarea placeholder="여러분의 생각을 적어주세요" th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
-                        <input type="submit" class="padding-half" value="등록"/>
+<!--                        <input type="submit" class="padding-half" value="등록"/>-->
+                        <input type="submit" class="padding-half comment-submit-button" value="등록"/>
                     </div>
                 </form>
                 <!-- 답변작성 -->
@@ -201,47 +178,54 @@ th:object를 사용하여 폼의 속성들이 QuestionForm의 속성들로 구�
     </div>
 
     <!-- 페이징처리 시작 -->
-<!--    <div th:if="${!paging.isEmpty()}">
-        <ul class="pagination justify-content-center">
-            <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
-                <a class="page-link"
-                   th:href="@{|?page=${paging.number-1}|}">
-                    <span>이전</span>
-                </a>
-            </li>
-            <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
-                th:if="${page >= paging.number-2 and page <= paging.number+2}"
-                th:classappend="${page == paging.number} ? 'active'"
-                class="page-item">
-                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
-            </li>
-            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
-                <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
-                    <span>다음</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    <div th:unless="${!paging.isEmpty()}">
-    </div>-->
+    <!--    <div th:if="${!paging.isEmpty()}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{|?page=${paging.number-1}|}">
+                        <span>이전</span>
+                    </a>
+                </li>
+                <li th:each="page: ${#numbers.sequence(0, paging.totalPages-1)}"
+                    th:if="${page >= paging.number-2 and page <= paging.number+2}"
+                    th:classappend="${page == paging.number} ? 'active'"
+                    class="page-item">
+                    <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                </li>
+                <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                    <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+                        <span>다음</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div th:unless="${!paging.isEmpty()}">
+        </div>-->
 
     <!-- 페이징처리 끝 -->
-<!--    <h2>홈페이지다</h2>-->
-<!--    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세용</button></a>-->
-<!--    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>-->
+    <!--    <h2>홈페이지다</h2>-->
+    <!--    <a class="signup" th:href="@{/user/signup}"><button>가입을 해보세용</button></a>-->
+    <!--    <a class="board" th:href="@{/question/list}"><button>게시판</button></a>-->
 
 
+    <script th:inline="javascript">
+        let size = [[${paging.size}]];
+        let totalPages = [[${paging.totalPages}]];
+        let totalElements = [[${paging.totalElements}]];
+        let number = [[${paging.number}]];
+        let hasPrevious = [[${paging.hasPrevious}]];
+        let hasNext = [[${paging.hasNext}]];
 
-<script th:inline="javascript">
-    let size = [[${paging.size}]];
-    let totalPages = [[${paging.totalPages}]];
-    let totalElements = [[${paging.totalElements}]];
-    let number = [[${paging.number}]];
-    let hasPrevious = [[${paging.hasPrevious}]];
-    let hasNext = [[${paging.hasNext}]];
-    let siteUser = [[${#authentication.getName()}]];
-    console.log('siteUser:',siteUser)
-</script>
-<script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>
+        // 로그인한 유저일땐 siteUser object
+        //게스트 유저일땐 #authentication.getName()
+        let principalName = [[${#authentication.getName()}]];
+        console.log('principalName:',principalName)
+        let siteUser;
+        if([[${siteUser}]]){
+            siteUser = [[${siteUser}]];
+            console.log('siteUser:',siteUser);
+        }
+    </script>
+    <script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>
 </div>
 </html>

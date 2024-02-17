@@ -185,7 +185,8 @@ textarea {
 input[type=submit] {
     /*margin-top: 10px;*/
     /*padding: 5px 10px;*/
-    background: coral;
+    /*background: coral;*/
+    background: linear-gradient(35deg, palevioletred, yellow);;
     border-radius: 5px;
     border:none;
     color: white;

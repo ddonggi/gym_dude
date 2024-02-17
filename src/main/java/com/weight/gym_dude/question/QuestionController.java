@@ -3,7 +3,6 @@ package com.weight.gym_dude.question;
  * Created by 이동기 on 2022-11-11
  */
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.weight.gym_dude.answer.AnswerForm;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestService;
@@ -62,7 +61,7 @@ public class QuestionController {
         return ResponseEntity.status(HttpStatus.OK).body(paging);
     }
 
-    @GetMapping("/")
+/*    @GetMapping("/")
     public String list(Model model,
                        @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
                        QuestionForm questionForm,
@@ -83,11 +82,11 @@ public class QuestionController {
         }else{
             logger.info("Guest User");
         }
-        return "new_index";
-    }
+        return "index";
+    }*/
 
     //    @GetMapping("/")
-    @GetMapping("/new_index")
+    @GetMapping("/")
     public String newFeed(Model model,
                        @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
                        QuestionForm questionForm,
@@ -101,14 +100,16 @@ public class QuestionController {
 //        model.addAttribute("questionList", questionList);
         model.addAttribute("paging", paging);
         if(principal!=null) {
+            logger.info("principal name:{}",principal.getName());
             SiteUser siteUser = userService.getUser(principal.getName());
             SiteUserDTO siteUserDTO = userService.toUserDTO(siteUser);
             logger.info("siteUser:{}", siteUserDTO);
+            logger.info("siteUser name:{}", siteUserDTO.getUserName());
             model.addAttribute("siteUser", siteUserDTO);
         }else{
             logger.info("Guest User");
         }
-        return "new_index";
+        return "index";
     }
 
 /*    @GetMapping("/detail/{id}")
@@ -201,8 +202,9 @@ public class QuestionController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"수정 권한이 없습니다.");
         }
         questionService.modify(question,questionForm.getContent());
-        HashMap<String,String> questionContent = new HashMap<>();
+        HashMap<String,Object> questionContent = new HashMap<>();
         questionContent.put("content",question.getContent());
+        questionContent.put("modifiedDate",question.getModifiedDate());
         return ResponseEntity.status(HttpStatus.OK).body(questionContent);
     }
 

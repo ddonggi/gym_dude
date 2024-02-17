@@ -27,4 +27,7 @@ public class SiteUserDTO {
     public SiteUser toEntity(){
         return new SiteUser(this.id,this.userName,this.category,this.email,this.introduce,this.hasProfile);
     }
+    public SiteUser toSignUpEntity(){
+        return new SiteUser(this.userName,this.password,this.email,this.hasProfile);
+    }
 }

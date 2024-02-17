@@ -50,8 +50,9 @@ public class UserService {
                 .userName(userName)
                 .password(passwordEncoder.encode(password)) //빈으로 등록한 시큐리티의 BCryptPasswordEncoder 클래스를 사용하여 암호화
                 .email(email)
+                .hasProfile(false)
                 .build();
-        SiteUser user = userDTO.toEntity();
+        SiteUser user = userDTO.toSignUpEntity();
         userRepository.save(user);
         return user;
     }

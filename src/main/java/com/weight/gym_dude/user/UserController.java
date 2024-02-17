@@ -58,19 +58,25 @@ public class UserController {
 
     @PostMapping("/signup")
     public String signup(@Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) return "signup_form";
+        if (bindingResult.hasErrors()) {
+            logger.info("에러발생:{}",bindingResult.getFieldError());
+            return "signup_form";
+        }
 
         if (!userCreateForm.getPassword().equals(userCreateForm.getPassword2())) { // 비밀번호 2개가 동일하지 않을 경우
+            logger.info("2개의 비밀번호가 일치하지 않습니다");
             // NOTE : 대형 프로젝트에서는 번역과 관리를 위해 오류코드를 잘 정의하여 사용해야 한다.
             bindingResult.rejectValue("password2", "passwordIncorrect",
                     "2개의 패스워드가 일치하지 않습니다"); // rejectValue 오류 발생 시킴
             return "signup_form";
         }
         if(userService.nicknameExist(userCreateForm.getUsername())){
+            logger.info("이미 사용중인 닉네임 입니다");
             bindingResult.rejectValue("username", "signupFailed", "이미 사용중인 닉네임 입니다.");
             return "signup_form";
         }
         if(userService.emailExist(userCreateForm.getEmail())){
+            logger.info("이미 사용중인 이메일 이에요");
             bindingResult.rejectValue("email", "signupFailed", "이미 사용중인 이메일 입니다.");
             return "signup_form";
         }
@@ -92,6 +98,7 @@ public class UserController {
         }
 
         return "redirect:/";
+//        return "signup_form";
     }
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다

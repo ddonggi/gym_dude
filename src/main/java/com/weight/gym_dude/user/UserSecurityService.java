@@ -53,8 +53,10 @@ public class UserSecurityService implements UserDetailsService {
         List<GrantedAuthority> authorities = new ArrayList<>();
         logger.info("email:{}",email);
         if ("test@test.com".equals(email)||"admin@test.com".equals(email)) {
+            logger.info("관리자 유저 계정 입니다");
             authorities.add(new SimpleGrantedAuthority(UserRole.ADMIN.getValue()));
         } else {
+            logger.info("일반 유저 계정 입니다");
             authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
         }
         return new User(siteUser.getUserName(), siteUser.getPassword(), authorities);

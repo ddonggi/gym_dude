@@ -145,13 +145,9 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/create")
     @ResponseBody
-//    public String questionCreate(@RequestParam String title, @RequestParam String content){
     public ResponseEntity<Object> questionCreateRest(
             @RequestPart(name = "files",required = false) Optional<List<MultipartFile>> optionalFiles,
-//            QuestionDTO questionDTO,
             @RequestPart(name="content") @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
-//            @RequestPart(name="content") @JsonProperty("content") @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
-//            @RequestPart(name="content") @Valid String content, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
             BindingResult bindingresult, // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
             Principal principal //현재 로그인한 사용자의 정보를 알려면 스프링 시큐리티가    제공하는 Principal 객체를 사용해야 한다.
     ) {
@@ -167,14 +163,11 @@ public class QuestionController {
         logger.info("question Id:{}",question.getId());
         if(optionalFiles.isPresent()) {
             List<MultipartFile> files = optionalFiles.get();
-//        if(files!=null) {
             logger.info("files size:{}", files.size());
             List<FileRequest> fileRequestList = fileUtils.uploadFiles(files, question); //파일 저장소 업로드
             fileService.saveFiles(fileRequestList);//파일 정보 DB 저장
         }
-//        }
         return ResponseEntity.status(HttpStatus.OK).body(questionForm);
-//        return ResponseEntity.status(HttpStatus.OK).body(content);
     }
 
 /*    @PreAuthorize("isAuthenticated()")
@@ -196,7 +189,7 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     @ResponseBody
-    public ResponseEntity<Object> questionModifyRest(@RequestBody @Valid QuestionForm questionForm, BindingResult bindingResult,
+    public ResponseEntity<Object> questionModify(@RequestBody @Valid QuestionForm questionForm, BindingResult bindingResult,
                                  @PathVariable("id") Integer id,Principal principal){
         logger.info("컨텐츠 내용:{}",questionForm.getContent());
         logger.info("id:{}",id);

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 //import javax.persistence.*;
 //import javax.validation.constraints.Email;
 
@@ -21,6 +23,7 @@ import jakarta.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 //@ToString
 @Entity
+@DynamicInsert //default value 기능을 수행을 위함.해당 컬럼이 null일 경우에, insert에서 제외
 public class SiteUser {
 
     /*
@@ -43,6 +46,8 @@ public class SiteUser {
 
     private String introduce;
 
+    @Column(nullable = false)
+    @ColumnDefault("false")
     private Boolean hasProfile;
 
     //회원가입
@@ -50,6 +55,12 @@ public class SiteUser {
         this.userName=userName;
         this.password=password;
         this.email=email;
+    }
+    public SiteUser(String userName, String password, String email,Boolean hasProfile) {
+        this.userName=userName;
+        this.password=password;
+        this.email=email;
+        this.hasProfile=hasProfile;
     }
     //정보 조회용
     public SiteUser(Long id, String userName, String category, String email, String introduce, Boolean hasProfile) {

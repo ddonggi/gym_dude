@@ -331,10 +331,10 @@ input[type=submit] {
 .carousel-slide img,.carousel-slide video {
     display: block;
     width: 100%;
+    height: 100%;
     object-fit: cover;
 }
 .carousel-slide video{
-    height: 100%;
     object-fit: contain;
 }
 

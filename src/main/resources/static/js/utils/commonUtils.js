@@ -656,35 +656,6 @@ let getFormatDate = (date)=> {
 
 let setFeedSaveEvent = ()=>{
     const form = document.querySelector('#feed-form');
-    // console.log('form:',form)
-/*    let handleSubmit = (e) => {
-        e.preventDefault();
-        const form = e.currentTarget;
-        console.log('target form:',form)
-        const url = new URL(form.action);
-        console.log('url:',url)
-        const formData = new FormData(form);
-        console.log('formData:',formData)
-        let content = document.querySelector(".question-input-container .question-input").value;
-        console.log('content:',content)
-
-        const fileInput = document.getElementById("files");
-        const selectedFile = [...fileInput.files];
-        console.log('selectedFile',selectedFile)
-
-        if(content.length<5){
-            alert('최소5자 이상은 써주세요')
-            return
-        }
-        const fetchOptions = {
-            method: form.method,
-            body: formData,
-        };
-        fetch(url, fetchOptions);
-        e.preventDefault();
-    }
-    form.addEventListener('submit', handleSubmit);*/
-
     if(document.querySelector(".feed-save-button")) {
         // let saveButton = document.querySelector(".feed-save-button");
         form.addEventListener('submit', (e) => {
@@ -728,7 +699,18 @@ let setFileThumbnailEvent = () =>{
         // console.log('selectedFile',selectedFile)
 
         // fileReader.readAsDataURL(selectedFile[0]);
-
+        //갯수 제한 5개
+        console.log('파일 갯수:',selectedFile.length);
+        if(selectedFile.length>5){
+            alert('파일은 최대 5개 선택 가능합니다.');
+            document.querySelector(".file-thumbnail-container").innerHTML='';
+            return
+        }
+        // if(selectedFile.){
+        //     alert('파일 용량은 최대 XXMB 까지 됩니다.');
+        //     document.querySelector(".file-thumbnail-container").innerHTML='';
+        // }
+        //용량 제한 ( 총용량 or 개당 용량)
         selectedFile.forEach((file)=>{
             const fileReader = new FileReader();
             fileReader.readAsDataURL(file);

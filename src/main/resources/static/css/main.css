@@ -180,6 +180,7 @@ html, body {
 }
 textarea {
     outline: 1px solid transparent;
+    font-size: 16px;
 }
 
 input[type=submit] {

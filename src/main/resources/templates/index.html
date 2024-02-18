@@ -4,7 +4,7 @@
     <form enctype="multipart/form-data" th:action="@{/create}" method="post" class="question-container feed-width flex-column align-flex-end padding-default" id="feed-form">
         <div sec:authorize="isAnonymous()" class="question-content">
             <div class="feed-profile-image">
-                <img alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                <img alt="피드프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
             </div>
             <div class="question-input-container">
                 <textarea  disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
@@ -13,13 +13,13 @@
         </div>
         <div sec:authorize="isAuthenticated()" class="question-content">
             <div class="feed-profile-image">
-                <img th:if="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${siteUser.id}.png|">
-                <img th:unless="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                <img th:if="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|/resource/userProfiles/${siteUser.id}.png|">
+                <img th:unless="${siteUser.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
             </div>
             <div class="flex-column width100 gap-half">
                 <div class="flex gap-default">
                     <label for="files" class="feed-upload-label">
-                        <img src="http://localhost:8080/resource/apps/feedCamera.png" class="upload-button" alt="카메라이미지"/>
+                        <img src="/resource/apps/feedCamera.png" class="upload-button" alt="카메라이미지"/>
                     </label>
                     <input type="file" name="files" id="files" multiple class="file-input" accept="image/*,video/*"/>
                     <div class="file-thumbnail-container flex"></div>
@@ -39,15 +39,15 @@
             <div class="feed-header padding-default">
                 <div class="flex gap-half" th:if="${question.author}" th:aria-label="|${question.author.getUserName()}의 프로필|">
                     <a class="feed-profile-image" th:href="|@{/user/feed/}${question.author.id}|">
-                        <img th:if="${question.author.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${question.author.id}.png|">
-                        <img th:unless="${question.author.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                        <img th:if="${question.author.hasProfile}" alt="피드프로필" class="img object-cover border-full" th:src="|/resource/userProfiles/${question.author.id}.png|">
+                        <img th:unless="${question.author.hasProfile}" alt="피드프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
                     </a>
                     <div>
                         <div class="feed-writer text-sm font-bold" th:text="${question.author.getUserName()}">글쓴이</div>
                         <div class="feed-tag text-xs" th:if="${question.author.category}" th:text="${question.author.category}">카테고리</div>
                         <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
-                        <div th:if="${question.modifiedDate}" class="feed-timestamps text-xs" th:text="|${#temporals.format(question.modifiedDate,'yyyy-MM-dd HH:mm')} (수정됨)|"></div>
-                        <div th:unless="${question.modifiedDate}" class="feed-timestamps text-xs" th:text="${#temporals.format(question.createDate,'yyyy-MM-dd HH:mm')}"></div>
+                        <div th:if="${question.modifiedDate}" class="feed-timestamps text-xs" th:text="|${question.modifiedDate} (수정됨)|"></div>
+                        <div th:unless="${question.modifiedDate}" class="feed-timestamps text-xs" th:text="${question.createDate}"></div>
                     </div>
                 </div>
 
@@ -80,10 +80,10 @@
                     <div class="flex carousel-wrapper">
                         <!--캐러셀 미디어 삽입-->
                         <div th:if="${file.getFileType()=='image'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
-                            <img th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}"/>
+                            <img th:src="|/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}"/>
                         </div>
                         <div th:if="${file.getFileType()=='video'}" th:each="file,loop : ${question.fileList}" class="carousel-slide">
-                            <video th:src="|http://localhost:8080/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}" controls></video>
+                            <video th:src="|/resource/${#temporals.format(file.createDate,'yyMMdd')}/${file.saveName}|"  th:alt="${file.originalName}" controls></video>
                         </div>
                     </div>
                     <!--캐러셀 사이드 버튼 : 미디어 사이즈가 2 이상일 경우만-->
@@ -113,13 +113,13 @@
             <!--feed footer -->
             <div class="feed-footer padding-half text-xs gap-half"><!--feed-footer-->
                 <div class="like flex align-center">
-                    <img class="like-img" src="http://localhost:8080/resource/apps/heartBorder.png" alt="좋아요이미지"/>
-                    <img class="like-img hide" src="http://localhost:8080/resource/apps/heart.png" alt="좋아요이미지"/>
+                    <img class="like-img" src="/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                    <img class="like-img hide" src="/resource/apps/heart.png" alt="좋아요이미지"/>
                     좋아요 N
                 </div>
                 <!--답변 갯수 출력-->
                 <span th:if="${#lists.size(question.answerList) > 0}" class="answer-count flex align-center">
-                    <img class="chat-img" src="http://localhost:8080/resource/apps/chat.png" alt="채팅이미지"/>
+                    <img class="chat-img" src="/resource/apps/chat.png" alt="채팅이미지"/>
                     <!--                      th:text="|댓글 ${#lists.size(question.answerList)}개|">-->
                     댓글 <strong>[[${#lists.size(question.answerList)}]]</strong>
                 </span>
@@ -130,8 +130,8 @@
                 <div class="answer-list">
                     <div class="answer padding-half" th:each="answer : ${question.answerList}">
                         <div th:if="${answer.author}" class="answer-profile-image" th:onclick="|location.href='@{/user/feed/}${answer.author.id}'|">
-                            <img th:if="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${answer.author.id}.png|">
-                            <img th:unless="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                            <img th:if="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|/resource/userProfiles/${answer.author.id}.png|">
+                            <img th:unless="${answer.author.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
                         </div>
 
                         <!-- 가입한 유저가 쓴 댓글 -->
@@ -140,8 +140,8 @@
                                 <div class="text-sm" th:text="${answer.author.getUserName()}">작성자 이름</div>
 
                                 <!--수정된 날짜가 있을때-->
-                                <div th:if="${answer.modifiedDate}" th:text="|${#temporals.format(answer.modifiedDate,'yyyy-MM-dd HH:mm')} (수정됨)|" class="feed-timestamps text-xs"></div>
-                                <div th:unless="${answer.modifiedDate}" th:text="${#temporals.format(answer.createDate,'yyyy-MM-dd HH:mm')}" class="feed-timestamps text-xs"></div>
+                                <div th:if="${answer.modifiedDate}" th:text="|${answer.modifiedDate} (수정됨)|" class="feed-timestamps text-xs"></div>
+                                <div th:unless="${answer.modifiedDate}" th:text="${answer.createDate}" class="feed-timestamps text-xs"></div>
                             </div>
                             <div class="answer-body">
                                 <div th:text="${answer.content}" class="answer-content text-sm"></div>
@@ -155,11 +155,11 @@
                     <!--        <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
                     <!--                <label for="content">댓글</label>-->
                     <div sec:authorize="isAnonymous()" class="answer-profile-image">
-                        <img class="img object-cover border-full" alt="게스트댓글프로필" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                        <img class="img object-cover border-full" alt="게스트댓글프로필" src="/resource/apps/defaultProfile.png">
                     </div>
                     <div sec:authorize="isAuthenticated()" class="answer-profile-image">
-                        <img th:if="${siteUser.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|http://localhost:8080/resource/userProfiles/${siteUser.id}.png|">
-                        <img th:unless="${siteUser.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="http://localhost:8080/resource/apps/defaultProfile.png">
+                        <img th:if="${siteUser.hasProfile}" alt="댓글프로필" class="img object-cover border-full" th:src="|/resource/userProfiles/${siteUser.id}.png|">
+                        <img th:unless="${siteUser.hasProfile}" alt="댓글프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
                     </div>
                     <div sec:authorize="isAnonymous()" class="flex-column width100 align-flex-end">
                         <textarea placeholder="로그인 후 작성해 주세요" disabled th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>

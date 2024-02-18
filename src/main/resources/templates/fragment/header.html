@@ -3,7 +3,7 @@
         <div class="navbar-container">
             <div class="navbar-left flex justify-content-center align-center">
 <!--                <a class="navbar-brand" href="/">-->
-                    <img onclick="location.href='/'" src="http://localhost:8080/resource/apps/headerLogo.png" alt="logo"/>
+                    <img onclick="location.href='/'" src="/resource/apps/headerLogo.png" alt="logo"/>
 <!--                </a>-->
             </div>
 <!--            <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -23,8 +23,8 @@ sec:authorize="isAuthenticated()" - 이 속성은 로그인 된 경우에만 해
                 <div sec:authorize="isAuthenticated()" th:text="|${siteUser.userName} 님|"></div>
                 <div sec:authorize="isAuthenticated()" class="nav-link my-menu-container" >
                     <div class="feed-profile-image">
-                            <img th:if="${siteUser.hasProfile}" class="img object-cover border-full" alt="사용자프로필" th:src="|http://localhost:8080/resource/userProfiles/${siteUser.id}.png|"/>
-                            <img th:unless="${siteUser.hasProfile}" class="img object-cover border-full" alt="기본프로필" src="http://localhost:8080/resource/apps/defaultProfile.png"/>
+                            <img th:if="${siteUser.hasProfile}" class="img object-cover border-full" alt="사용자프로필" th:src="|/resource/userProfiles/${siteUser.id}.png|"/>
+                            <img th:unless="${siteUser.hasProfile}" class="img object-cover border-full" alt="기본프로필" src="/resource/apps/defaultProfile.png"/>
                     </div>
 
                     <!--내 프로필 클릭시 나타나는 메뉴-->

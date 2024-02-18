@@ -1,69 +1,27 @@
 /* 비동기 통신에 쓰일 보안용 CSRF 정보 */
 let csrf_header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
 let csrf_token = document.querySelector("meta[name='_csrf']").getAttribute("content");
-// console.log('header:',csrf_header)
-// console.log('token:',csrf_token)
-let siteURL = "http://localhost:8080";
+let siteURL = "";
+let formatter = new Intl.RelativeTimeFormat(navigator.geolocation,{numeric:'auto'});
 
-// internationalization API
-// let formatter = new Intl.NumberFormat('ko'); // 한국어 지정
-/* 숫자 */
-// let views = 9744642
-// let formatter = new Intl.NumberFormat('ko'); // 한국어 지정
-// formatter.format(view)  >>> 9,744,642 (콤마 찍힘)
-// let formatter = new Intl.NumberFormat('ko',{notation:'compact'}); | en | navigator.language
-// formatter.format(view)  >>> 974만 | 974m | 언어별 |
-/* 가격 */
-/* 날짜 */
-let formatter = new Intl.RelativeTimeFormat('ko'); // 한국어 지정
-console.log(formatter.format(1,'day'));
-console.log(formatter.format(2,'day'));
-console.log(formatter.format(3,'day'));
-console.log(formatter.format(-1,'day'));
-console.log(formatter.format(-2,'day'));
-console.log(formatter.format(-3,'day'));
-formatter = new Intl.RelativeTimeFormat('ko',{numeric:'auto'});
-console.log(formatter.format(0,'day')); //오늘
-console.log(formatter.format(1,'day')); //내일
-console.log(formatter.format(2,'day')); //모레
-console.log(formatter.format(3,'day')); //3일 후
-console.log(formatter.format(-1,'day')); //어제
-console.log(formatter.format(-2,'day')); //그저께
-console.log(formatter.format(-3,'day')); // 3일 전
-console.log('-----')
-console.log(formatter.format(-3,'hour')); // 3일 전
-console.log(formatter.format(-2,'hour')); // 3일 전
-console.log(formatter.format(-1,'hour')); // 3일 전
-console.log(formatter.format(0,'hour')); // 3일 전
-console.log(formatter.format(1,'hour')); // 3일 전
-console.log(formatter.format(2,'hour')); // 3일 전
-console.log(formatter.format(3,'hour')); // 3일 전
-console.log('-----')
-console.log(formatter.format(-3,'minute')); // 3일 전
-console.log(formatter.format(-2,'minute')); // 3일 전
-console.log(formatter.format(-1,'minute')); // 3일 전
-console.log(formatter.format(0,'minute')); // 3일 전
-console.log(formatter.format(1,'minute')); // 3일 전
-console.log(formatter.format(2,'minute')); // 3일 전
-console.log(formatter.format(3,'minute')); // 3일 전
-console.log('-----')
-console.log(formatter.format(-3,'minutes')); // 3일 전
-console.log(formatter.format(0,'minutes')); // 3일 전
-console.log(formatter.format(3,'minutes')); // 3일 전
-formatter = new Intl.RelativeTimeFormat('en');
-console.log(formatter.format(1,'day'));
-console.log(formatter.format(2,'day'));
-console.log(formatter.format(3,'day'));
-console.log(formatter.format(-1,'day'));
-console.log(formatter.format(-2,'day'));
-console.log(formatter.format(-3,'day'));
-formatter = new Intl.RelativeTimeFormat('en',{numeric:'auto'});
-console.log(formatter.format(1,'day'));
-console.log(formatter.format(2,'day'));
-console.log(formatter.format(3,'day'));
-console.log(formatter.format(-1,'day'));
-console.log(formatter.format(-2,'day'));
-console.log(formatter.format(-3,'day'));
+let getRelativeDate = (originRawDate) => {
+    let now = new Date();
+    let originDate = new Date(originRawDate);
+    let resultYear = originDate.getFullYear()-now.getFullYear();
+    let resultMonth = originDate.getMonth()-now.getMonth();
+    let resultDate = originDate.getDate()-now.getDate();
+    let resultHours = originDate.getHours()-now.getHours();
+    let resultMinutes = originDate.getMinutes()-now.getMinutes();
+    let resultSeconds = originDate.getSeconds()-now.getSeconds();
+    if(resultYear<0) return formatter.format(resultYear,'year');
+    else if(resultMonth<0) return formatter.format(resultMonth,'month');
+    else if(resultDate<0) return formatter.format(resultDate,'day');
+    else if(resultHours<0) return formatter.format(resultHours,'hour');
+    else if(resultMinutes<0) return formatter.format(resultMinutes,'minute');
+    else return formatter.format(resultSeconds,'second');
+}
+
+
 /* 비동기통신을 위한 fetch API */
 let postData = async (url, data = {}, csrf_header, csrf_token) => {
     // 옵션 기본 값은 *로 강조
@@ -192,9 +150,10 @@ let setFeedModifySaveEvent = (feed) => {
                 console.log('res data:', resData);
                 console.log('res content:', resData.content);
                 console.log('res date:', resData.modifiedDate);
+                let modifiedDate = getRelativeDate(resData.modifiedDate);
                 //날짜 변경
                 // feed.
-                feed.querySelector(".feed-timestamps").innerHTML = `${resData.modifiedDate} (수정됨)`; //날짜 변경
+                feed.querySelector(".feed-timestamps").innerHTML = `${modifiedDate} (수정됨)`; //날짜 변경
                 feed.querySelector(".feed-content").innerText = resData.content; //내용 변경
                 feed.querySelector(".modify-button").classList.toggle("hide");
                 feed.querySelector(".delete-button").classList.toggle("hide");
@@ -360,13 +319,17 @@ let setCommentToggleEvent = (feed) => {
 }
 
 let setLikeToggleEvent = (feed) => {
-    if(principalName!=='anonymousUser'){
-        let likeButton = feed.querySelector(".like");
+    let likeButton = feed.querySelector(".like");
+    if(principalName!=='anonymousUser'){ // 로그인한 유저 일 경우
         likeButton.addEventListener('click', () => {
             likeButton.classList.toggle("like-text-color");
             likeButton.querySelectorAll(".like-img").forEach(button => {
                 button.classList.toggle("hide");
             })
+        })
+    }else{
+        likeButton.addEventListener('click', () => {
+            alert('로그인 후 이용해 주세요')
         })
     }
 }
@@ -412,6 +375,7 @@ let renderFeedList = (response) => {
         console.log('author.userName:', author.userName)
         let fileList = feed.fileList;
         let answerList = feed.answerList;
+        let createDate = getRelativeDate(feed.createDate);
         feedContainer.innerHTML +=
             `<div class="feed" id="${feed.id}">
                 <!--피드 헤더-->
@@ -424,7 +388,7 @@ let renderFeedList = (response) => {
                             <div class="feed-writer text-sm font-bold">${author.userName}</div>
                             <div class="feed-tag text-xs">${author.category}</div>
                             <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
-                            <div class="feed-timestamps text-xs">${feed.createDate}</div>
+                            <div class="feed-timestamps text-xs">${createDate}</div>
                         </div>
                     </div>
                 </div>
@@ -575,6 +539,7 @@ let renderFeedList = (response) => {
             let answerListContainer = answerContainer.querySelector(".answer-list");
             answerList.forEach((answer) => {
                 let answerAuthor = answer.author;
+                let answerCreateDate = getRelativeDate(answer.createDate);
 
                 answerListContainer.innerHTML += `
                 <div class="answer padding-half">
@@ -584,7 +549,7 @@ let renderFeedList = (response) => {
                     <div>
                         <div class="answer-header">
                             <div class="text-sm">${answerAuthor.userName}</div>
-                            <div class="feed-timestamps text-xs">${answer.createDate}</div>
+                            <div class="feed-timestamps text-xs">${answerCreateDate}</div>
                         </div>
                         <div class="answer-body">
                             <div class="answer-content text-sm">${answer.content}</div>
@@ -597,6 +562,7 @@ let renderFeedList = (response) => {
                 }
                 if (answer.modifiedDate !== null) {
                     console.log('answer modified date:',answer.modifiedDate);
+
                     currentFeed.querySelector(".answer-header div:last-child").innerHTML = `<div class="feed-timestamps text-xs">${answer.modifiedDate} (수정됨)</div>`;
                 }
             })
@@ -683,6 +649,7 @@ let setCommentConfirmEvent = (currentFeed)=>{
                     let content=resData.content;
                     let author=resData.author;
                     let profileImage ="";
+                    let answerCreateDate = getRelativeDate(resData.createDate);
                     if(author.hasProfile){ // 댓글 작성자 정보
                         profileImage="/userProfiles/"+author.id;
                     }else{
@@ -695,7 +662,7 @@ let setCommentConfirmEvent = (currentFeed)=>{
                         <div>
                             <div class="answer-header">
                                 <div class="text-sm">${author.userName}</div>
-                                <div class="feed-timestamps text-xs">${resData.createDate}</div>
+                                <div class="feed-timestamps text-xs">${answerCreateDate}</div>
                             </div>
                             <div class="answer-body">
                                 <div class="answer-content text-sm">${content}</div>
@@ -719,6 +686,7 @@ let easyDate = (formatter) =>{
     console.log('');
 }
 
+//YYmmdd
 let getFormatDate = (date)=> {
     let year = date.getFullYear().toString();
     console.log('year',year)
@@ -826,5 +794,6 @@ export {
     setFeedEvent,
     observeLastItem,
     setFeedSaveEvent,
-    setFileThumbnailEvent
+    setFileThumbnailEvent,
+    getRelativeDate
 };

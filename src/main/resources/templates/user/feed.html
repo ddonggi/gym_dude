@@ -9,10 +9,10 @@
                 <div th:if="${question.getIsHide()==false}" th:each="question,loop : ${feedPaging}" class="my-feed flex-column" th:id="${question.id}">
                     <!--썸네일 부분 -->
                     <div th:if="${question.fileList.size>0&&question.fileList.get(0).getFileType()=='image'}" class="my-feed-media-wrapper">
-                        <img th:src="|http://localhost:8080/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"/>
+                        <img th:src="|/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"/>
                     </div>
                     <div th:if="${question.fileList.size>0&&question.fileList.get(0).getFileType()=='video'}" class="my-feed-media-wrapper">
-                        <video th:src="|http://localhost:8080/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"></video>
+                        <video th:src="|/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"></video>
                     </div>
                     <!-- 미디어가 없다면 텍스트만 -->
                     <div th:unless="${question.fileList.size>0}" class="my-feed-content-wrapper" th:text="${question.content}"></div>

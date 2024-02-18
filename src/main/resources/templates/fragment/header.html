@@ -30,7 +30,7 @@ sec:authorize="isAuthenticated()" - 이 속성은 로그인 된 경우에만 해
                     <!--내 프로필 클릭시 나타나는 메뉴-->
                     <div class="my-menu-wrapper flex-column hide">
                         <div>
-                            <a th:href="@{/user/my_profile}">내 프로필</a>
+                            <a th:href="|@{/user/profile/}${siteUser.id}|">내 프로필</a>
                         </div>
                         <div>
                             <a th:href="|@{/user/feed/}${siteUser.id}|">내 게시물</a>

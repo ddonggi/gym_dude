@@ -101,12 +101,23 @@ public class UserController {
 //        return "signup_form";
     }
 
+//    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @GetMapping("/profile/{id}")
+    public String profile(@PathVariable(value = "id") Long id, Model model,Principal principal) {
+//        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        Optional<SiteUser> optionalAuthor = userRepository.findById(id);
+        if(optionalAuthor.isPresent()) {
+            SiteUser siteUser = optionalAuthor.get();
+            model.addAttribute("siteUser", siteUser);
+        }
+        return "user/profile";
+    }
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
-    @GetMapping("/my_profile")
-    public String myProfile(Model model,Principal principal) {
+    @GetMapping("/profile/edit")
+    public String myProfileEdit(Model model,Principal principal) {
         SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
         model.addAttribute("siteUser",author);
-        return "user/my_profile";
+        return "user/profile_form";
     }
     @GetMapping("/feed/{id}")
     public String feed(Model model,

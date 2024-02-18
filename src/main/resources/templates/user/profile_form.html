@@ -1,0 +1,42 @@
+<html layout:decorate="~{layout/layout}">
+<div layout:fragment="content" class="my-profile-container">
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+    <div class="my-profile-block feed-width padding-default">
+        <h1>내 프로필</h1>
+        <section>
+            <div class="section-header flex width100 gap-rem">
+                <div class="flex-column align-center width100 gap-half">
+                    <div class="my-profile-image edit-image-border">
+                        <img th:if="${siteUser.hasProfile}" th:src="|/resource/userProfiles/${siteUser.id}.png|" alt="유저 프로필 이미지"/>
+                        <img th:unless="${siteUser.hasProfile}" th:src="/resource/apps/defaultProfile.png"  alt="기본 프로필 이미지"/>
+                        <div class="plus-shape"><b>+</b></div>
+                    </div>
+                    <div class="flex gap-rem"> 닉네임
+                        <input type="text" th:value="${siteUser.userName}"/>
+                        <button>중복체크</button>
+                    </div>
+                    <div class="flex gap-rem"> 이메일
+                        <div th:text="${siteUser.email}"></div>
+                    </div>
+                    <div class="flex gap-rem"> 관심분야
+                        <select name="fitness" class="select-box">
+                            <option value="보디빌딩" selected="selected">보디빌딩</option>
+                            <option value="크로스핏">크로스핏</option>
+                            <option value="파워리프팅">파워리프팅</option>
+                            <option value="맨몸운동">맨몸운동</option>
+                            <option value="역도">역도</option>
+                        </select>
+                    </div>
+                </div>
+                <input type="submit" class="profile-edit-button padding-default" value="저장"></input>
+            </div>
+            <article>
+                <h2>내 소개</h2>
+                <textarea th:value="${siteUser.introduce}"></textarea>
+            </article>
+        </section>
+    </div>
+    <th:block th:replace="~{fragment/footer::footer}"></th:block>
+    <script layout:fragment="profile_js" th:src="@{/js/myProfile.js}" type="module"></script>
+</div>
+</html>

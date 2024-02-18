@@ -4,22 +4,32 @@
     <div class="my-profile-block feed-width padding-default">
         <h1>내 프로필</h1>
         <section>
-            <div class="section-header flex width100 gap-rem">
-                <div class="flex-column align-center width100 gap-half">
-                    <div class="my-profile-image edit-image-border">
+            <form>
+            <div class="section-header flex width100 gap-half">
+                <div class="flex-column align-center gap-rem width100">
+                    <div class="my-profile-image edit-image-border width-sm">
                         <img th:if="${siteUser.hasProfile}" th:src="|/resource/userProfiles/${siteUser.id}.png|" alt="유저 프로필 이미지"/>
                         <img th:unless="${siteUser.hasProfile}" th:src="/resource/apps/defaultProfile.png"  alt="기본 프로필 이미지"/>
                         <div class="plus-shape"><b>+</b></div>
                     </div>
-                    <div class="flex gap-rem"> 닉네임
-                        <input type="text" th:value="${siteUser.userName}"/>
-                        <button>중복체크</button>
+                    <div class="flex-column width-sm">
+                        <div class="flex align-center gap-half">
+                            <div>닉네임</div>
+                            <div class="flex align-center">
+                                <div class="text-limit-current text-xs"></div>
+                                <div class="text-limit-max text-xs"></div>
+                            </div>
+                        </div>
+                        <div class="flex-column gap-half">
+                            <input minlength="2" maxlength="8" class="padding-half nickname-input" pattern="^[a-zA-Zㄱ-ㅎ가-힣0-9]+$" type="text" th:value="${siteUser.userName}" placeholder="크리스범스테드" required/>
+                            <div class="text-xs text-warning"></div>
+                        </div>
                     </div>
-                    <div class="flex gap-rem"> 이메일
-                        <div th:text="${siteUser.email}"></div>
+                    <div class="flex-column width-sm"> 이메일
+                        <div class="" th:text="${siteUser.email}"></div>
                     </div>
-                    <div class="flex gap-rem"> 관심분야
-                        <select name="fitness" class="select-box">
+                    <div class="flex-column width-sm"> 관심분야
+                        <select name="fitness" class="select-box padding-half">
                             <option value="보디빌딩" selected="selected">보디빌딩</option>
                             <option value="크로스핏">크로스핏</option>
                             <option value="파워리프팅">파워리프팅</option>
@@ -28,15 +38,24 @@
                         </select>
                     </div>
                 </div>
-                <input type="submit" class="profile-edit-button padding-default" value="저장"></input>
+                <button type="submit" class="profile-edit-button padding-default submit-button">저장</button>
             </div>
             <article>
-                <h2>내 소개</h2>
-                <textarea th:value="${siteUser.introduce}"></textarea>
+                <div class="flex align-center gap-half">
+                    <h2>내 소개</h2>
+                    <div class="flex align-center">
+                        <div class="text-limit-current text-xs"></div>
+                        <div class="text-limit-max text-xs"></div>
+                    </div>
+                </div>
+                <div>
+                    <textarea maxlength="300" class="my-profile-introduce-input padding-half" th:text="${siteUser.introduce}"></textarea>
+                </div>
             </article>
+            </form>
         </section>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>
-    <script layout:fragment="profile_js" th:src="@{/js/myProfile.js}" type="module"></script>
+    <script layout:fragment="profile_js" th:src="@{/js/profileForm.js}" type="module"></script>
 </div>
 </html>

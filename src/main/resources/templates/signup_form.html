@@ -9,21 +9,29 @@
             <!--    <div th:replace="~{fragment/form_errors :: formErrorsFragment}"></div>-->
             <div class="signup-name">
                 <label for="username" class="form-label">닉네임</label>
+                <div class="flex align-center">
+                    <div class="text-limit-current text-xs"></div>
+                    <div class="text-limit-max text-xs"></div>
+                </div>
                 <div th:if="${#fields.hasErrors('username')}" role="alert">
 <!--                        <input type="text" th:field="*{username}" th:placeholder="${#fields.errors('username').get(0)}" class="input-block-sm"/>-->
-                    <input type="text" th:field="*{username}" id="username" th:errorclass="error" th:errors="*{username}" class="input-block-sm" pattern="^[a-zA-Zㄱ-ㅎ가-힣0-9]+$" minlength="2" maxlength="8" required/>
+                    <input type="text" th:field="*{username}" id="username"  class="input-block-sm nickname-input" pattern="^[a-zA-Zㄱ-ㅎ가-힣0-9]+$" minlength="2" maxlength="8" required/>
+                    <div class="text-xs text-warning" th:errorclass="error" th:errors="*{username}"></div>
                 </div>
 
                 <div th:unless="${#fields.hasErrors('username')}" role="alert">
-                    <input type="text" th:field="*{username}" id="username" class="input-block-sm" placeholder="홍길동" pattern="^[a-zA-Zㄱ-ㅎ가-힣0-9]+$" minlength="2" maxlength="8" required />
+                    <input type="text" th:field="*{username}" id="username" class="input-block-sm nickname-input" placeholder="크리스범스테드" pattern="^[a-zA-Zㄱ-ㅎ가-힣0-9]+$" minlength="2" maxlength="8" required />
+                    <div class="text-xs text-warning"></div>
                 </div>
+
             </div>
 
             <div class="signup-email">
                 <label for="email" class="form-label">이메일</label>
-                <div th:if="${#fields.hasErrors('email')}" role="alert">
+                <div th:if="${#fields.hasErrors('email')}" >
 <!--                    <input type="email" th:field="*{email}" id="email" th:placeholder="${#fields.errors('email').get(0)}" class="input-block-sm"/>-->
-                    <input type="email" th:field="*{email}" id="email" th:errorclass="error" th:errors="*{email}" class="input-block-sm" />
+                    <input type="email" th:field="*{email}" id="email"  class="input-block-sm" />
+                    <div role="alert" th:errorclass="error" class="text-xs text-warning" th:errors="*{email}"></div>
                 </div>
                 <div th:unless="${#fields.hasErrors('email')}" role="alert">
                     <input type="email" th:field="*{email}" id="email" class="input-block-sm" placeholder="example@fitive.com"/>
@@ -34,8 +42,9 @@
                 <label for="password" class="form-label">비밀번호</label>
                 <div th:if="${#fields.hasErrors('password')}" role="alert">
 <!--                    <input type="password" th:field="*{password}" id="password" th:placeholder="${#fields.errors('password').get(0)}" class="input-block-sm"/>-->
-                    <input type="password" th:field="*{password}" id="password" th:errorclass="error" th:errors="*{password}" class="input-block-sm" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,20}$"
+                    <input type="password" th:field="*{password}" id="password" class="input-block-sm" pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,20}$"
                            minlength="8" maxlength="20"/>
+                    <div th:errorclass="error" th:errors="*{password}" class="text-warning text-xs"></div>
 
                 </div>
                 <div th:unless="${#fields.hasErrors('password')}" role="alert">
@@ -48,7 +57,8 @@
                 <label for="password2" class="form-label">비밀번호 확인</label>
                 <div th:if="${#fields.hasErrors('password2')}" role="alert">
 <!--                    <input type="password" th:field="*{password2}" id="password2" th:placeholder="${#fields.errors('password2').get(0)}" class="input-block-sm"/>-->
-                    <input type="password" th:field="*{password2}" id="password2" th:errorclass="error" th:errors="*{password2}" class="input-block-sm" />
+                    <input type="password" th:field="*{password2}" id="password2" class="input-block-sm" />
+                    <div th:errorclass="error" th:errors="*{password2}" class="text-warning text-xs"></div>
 
                 </div>
                 <div th:unless="${#fields.hasErrors('password2')}" role="alert">
@@ -56,9 +66,15 @@
                 </div>
             </div>
 
-            <input type="submit" class="button padding-default" value="회원가입"></input>
+            <button type="submit" class="button padding-default submit-button" >회원가입</button>
         </form>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>
+    <script th:inline="javascript" type="module">
+        import {setTextChangeTrackingEvent,setAsyncNickNameCheckEvent} from '/js/utils/commonUtils.js';
+        let nicknameInput = document.querySelector(".nickname-input");
+        setTextChangeTrackingEvent(nicknameInput);
+        setAsyncNickNameCheckEvent(nicknameInput);
+    </script>
 </div>
 </html>

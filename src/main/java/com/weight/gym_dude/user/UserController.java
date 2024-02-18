@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 //import javax.validation.Valid;
 
@@ -48,12 +52,21 @@ public class UserController {
         return "signup_form"; // 회원가입을 위한 템플릿 렌더링
     }
 
+
     @PostMapping("/name/check")
     @ResponseBody
-    public String nicknameDuplicateCheck(@RequestBody String username){
-        boolean isNickNameExist = userService.nicknameExist(username);
-        if(isNickNameExist) return "이미 사용중인 닉네임 입니다";
-        return "사용 가능한 닉네임 입니다";
+    public ResponseEntity<Object> nicknameDuplicateCheck(@RequestBody UserCreateForm userCreateForm){
+        logger.info("닉네임 체크 시작:{}",userCreateForm.getUsername());
+        boolean isNickNameExist = userService.nicknameExist(userCreateForm.getUsername());
+        HashMap<String,String> response = new HashMap<>();
+        if(isNickNameExist) {
+            response.put("result","negative");
+            response.put("message","사용할 수 없는 닉네임 입니다");
+        }else{
+            response.put("result","positive");
+            response.put("message","사용 가능한 닉네임 입니다");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/signup")

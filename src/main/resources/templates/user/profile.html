@@ -2,35 +2,39 @@
 <div layout:fragment="content" class="my-profile-container">
     <th:block th:replace="~{fragment/header::header}"></th:block>
     <div class="my-profile-block feed-width padding-default">
-        <h1 sec:authorize="isAuthenticated()" th:text="|내 프로필|"></h1>
+        <h1 sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==siteUser.getUserName()}" th:text="|내 프로필|"></h1>
+        <h1 sec:authorize="isAnonymous()" th:unless="${#authentication.getName()==siteUser.getUserName()}" th:text="|${siteUser.userName} 님의 프로필|"></h1>
         <h1 sec:authorize="isAnonymous()" th:text="|${siteUser.userName} 님의 프로필|"></h1>
         <section>
-            <div class="section-header flex width100 gap-rem">
-                <div class="flex-column align-center width100 gap-half">
+            <div class="section-header flex width100 gap-half">
+                <div class="flex-column align-center gap-rem width100">
                     <div class="my-profile-image">
                         <img th:if="${siteUser.hasProfile}" th:src="|/resource/userProfiles/${siteUser.id}.png|" alt="유저 프로필 이미지"/>
                         <img th:unless="${siteUser.hasProfile}" th:src="/resource/apps/defaultProfile.png" alt="기본 프로필 이미지"/>
                     </div>
-                    <div class="flex gap-rem"> 닉네임
+                    <div class="flex-column width-sm">닉네임
                         <div th:text="${siteUser.userName}"></div>
                     </div>
-                    <div class="flex gap-rem"> 이메일
+                    <div class="flex-column width-sm"> 이메일
                         <div th:text="${siteUser.email}"></div>
                     </div>
-                    <div class="flex gap-rem"> 운동분야
+                    <div class="flex-column width-sm"> 관심분야
                         <div th:if="${siteUser.category!=null}" th:text="${siteUser.category}"></div>
-                        <div th:unless="${siteUser.category!=null}" th:text=""></div>
+                        <div th:unless="${siteUser.category!=null}" th:text="|미선택|"></div>
                     </div>
                 </div>
-                <button sec:authorize="isAuthenticated()" class="profile-edit-button" onclick="location.href='/user/profile/edit'">정보 수정하기</button>
+                <button sec:authorize="isAuthenticated()"
+                        th:if="${#authentication.getName()==siteUser.getUserName()}"
+                        class="profile-edit-button" onclick="location.href='/user/profile/edit'">정보 수정하기</button>
             </div>
             <article>
                 <h2>내 소개</h2>
-                <p th:text="${siteUser.introduce}"></p>
+                <pre th:if="${siteUser.introduce!=null}" th:text="${siteUser.introduce}"></pre>
+                <pre th:unless="${siteUser.introduce!=null}" th:text="|나에 대해 소개해 보세요|"></pre>
             </article>
         </section>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>
-    <script layout:fragment="profile_js" th:src="@{/js/myProfile.js}" type="module"></script>
+    <script layout:fragment="profile_js" th:src="@{/js/profile.js}" type="module"></script>
 </div>
 </html>

@@ -1,5 +1,6 @@
 package com.weight.gym_dude.config;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 /**
  * PackageName : com.weight.gym_dude.config
@@ -90,7 +95,19 @@ public class SecurityConfig {
                             authorizeRequests.requestMatchers(new AntPathRequestMatcher("/**")).permitAll(); // 인증되지 않은 모든 url에 대해 승인
 //                        authorizeRequests.anyRequest().permitAll();
                         })
-                        .cors(Customizer.withDefaults())
+//                        .cors(Customizer.withDefaults())
+                        .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                            @Override
+                            public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                                CorsConfiguration config = new CorsConfiguration();
+                                config.setAllowedOrigins(Collections.singletonList("http://localhost:8080"));
+                                config.setAllowedMethods(Collections.singletonList("*"));
+                                config.setAllowCredentials(true);
+                                config.setAllowedHeaders(Collections.singletonList("*"));
+                                config.setMaxAge(3600L); //1시간
+                                return config;
+                            }
+                        }))
                         // CSRF 에 대한 설정
 //                    .csrf(AbstractHttpConfigurer::disable)// stateless한 rest api를 개발할 것이므로 csrf 공격에 대한 옵션은 꺼둔다.
                         .csrf((csrf) -> csrf

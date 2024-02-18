@@ -41,11 +41,23 @@ img, svg {
 .justify-content-center{
     justify-content: center;
 }
+.justify-content-between{
+    justify-content: space-between;
+}
+.text-limit-current{
+    color: var(--text-timestamps);
+}
 .text-center{
     text-align: center;
 }
 .gap-half{
     gap: 0.5rem;
+}
+.text-warning{
+    color: indianred;
+}
+.text-good{
+    color: darkseagreen;
 }
 .gap-rem{
     gap: 1rem;
@@ -74,6 +86,10 @@ img, svg {
 .rotate90{
     rotate: 90deg;
 }
+.width-sm {
+    min-width: 240px;
+}
+
 @font-face {
     /*font-family: 'GmarketSansMedium';*/
     /*src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts-2001@1.1/GmarketSansMedium.woff') format('woff');*/
@@ -83,7 +99,8 @@ img, svg {
 }
 
 html, body {
-    height: 100%;
+    /*height: 100%;*/
+    min-height: 100%;
     margin: 0;
     padding: 0;
     font-weight: 400;
@@ -117,8 +134,8 @@ html, body {
     border-bottom: 1px solid var(--border-silver100);
     position: sticky;
     /*position: fixed;*/
-    top: 0;
     height: 3.5rem;
+    top: 0;
     display: flex;
     justify-content: center;
     width: 100%;
@@ -151,7 +168,8 @@ html, body {
     display: flex;
     padding: 0 1rem;
     justify-content: space-between;
-    min-width: 1024px;
+    min-width: 640px;
+    width: 100%;
     max-width: 1280px;
     height: 100%;
     align-items: center;
@@ -161,6 +179,9 @@ html, body {
     gap: 0.5rem;
     align-items: center;
 }
+.nav-link.my-menu-container {
+    position: relative;
+}
 .my-menu-wrapper {
     position: absolute;
     width: max-content;
@@ -169,6 +190,7 @@ html, body {
     border: 1px solid var(--border-silver100);
     /*padding: 1rem;*/
     border-radius: 3px;
+    right: -1rem;
 }
 .my-menu-wrapper div{
     padding: 0.5rem 1rem;
@@ -188,13 +210,17 @@ input[type=submit] {
     /*margin-top: 10px;*/
     /*padding: 5px 10px;*/
     /*background: coral;*/
-    background: linear-gradient(35deg, palevioletred, yellow);;
+    /*background: linear-gradient(35deg, palevioletred, yellow);;*/
     border-radius: 5px;
     border:none;
     color: white;
     font-family: inherit;
     outline-color: var(--border-silver100);
-    cursor: pointer;
+    /*cursor: pointer;*/
+}
+.disabled{
+    cursor: not-allowed;
+    background: silver;
 }
 .footer {
     display: flex;
@@ -640,6 +666,7 @@ input[type=submit] {
     justify-content: center;
     align-items: center;
     background: white;
+    min-height: 640px;
     flex-grow: 1;
     border-right: 1px solid var(--border-silver100);
     border-left: 1px solid var(--border-silver100);
@@ -678,10 +705,24 @@ section{
     width: 100%;
     height: 100%;
     border-radius: 50%;
+    object-fit: cover;
+}
+.my-profile-introduce-input{
+    width: 100%;
+    resize: none;
+    min-height: 240px;
+    height: 100%;
+    max-height: 320px;
+    border: 1px solid var(--border-silver100);
+    border-radius: 5px;
 }
 .profile-edit-button{
     position: absolute;
     right: 0;
+    cursor: pointer;
+}
+.submit-button{
+
 }
 .plus-shape{
     background: var(--background-silver100);
@@ -734,9 +775,6 @@ section{
         width: 100%;
         margin-left: auto;
         margin-right: auto;
-    }
-    .my-menu-wrapper{
-        right: 0;
     }
     .feed-width{
         width: 100%;

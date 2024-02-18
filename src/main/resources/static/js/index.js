@@ -6,10 +6,12 @@ import {
     observeLastItem,
     setFeedSaveEvent,
     setFileThumbnailEvent,
-    getRelativeDate
+    getRelativeDate, setTextChangeTrackingEvent
 } from './utils/commonUtils.js';
 
 let feedList = document.querySelectorAll('.feed');
+let questionInput = document.querySelector(".question-input");
+setTextChangeTrackingEvent(questionInput);
 let changeFirstPageDate = (feedList) =>{
     feedList.forEach((feed)=>{
         feed.querySelectorAll(".feed-timestamps").forEach((date)=>{

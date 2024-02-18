@@ -167,6 +167,70 @@ let setFeedModifySaveEvent = (feed) => {
         }
     })
 }
+let setTextChangeTrackingEvent = (element) =>{
+    let maxLength = element.maxLength;
+    console.log('maxLength:',maxLength)
+    element.parentElement.parentElement.querySelector(".text-limit-max").textContent='/'+maxLength;
+    let currentContainer = element.parentElement.parentElement.querySelector(".text-limit-current");
+    currentContainer.textContent = element.value.length;
+    element.addEventListener('input',()=>{
+        console.log('change textContent:',element.value.length)
+        currentContainer.textContent = element.value.length;
+        if(element.value.length>=maxLength)currentContainer.classList.add("text-warning")
+        else currentContainer.classList.remove("text-warning")
+    })
+}
+let setAsyncNickNameCheckEvent = (element)=>{
+    element.addEventListener('input', debounce(() => saveInput(element)))
+}
+
+function debounce(func, timeout = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, timeout);
+    };
+}
+let regex = /^[가-힣a-zA-Z0-9]*$/;
+function saveInput(element) {
+    // console.log('Saving data:',element);
+    // element.value
+    // console.log(inputText.indexOf(" "))
+    let submitButton = document.querySelector(".submit-button");
+    let inputText = element.value;
+    if(!regex.test(inputText)){
+        console.log('공백은 안되염')
+        //저장 비활 //disable /pointer
+        submitButton.setAttribute('disabled',true);
+        submitButton.classList.add("disabled");
+        element.nextElementSibling.classList.remove("text-good");
+        element.nextElementSibling.textContent='사용할 수 없는 패턴 입니다';
+    } else if(inputText.length<2){
+        submitButton.setAttribute('disabled',true);
+        submitButton.classList.add("disabled");
+        element.nextElementSibling.classList.remove("text-good");
+        element.nextElementSibling.textContent='닉네임은 최소 2글자 이상 필요합니다';
+    }
+    else{
+        //저장버튼 활성
+        // pointer
+        submitButton.classList.remove("disabled");
+        submitButton.removeAttribute('disabled');
+        postData('/user/name/check',{username:inputText},csrf_header,csrf_token).then(response => {
+            if(response.result==="positive") {
+                element.nextElementSibling.classList.add("text-good");
+            }else {
+                element.nextElementSibling.classList.remove("text-good");
+            }
+            element.nextElementSibling.textContent=response.message;
+        })
+        //
+    }
+}
+// const processChange = debounce((inputText) => saveInput(inputText));
+
 let setModifyCancelEvent = (feed) => {
     let optionMenu = feed.querySelector(".option-menu");
     let content = feed.querySelector(".feed-content");
@@ -206,7 +270,7 @@ let setOptionToggleEvent = (feed) => {
     })
 }
 
-/*로그인된 유저의 헤더 프로필 이미지에 토글 이벤트 등록*/
+/*로그인된 유저의 헤더 프로필 이미지에 옵션(내정보/내피드/로그아웃) 토글 이벤트 등록*/
 let setHeaderProfileEvent = () => {
     if (document.querySelector(".my-menu-container")) {
         document.querySelector(".my-menu-container").addEventListener('click', () => {
@@ -625,12 +689,12 @@ let setFeedEvent = () => {
             setCarouselEvent(feed);
             setLikeToggleEvent(feed);
             setCommentToggleEvent(feed);
-            setCommentConfirmEvent(feed);
+            setCommentEvent(feed);
         })
     }
 }
 
-let setCommentConfirmEvent = (currentFeed)=>{
+let setCommentEvent = (currentFeed)=>{
     if(currentFeed.querySelector(".comment-submit-button")){
         let submitButton = currentFeed.querySelector(".comment-submit-button");
         submitButton.addEventListener('click', (e) => {
@@ -795,5 +859,7 @@ export {
     observeLastItem,
     setFeedSaveEvent,
     setFileThumbnailEvent,
-    getRelativeDate
+    getRelativeDate,
+    setTextChangeTrackingEvent,
+    setAsyncNickNameCheckEvent
 };

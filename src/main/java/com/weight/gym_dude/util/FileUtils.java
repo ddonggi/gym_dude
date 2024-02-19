@@ -3,6 +3,8 @@ package com.weight.gym_dude.util;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestDTO;
 import com.weight.gym_dude.question.Question;
+import com.weight.gym_dude.user.SiteUser;
+import com.weight.gym_dude.user.SiteUserImage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
@@ -101,6 +103,53 @@ public class FileUtils {
                 .question(question)
                 .size(multipartFile.getSize())
                 .build().toEntity();
+    }
+    /**
+     * 단일 파일 업로드
+     * @param multipartFile - 파일 객체
+     * @return DB에 저장할 파일 정보
+     */
+    public SiteUserImage uploadProfileImage(final MultipartFile multipartFile, SiteUser siteUser) {
+
+        if (multipartFile.isEmpty()) {
+            logger.info("upload file is empty");
+            return null;
+        }
+        logger.info("upload file is not empty");
+        String fileType = multipartFile.getContentType();
+
+        logger.info("content type:{}",fileType);
+
+        // 이미지 파일만 업로드
+//        if (!Objects.requireNonNull(multipartFile.getContentType()).contains("image")||!Objects.requireNonNull(multipartFile.getContentType()).contains("video")) {
+        assert fileType != null;
+
+        logger.info("upload path:{}",uploadPath);
+//        String saveName = generateSaveFilename(multipartFile.getOriginalFilename());
+        String saveName = siteUser.getId()+".png";
+//        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString();
+        String uploadPath_ = uploadPath + "userProfiles" + File.separator + saveName;
+        File uploadFile = new File(uploadPath_);
+        if(fileType.contains("image")){
+            fileType="image";
+        }else {
+            logger.warn("this file is not image or video type!!");
+            throw new UploadDataTypeException("this file is not image or video type");
+        }
+
+        try {
+            multipartFile.transferTo(uploadFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new SiteUserImage(
+                Objects.requireNonNull(multipartFile.getOriginalFilename()).replaceAll(" ",""),
+                saveName,
+                fileType,
+                multipartFile.getSize(),
+                LocalDateTime.now(),
+                siteUser);
     }
 
     /**

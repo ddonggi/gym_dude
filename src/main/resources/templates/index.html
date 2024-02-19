@@ -6,9 +6,23 @@
             <div class="feed-profile-image">
                 <img alt="피드프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
             </div>
+<!--            <div class="flex align-center">
+                <div class="text-limit-current text-xs"></div>
+                <div class="text-limit-max text-xs"></div>
+            </div>
             <div class="question-input-container">
-                <textarea  disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+                <textarea disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
                 <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
+            </div>-->
+            <div class="flex-column width100 gap-half">
+                <div class="flex align-center">
+                    <div class="text-limit-current text-xs"></div>
+                    <div class="text-limit-max text-xs"></div>
+                </div>
+                <div class="question-input-container">
+                    <textarea disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+                    <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
+                </div>
             </div>
         </div>
         <div sec:authorize="isAuthenticated()" class="question-content">
@@ -222,12 +236,12 @@
 
         // 로그인한 유저일땐 siteUser object
         //게스트 유저일땐 #authentication.getName()
-        let principalName = [[${#authentication.getName()}]];
-        console.log('principalName:',principalName)
+        let principalEmail = [[${#authentication.getName()}]];
+        console.log('principalName(email):',principalEmail)
         let siteUser;
         if([[${siteUser}]]){
             siteUser = [[${siteUser}]];
-            console.log('siteUser:',siteUser);
+            console.log('logined siteUser:',siteUser);
         }
     </script>
     <script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>

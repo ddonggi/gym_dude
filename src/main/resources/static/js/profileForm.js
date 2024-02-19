@@ -1,4 +1,9 @@
-import {setHeaderProfileEvent,setTextChangeTrackingEvent,setAsyncNickNameCheckEvent} from './utils/commonUtils.js';
+import {
+    setHeaderProfileEvent,
+    setTextChangeTrackingEvent,
+    setAsyncNickNameCheckEvent,
+    setProfileThumbnailEvent
+} from './utils/commonUtils.js';
 
 setHeaderProfileEvent();
 
@@ -10,3 +15,10 @@ let introduceInput = document.querySelector(".my-profile-introduce-input");
 setTextChangeTrackingEvent(nicknameInput);
 setTextChangeTrackingEvent(introduceInput);
 setAsyncNickNameCheckEvent(nicknameInput);
+setProfileThumbnailEvent();
+if(siteUser.category!==null) {
+    document.querySelectorAll("option").forEach((option)=>{
+        if(option.value===siteUser.category)
+            option.setAttribute('selected','selected')
+    })
+}

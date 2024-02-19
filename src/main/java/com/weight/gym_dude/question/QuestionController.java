@@ -40,7 +40,9 @@ public class QuestionController {
     private final UserService userService;
     private final FileUtils fileUtils;
     private final FileRequestService fileService;
-    @GetMapping("/question")
+
+    //피드 페이징
+    @GetMapping("/feed")
     @CrossOrigin
     @ResponseBody
     public ResponseEntity<Object> index(
@@ -100,11 +102,12 @@ public class QuestionController {
 //        model.addAttribute("questionList", questionList);
         model.addAttribute("paging", paging);
         if(principal!=null) {
-            logger.info("principal name:{}",principal.getName());
-            SiteUser siteUser = userService.getUser(principal.getName());
-            SiteUserDTO siteUserDTO = userService.toUserDTO(siteUser);
-            logger.info("siteUser:{}", siteUserDTO);
-            logger.info("siteUser name:{}", siteUserDTO.getUserName());
+            logger.info("principal name:{}",principal.getName()); // getName은 이메일임
+            SiteUser principalUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            SiteUserDTO siteUserDTO = userService.toUserDTO(principalUser);
+//            logger.info("siteUser:{}", siteUserDTO);
+            logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
+//            model.addAttribute("principalUser", siteUserDTO);
             model.addAttribute("siteUser", siteUserDTO);
         }else{
             logger.info("Guest User");
@@ -146,7 +149,7 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/create")
     @ResponseBody
-    public ResponseEntity<Object> questionCreateRest(
+    public ResponseEntity<Object> questionCreateRest(Model model,
             @RequestPart(name = "files",required = false) Optional<List<MultipartFile>> optionalFiles,
             @RequestPart(name="content") @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
             BindingResult bindingresult, // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
@@ -168,6 +171,7 @@ public class QuestionController {
             List<FileRequest> fileRequestList = fileUtils.uploadFiles(files, question); //파일 저장소 업로드
             fileService.saveFiles(fileRequestList);//파일 정보 DB 저장
         }
+        model.addAttribute("principalUser",siteUser);
         return ResponseEntity.status(HttpStatus.OK).body(questionForm);
     }
 

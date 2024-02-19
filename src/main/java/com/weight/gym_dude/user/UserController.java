@@ -1,8 +1,8 @@
 package com.weight.gym_dude.user;
 
 import com.weight.gym_dude.question.Question;
-import com.weight.gym_dude.question.QuestionController;
 import com.weight.gym_dude.question.QuestionService;
+import com.weight.gym_dude.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,18 +11,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-//import javax.validation.Valid;
 
 /**
  * PackageName : com.weight.gym_dude.user
@@ -39,6 +39,9 @@ public class UserController {
     private final UserService userService;
     private final QuestionService questionService;
     private final UserRepository userRepository;
+    private final FileUtils fileUtils;
+    private final SiteUserImageService siteUserImageService;
+    private final AuthenticationManager authenticationManager;
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/login")
@@ -110,41 +113,92 @@ public class UserController {
             return "signup_form";
         }
 
-        return "redirect:/";
+        return "redirect:/user/login";
 //        return "signup_form";
     }
 
 //    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/profile/{id}")
     public String profile(@PathVariable(value = "id") Long id, Model model,Principal principal) {
-//        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-        Optional<SiteUser> optionalAuthor = userRepository.findById(id);
-        if(optionalAuthor.isPresent()) {
-            SiteUser siteUser = optionalAuthor.get();
-            model.addAttribute("siteUser", siteUser);
+        SiteUser siteUser = null;
+        if(principal!=null) {
+            siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        }
+        Optional<SiteUser> optionalProfileUser = userRepository.findById(id);
+        if(optionalProfileUser.isPresent()) {
+            SiteUser profileUser = optionalProfileUser.get();
+            model.addAttribute("profileUser", profileUser); // 방문할 유저
+            model.addAttribute("siteUser", siteUser); //현재 로그인한 유저 ( header 에서도 씀)
         }
         return "user/profile";
     }
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/profile/edit")
     public String myProfileEdit(Model model,Principal principal) {
-        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-        model.addAttribute("siteUser",author);
+        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        model.addAttribute("siteUser",siteUser);
         return "user/profile_form";
     }
+    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @PostMapping("/profile/edit")
+    public String myProfileEdit(Model model, Principal principal,
+                                @RequestPart(name = "userName") String userName,
+                                @RequestPart(name = "introduce",required = false) String introduce,
+                                @RequestPart(name = "file",required = false) MultipartFile file,
+                                @RequestPart(name = "category") String category) {
+        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        Long id = siteUser.getId();
+//        SiteUser prince = (SiteUser) authentication.getPrincipal();
+
+        logger.info("id:{}",id);
+        logger.info("userName:{}",userName);
+        logger.info("introduce:{}",introduce);
+        logger.info("file name:{}",file.getName());
+        logger.info("category:{}",category);
+
+        logger.info("file original name:{}",file.getOriginalFilename());
+        logger.info("file name is  empty:{}",file.getOriginalFilename().isEmpty());
+        Boolean hasProfile = false;
+        if(!file.getOriginalFilename().isEmpty()){ //파일이 있을경우저장
+            SiteUserImage siteUserImage = fileUtils.uploadProfileImage(file,siteUser);// 저장소에 사진저장
+            siteUserImageService.save(siteUserImage); //DB에 사진에 대한 정보 저장
+        }else {
+            //파일이 없을 경우
+            if(siteUser.getHasProfile()) hasProfile=true;//기존에 프로필을 가진 경우
+        }
+        siteUser = userService.modifiedUser(siteUser,userName, introduce, category, hasProfile);
+
+        model.addAttribute("profileUser", siteUser); // 방문할 유저
+        model.addAttribute("siteUser",siteUser); //현재 로그인한 유저 ( header 에서도 씀)
+        //세션 등록
+//        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(principalUser.getUserName(),principalUser.getPassword()));
+//        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        logger.info("hasProfile?:{}",principalUser.getHasProfile());
+
+//        userService.modifiedProfileInfo(userName,introduce,,category);
+//        fileUtils.uploadFile();
+//        fileService.saveFiles();
+
+        return "user/profile";
+    }
+
     @GetMapping("/feed/{id}")
     public String feed(Model model,
                          @PathVariable(value = "id") Long id,
                          @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
                          Principal principal) {
         logger.info("feed request");
-//        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-        Optional<SiteUser> optionalAuthor = userRepository.findById(id);
-        if(optionalAuthor.isPresent()){
-            SiteUser author = optionalAuthor.get();
-            Page<Question> feedPaging = questionService.getMyFeedList(page,author);
+        SiteUser siteUser = null;
+        if(principal!=null) {
+            siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        }
+        Optional<SiteUser> optionalFeedUser = userRepository.findById(id);
+        if(optionalFeedUser.isPresent()){
+            SiteUser feedUser = optionalFeedUser.get();
+            Page<Question> feedPaging = questionService.getMyFeedList(page,feedUser);
             model.addAttribute("feedPaging", feedPaging);
-            model.addAttribute("siteUser",author);
+            model.addAttribute("feedUser",feedUser);
+            model.addAttribute("siteUser",siteUser);
         }
         return "user/feed";
     }

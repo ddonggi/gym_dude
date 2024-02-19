@@ -67,8 +67,8 @@ public class UserService {
         return optionalUser.isPresent();
     }
 
-    public SiteUser getUser(String username){
-        Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(username);
+    public SiteUser getUser(String email){
+        Optional<SiteUser> optionalSiteUser = userRepository.findByEmail(email);
         if(optionalSiteUser.isPresent()){
             return optionalSiteUser.get();
         }else{
@@ -85,5 +85,17 @@ public class UserService {
                 .userName(siteUser.getUserName())
                 .email(siteUser.getEmail())
                 .build();
+    }
+
+    public SiteUser modifiedUser(SiteUser principalUser, String userName,String introduce, String category,Boolean hasProfile) {
+//            SiteUser siteUser = SiteUserDTO.builder()
+//                    .userName(userName)
+//                    .introduce(introduce).category(category).build().toModifedProfileEntity();
+        principalUser.setUserName(userName);
+        principalUser.setIntroduce(introduce);
+        principalUser.setCategory(category);
+        principalUser.setHasProfile(hasProfile);
+        userRepository.save(principalUser);
+        return principalUser;
     }
 }

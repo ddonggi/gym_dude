@@ -170,6 +170,8 @@ let setFeedModifySaveEvent = (feed) => {
 let setTextChangeTrackingEvent = (element) =>{
     let maxLength = element.maxLength;
     console.log('maxLength:',maxLength)
+    let minLength = element.minLength;
+    console.log('minLength:',minLength)
     element.parentElement.parentElement.querySelector(".text-limit-max").textContent='/'+maxLength;
     let currentContainer = element.parentElement.parentElement.querySelector(".text-limit-current");
     currentContainer.textContent = element.value.length;
@@ -177,6 +179,7 @@ let setTextChangeTrackingEvent = (element) =>{
         console.log('change textContent:',element.value.length)
         currentContainer.textContent = element.value.length;
         if(element.value.length>=maxLength)currentContainer.classList.add("text-warning")
+        else if(element.value.length<minLength)currentContainer.classList.add("text-warning")
         else currentContainer.classList.remove("text-warning")
     })
 }
@@ -384,7 +387,7 @@ let setCommentToggleEvent = (feed) => {
 
 let setLikeToggleEvent = (feed) => {
     let likeButton = feed.querySelector(".like");
-    if(principalName!=='anonymousUser'){ // 로그인한 유저 일 경우
+    if(principalEmail!=='anonymousUser'){ // 로그인한 유저 일 경우
         likeButton.addEventListener('click', () => {
             likeButton.classList.toggle("like-text-color");
             likeButton.querySelectorAll(".like-img").forEach(button => {
@@ -406,19 +409,19 @@ const ioCallback = (entries, io) => {
         console.log('is observed!!!')
         io.unobserve(entry.target);//옵저빙했던 아이템 해제
         // postData("/question",{page:page}).then(response=>{
-        if(principalName==='anonymousUser'&&page>=1){
+        if(principalEmail==='anonymousUser'&&page>=1){
             let signInContainer = document.createElement("div");
             signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
             signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
             document.querySelector(".index-container").append(signInContainer);
             setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
         }else {
-            getData("question?page=" + (++page)).then(response => {
+            getData("feed?page=" + (++page)).then(response => {
                 console.log("target page:", page)
                 console.log('response:', response)
                 renderFeedList(response);
-                // 마지막 페이지가 아닐때만
-                console.log('콘텐츠 길이:', response.content.length)
+                // 마지막 페이지가 아니면 계속 옵저빙
+                console.log('콘텐츠 길이(피드갯수):', response.content.length)
                 if (response.content.length === 10)
                     observeLastItem(io, document.querySelectorAll('.feed'));
 
@@ -440,6 +443,8 @@ let renderFeedList = (response) => {
         let fileList = feed.fileList;
         let answerList = feed.answerList;
         let createDate = getRelativeDate(feed.createDate);
+        let category = author.category;
+        if(category===null)category='';
         feedContainer.innerHTML +=
             `<div class="feed" id="${feed.id}">
                 <!--피드 헤더-->
@@ -450,7 +455,7 @@ let renderFeedList = (response) => {
                         </a>
                         <div>
                             <div class="feed-writer text-sm font-bold">${author.userName}</div>
-                            <div class="feed-tag text-xs">${author.category}</div>
+                            <div class="feed-tag text-xs">${category}</div>
                             <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
                             <div class="feed-timestamps text-xs">${createDate}</div>
                         </div>
@@ -482,7 +487,7 @@ let renderFeedList = (response) => {
         }
 
         // 더보기 | 팔로우
-        if (principalName === author.userName) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 다를 경우
+        if (principalEmail === author.userName) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 다를 경우
             currentFeed.querySelector(".feed-header").innerHTML += `
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -493,7 +498,7 @@ let renderFeedList = (response) => {
                         <button class="option-button flex justify-content-center align-center">
                             ⁝
                         </button>`;
-        } else if (principalName === 'anonymousUser') {
+        } else if (principalEmail === 'anonymousUser') {
 
         } else {
             currentFeed.querySelector(".feed-header").innerHTML += `
@@ -633,7 +638,7 @@ let renderFeedList = (response) => {
         }
         //댓글 폼
         let profileImage ="";
-        if (principalName === 'anonymousUser') { // 방문자
+        if (principalEmail === 'anonymousUser') { // 방문자
             profileImage="/apps/defaultProfile";
             answerContainer.innerHTML += `
             <div class="answer-form padding-default flex">
@@ -645,7 +650,7 @@ let renderFeedList = (response) => {
                 </div>
             </div>`;
         } else { //접속자
-            console.log('접속자:',principalName)
+            // console.log('접속자 mail:',principalEmail)
             if(siteUser.hasProfile)
                 profileImage="/userProfiles/"+siteUser.id; //프로필 있는사람
             else
@@ -799,6 +804,20 @@ let setFeedSaveEvent = ()=>{
         })
     }
 }
+/** 내정보 이미지 썸네일 이벤트*/
+let setProfileThumbnailEvent = ()=> {
+    const fileInput = document.getElementById("file");
+    const handleFile = () => {
+        const fileReader = new FileReader();
+        let file = fileInput.files;
+        fileReader.readAsDataURL(file[0]);
+        fileReader.onload = () => {
+            document.querySelector("#profile-image").setAttribute('src',fileReader.result);
+        }
+    }
+    if (fileInput) fileInput.addEventListener("change", handleFile);
+}
+/** 피드 파일 썸네일 이벤트*/
 let setFileThumbnailEvent = () =>{
     const fileInput = document.getElementById("files");
     const handleFiles = (e) => {
@@ -861,5 +880,6 @@ export {
     setFileThumbnailEvent,
     getRelativeDate,
     setTextChangeTrackingEvent,
-    setAsyncNickNameCheckEvent
+    setAsyncNickNameCheckEvent,
+    setProfileThumbnailEvent
 };

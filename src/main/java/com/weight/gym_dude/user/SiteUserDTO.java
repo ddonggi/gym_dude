@@ -30,4 +30,8 @@ public class SiteUserDTO {
     public SiteUser toSignUpEntity(){
         return new SiteUser(this.userName,this.password,this.email,this.hasProfile);
     }
+
+    public SiteUser toModifedProfileEntity(){
+        return new SiteUser(this.userName,this.introduce,this.category);
+    }
 }

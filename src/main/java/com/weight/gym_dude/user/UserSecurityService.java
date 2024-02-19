@@ -45,9 +45,11 @@ public class UserSecurityService implements UserDetailsService {
         * 스프링 시큐리티는 loadUserByUsername 메서드에 의해 리턴된 User 객체의 비밀번호가 화면으로부터 입력 받은 비밀번호와 일치하는지를 검사하는 로직을 내부적으로 가지고 있다.
         * */
 //        Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(username);
+        logger.info("email:{}",email);
         Optional<SiteUser> optionalSiteUser = userRepository.findByEmail(email); //기존 유저 이름에서 이메일로 로그인
+//        Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(usenameOrEmail); //기존 유저 이름에서 이메일로 로그인
         if(optionalSiteUser.isEmpty()){
-            throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
+                throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }
         SiteUser siteUser = optionalSiteUser.get();
         List<GrantedAuthority> authorities = new ArrayList<>();
@@ -59,9 +61,9 @@ public class UserSecurityService implements UserDetailsService {
             logger.info("일반 유저 계정 입니다");
             authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
         }
-        return new User(siteUser.getUserName(), siteUser.getPassword(), authorities);
+//        return new User(siteUser.getUserName(), siteUser.getPassword(), authorities);
+        return new User(siteUser.getEmail(), siteUser.getPassword(), authorities);
     }
     // Security Config 에 UserSecurityService를 등록하자
-
 
 }

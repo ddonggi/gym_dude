@@ -1,6 +1,7 @@
 package com.weight.gym_dude.user;
 
 import com.weight.gym_dude.question.Question;
+import com.weight.gym_dude.question.QuestionDTO;
 import com.weight.gym_dude.question.QuestionService;
 import com.weight.gym_dude.util.FileUtils;
 import lombok.RequiredArgsConstructor;
@@ -187,6 +188,7 @@ public class UserController {
         return "user/profile";
     }
 
+    //해당 유저의 피드 리스트
     @GetMapping("/feed/{id}")
     public String feed(Model model,
                          @PathVariable(value = "id") Long id,
@@ -201,14 +203,34 @@ public class UserController {
         if(optionalFeedUser.isPresent()){
             SiteUser feedUser = optionalFeedUser.get();
             Page<Question> feedPaging = questionService.getMyFeedList(page,feedUser);
-            model.addAttribute("feedPaging", feedPaging);
+            model.addAttribute("feedPaging",feedPaging);
             model.addAttribute("feedUser",feedUser);
-            model.addAttribute("siteUser",siteUser);
+            model.addAttribute("siteUser",siteUser); //현재 로그인한 사람
         }
         return "user/feed";
     }
 
+    //한 유저의 피드 페이징
+    @GetMapping("/feed/list/{id}")
+    @CrossOrigin
+    @ResponseBody
+    public ResponseEntity<Object> index(
+            @PathVariable(value = "id") Long id,
+            @RequestParam(value = "page",defaultValue = "0") int page){
 
+        logger.info("user feed page test:{}",page);
+        Page<Question> feedPaging =null;
+        Optional<SiteUser> optionalFeedUser = userRepository.findById(id);
+        if(optionalFeedUser.isPresent()){
+            SiteUser feedUser = optionalFeedUser.get();
+            feedPaging = questionService.getMyFeedList(page,feedUser);
+        }
+        HashMap<String,Page<Question>> questionMap = new HashMap<>();
+        questionMap.put("feedPaging",feedPaging);
+        return ResponseEntity.status(HttpStatus.OK).body(feedPaging);
+    }
+
+/*
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/my_feed")
     public String myFeed(Model model,
@@ -219,7 +241,7 @@ public class UserController {
         model.addAttribute("feedPaging", feedPaging);
         model.addAttribute("siteUser",author);
         return "feed";
-    }
+    }*/
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/modify")

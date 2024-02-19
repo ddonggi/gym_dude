@@ -48,7 +48,7 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @OrderBy("createDate asc")
     @JsonManagedReference
-    @JsonIgnore
+//    @JsonIgnore
 //    @ToString.Exclude
     private List<Answer> answerList;
 
@@ -56,7 +56,7 @@ public class Question {
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @OrderBy("createDate asc")
     @JsonManagedReference
-    @JsonIgnore
+//    @JsonIgnore
 //    @ToString.Exclude
     private List<FileRequest> fileList;
 

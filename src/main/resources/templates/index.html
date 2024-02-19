@@ -237,7 +237,9 @@
         // 로그인한 유저일땐 siteUser object
         //게스트 유저일땐 #authentication.getName()
         let principalEmail = [[${#authentication.getName()}]];
+        let authorities = [[${#authentication.getAuthorities()}]];
         console.log('principalName(email):',principalEmail)
+        console.log('authorities:',authorities)
         let siteUser;
         if([[${siteUser}]]){
             siteUser = [[${siteUser}]];

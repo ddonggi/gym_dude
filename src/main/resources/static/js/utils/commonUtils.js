@@ -409,7 +409,7 @@ const ioCallback = (entries, io) => {
         console.log('is observed!!!')
         io.unobserve(entry.target);//옵저빙했던 아이템 해제
         // postData("/question",{page:page}).then(response=>{
-        if(principalEmail==='anonymousUser'&&page>=1){
+        if(principalEmail==='anonymousUser'&&page>=1){ //
             let signInContainer = document.createElement("div");
             signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
             signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
@@ -670,15 +670,64 @@ let renderFeedList = (response) => {
         }
     })
 }
+const userFeedIoCallback = (entries, io) => {
+    entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        // if (entry.isIntersecting) {
+        console.log('is observed!!!')
+        io.unobserve(entry.target);//옵저빙했던 아이템 해제
+        // postData("/question",{page:page}).then(response=>{
+        if(principalEmail==='anonymousUser'&&page>=1){ //
+            let signInContainer = document.createElement("div");
+            signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
+            signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
+            document.querySelector(".my-feed-container").append(signInContainer);
+            setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
+        }else {
+            getData("/user/feed/list/"+feedUser.id+"?page=" + (++page)).then(response => {
+                console.log("target page:", page)
+                console.log('response:', response)
+                renderUserFeedList(response);
+                // 마지막 페이지가 아니면 계속 옵저빙
+                console.log('콘텐츠 길이(피드갯수):', response.content.length)
+                if (response.content.length === 9)
+                    observeLastItem(io, document.querySelectorAll('.my-feed'));
 
+                // setFeedEvent();
+                // setFeedContentHeight();
+            });
+        }
+    });
+};
 const observeLastItem = (io, items) => {
     const lastItem = items[items.length - 5]; //관찰 대상
-    io.observe(lastItem); // 관찰 대상 등록
+    if(items.length>4) {
+        io.observe(lastItem); // 관찰 대상 등록
+    }
 };
 
 // 관찰자 초기화
-const io = new IntersectionObserver(ioCallback, {threshold: 0.7});
-
+const io = new IntersectionObserver(ioCallback, {threshold: 0.7}); //인덱스페이지 피드 옵저버
+const userFeedIo = new IntersectionObserver(userFeedIoCallback, {threshold: 0.7}); //유저 피드 옵저버
+let setUserFeedEvent = () => {
+    if (document.querySelectorAll(".my-feed")) {
+        document.querySelectorAll(".my-feed").forEach((userFeed) => {
+            /* 본인 게시물 : 옵션 토글, 게시물 수정,삭제 이벤트 등록 */
+            if (userFeed.querySelector(".option-button")) {
+                // setOptionToggleEvent(feed);
+                // setModifyFormEvent(feed);
+                // setModifyCancelEvent(feed);
+                // setFeedModifySaveEvent(feed);
+                // setDeleteEvent(feed);
+            }
+            // setFollowEvent(feed);
+            // setCarouselEvent(feed);
+            // setLikeToggleEvent(feed);
+            // setCommentToggleEvent(feed);
+            // setCommentEvent(feed);
+        })
+    }
+}
 let setFeedEvent = () => {
     if (document.querySelectorAll(".feed")) {
         document.querySelectorAll(".feed").forEach((feed) => {
@@ -858,6 +907,61 @@ let setFileThumbnailEvent = () =>{
     if(fileInput)fileInput.addEventListener("change", handleFiles);
 }
 
+let renderUserFeedList =(response) =>{
+    let userFeedWrapper = document.querySelector(".my-feed-wrapper");
+    let userFeedList = response.content;
+    userFeedList.forEach((userFeed)=>{
+        let fileList = userFeed.fileList;
+        let answerList = userFeed.answerList;
+        let feedId = userFeed.id;
+        let content = userFeed.content;
+        let createDate = userFeed.createDate;
+        let isHide = userFeed.isHide;
+        if(userFeed.modifiedDate!==null){
+            createDate = userFeed.modifiedDate;
+        };
+        // console.log('author:',author)
+        console.log('fileList:',fileList)
+        console.log('answerList:',answerList)
+        console.log('feedId:',feedId)
+        console.log('content:',content)
+        console.log('createDate:',createDate)
+        console.log('isHide:',isHide)
+        console.log('before return')
+        if(isHide){
+            if(principalEmail==='anonymousUser')
+                return
+            if(siteUser.userName!==feedUser.userName)
+                return;
+        }
+        console.log('after return')
+        let mediaWrapper;
+        userFeedWrapper.innerHTML += `<div class="pseudo-container" id="${feedId}">
+                                            <div class='my-feed flex-column'>
+                                            </div>
+                                    </div>`;
+        if(fileList.length>0) {
+            let firstFile = fileList[0];
+            let fileCreateDate = firstFile.createDate;
+            let filename = firstFile.saveName;
+            let originName = firstFile.originalName;
+            let date = new Date(fileCreateDate);
+            let formatDate = getFormatDate(date);
+            console.log('formdate:',formatDate)
+            if(firstFile.fileType==='image') {
+                mediaWrapper = `<div class="my-feed-media-wrapper"><img src="/resource/${formatDate}/${filename}" alt="${originName}"/></div>`;
+            }else {
+                mediaWrapper = `<div class="my-feed-media-wrapper"><video src="/resource/${formatDate}/${filename}" alt="${originName}"></video></div>`;
+            }
+            document.querySelector(".pseudo-container:last-child").querySelector('.my-feed').innerHTML+=mediaWrapper;
+            document.querySelector(".pseudo-container:last-child").querySelector('.my-feed').innerHTML+=`<div class="my-feed-content-wrapper">${content}</div>`;
+        }else {
+            document.querySelector(".pseudo-container:last-child").querySelector('.my-feed').innerHTML+=`<div class="my-feed-content-wrapper">${content}</div>`;
+        }
+
+    })
+}
+
 export {
     postData,
     csrf_token,
@@ -881,5 +985,7 @@ export {
     getRelativeDate,
     setTextChangeTrackingEvent,
     setAsyncNickNameCheckEvent,
-    setProfileThumbnailEvent
+    setProfileThumbnailEvent,
+    userFeedIo,
+    setUserFeedEvent
 };

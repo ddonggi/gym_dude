@@ -25,7 +25,7 @@
                 </div>
                 <button sec:authorize="isAuthenticated()"
                         th:if="${#authentication.getName()==profileUser.email}"
-                        class="profile-edit-button" onclick="location.href='/user/profile/edit'">정보 수정하기</button>
+                        class="profile-edit-button" onclick="location.href='/user/profile/edit'">편집</button>
             </div>
             <article>
                 <h2>내 소개</h2>

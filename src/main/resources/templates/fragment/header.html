@@ -21,7 +21,8 @@ sec:authorize="isAuthenticated()" - 이 속성은 로그인 된 경우에만 해
                 <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
                 <!-- 로그인된 사용자만 보이는 항목-->
 <!--                <div sec:authorize="isAuthenticated()" th:text="|${#authentication.getName()} 님|"></div>-->
-                <div sec:authorize="isAuthenticated()" th:text="|${siteUser.userName} 님|"></div>
+                <div sec:authorize="isAuthenticated()" th:if="${#authentication.getAuthorities()[0].getAuthority().equals('ROLE_ADMIN')}" th:text="|관리자 ${siteUser.userName} 님|"></div>
+                <div sec:authorize="isAuthenticated()" th:unless="${#authentication.getAuthorities()[0].getAuthority().equals('ROLE_ADMIN')}" th:text="|${siteUser.userName} 님|"></div>
                 <div sec:authorize="isAuthenticated()" class="nav-link my-menu-container" >
                     <div class="feed-profile-image">
                             <img th:if="${siteUser.hasProfile}" class="img object-cover border-full" alt="사용자프로필" th:src="|/resource/userProfiles/${siteUser.id}.png|"/>

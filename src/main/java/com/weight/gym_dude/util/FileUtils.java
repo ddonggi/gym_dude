@@ -128,7 +128,7 @@ public class FileUtils {
 //        String saveName = generateSaveFilename(multipartFile.getOriginalFilename());
         String saveName = siteUser.getId()+".png";
 //        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString();
-        String uploadPath_ = uploadPath + "userProfiles" + File.separator + saveName;
+        String uploadPath_ = uploadPath + File.separator + "userProfiles" + File.separator + saveName;
         File uploadFile = new File(uploadPath_);
         if(fileType.contains("image")){
             fileType="image";

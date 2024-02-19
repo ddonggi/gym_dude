@@ -161,11 +161,16 @@ public class UserController {
         Boolean hasProfile = false;
         if(!file.getOriginalFilename().isEmpty()){ //파일이 있을경우저장
             SiteUserImage siteUserImage = fileUtils.uploadProfileImage(file,siteUser);// 저장소에 사진저장
-            siteUserImageService.save(siteUserImage); //DB에 사진에 대한 정보 저장
-        }else {
-            //파일이 없을 경우
-            if(siteUser.getHasProfile()) hasProfile=true;//기존에 프로필을 가진 경우
+            if(siteUser.getHasProfile()){//기존에 프로필을 가진 경우
+                siteUserImageService.modified(id,siteUserImage); //DB에 사진에 대한 정보 수정
+            }else{
+                siteUserImageService.save(siteUserImage); //DB에 사진에 대한 정보 저장
+                hasProfile = true;
+            }
         }
+        //파일이 없을 경우
+        if(siteUser.getHasProfile()) hasProfile=true;//기존에 프로필을 가진 경우
+        logger.info("hasProfile?{}",hasProfile);
         siteUser = userService.modifiedUser(siteUser,userName, introduce, category, hasProfile);
 
         model.addAttribute("profileUser", siteUser); // 방문할 유저

@@ -34,9 +34,6 @@
                             <div class="text-xs text-warning"></div>
                         </div>
                     </div>
-                    <div class="flex-column width-sm"> 이메일
-                        <div class="" th:text="${siteUser.email}"></div>
-                    </div>
                     <div class="flex-column width-sm"> 관심분야
                         <label>
                             <select name="category" class="select-box padding-half">
@@ -48,8 +45,11 @@
                             </select>
                         </label>
                     </div>
+                    <div class="flex-column width-sm"> 이메일
+                        <div class="" th:text="${siteUser.email}"></div>
+                    </div>
                 </div>
-                <button type="submit" onclick="return confirm('저장하실?')" class="profile-edit-button padding-default submit-button">저장</button>
+                <button type="submit" onclick="return confirm('해당 정보로 저장하시겠습니까?')" class="profile-edit-button padding-default submit-button">저장</button>
             </div>
             <article>
                 <div class="flex align-center gap-half">

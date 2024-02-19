@@ -15,12 +15,12 @@
                     <div class="flex-column width-sm">닉네임
                         <div th:text="${profileUser.userName}"></div>
                     </div>
-                    <div class="flex-column width-sm"> 이메일
-                        <div th:text="${profileUser.email}"></div>
-                    </div>
                     <div class="flex-column width-sm"> 관심분야
                         <div th:if="${profileUser.category!=null}" th:text="${profileUser.category}"></div>
                         <div th:unless="${profileUser.category!=null}" th:text="|미선택|"></div>
+                    </div>
+                    <div class="flex-column width-sm"> 이메일
+                        <div th:text="${profileUser.email}"></div>
                     </div>
                 </div>
                 <button sec:authorize="isAuthenticated()"

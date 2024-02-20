@@ -2,22 +2,28 @@ package com.weight.gym_dude;
 
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestRepository;
+import com.weight.gym_dude.like.Like;
+import com.weight.gym_dude.like.LikeRepository;
 import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.user.UserRepository;
 import com.weight.gym_dude.user.UserRole;
 import com.weight.gym_dude.util.FileUtils;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import com.weight.gym_dude.answer.Answer;
 import com.weight.gym_dude.answer.AnswerRepository;
 import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.question.QuestionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
@@ -25,10 +31,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
+@Transactional
+@AutoConfigureMockMvc
 class GymDudeApplicationTests {
 
     @Autowired
@@ -41,7 +50,10 @@ class GymDudeApplicationTests {
     private FileRequestRepository fileRequestRepository;
     @Autowired
     private FileUtils fileUtils;
-
+    @Autowired
+    private MockMvc mockMvc;
+    @Autowired
+    private LikeRepository likeRepository;
     //데이터 입력(글쓰기)
     @Test
 //    @Transactional
@@ -261,6 +273,73 @@ class GymDudeApplicationTests {
             Resource resource = fileUtils.readFileAsResource(file);
             System.out.println("resource = " + resource);
         }
+    }
+
+    //좋아요 테스트
+    @DisplayName("좋아요 테스트")
+    @WithMockUser(username = "테스트계정", password = "custom_password", roles = {"USER","ADMIN"})
+    @Test
+    void testCreateLike() throws Exception {
+        Question question = addQuestion();
+
+//        Optional<Question> optionalQuestion = questionRepository.findById(161);
+//        if(optionalQuestion.isPresent()) {
+//            Question question = optionalQuestion.get();
+        System.out.println("qId:"+question.getId());
+
+        mockMvc.perform(post("/like/" + 161))
+                    .andExpect(status().isOk());
+
+            Like like = likeRepository.findAll().get(0);
+
+            assertNotNull(like);
+            assertNotNull(like.getAuthor().getId());
+            assertNotNull(like.getQuestion().getId());
+//        }
+    }
+
+    @DisplayName("좋아요 중복 테스트 - fail")
+    @WithMockUser
+    @Test
+    void testDuplicateLike() throws Exception {
+        Question question = addQuestion();
+//        Optional<Question> optionalQuestion = questionRepository.findById(161);
+//        if(optionalQuestion.isPresent()) {
+//            Question question = optionalQuestion.get();
+        System.out.println("qId:"+question.getId());
+        mockMvc.perform(post("/like/" + 161))
+                    .andExpect(status().isOk());
+
+        mockMvc.perform(post("/like/" + question.getId()))
+                    .andExpect(status().isBadRequest());
+
+            Like like = likeRepository.findAll().get(0);
+
+            assertNotNull(like);
+            assertNotNull(like.getAuthor().getId());
+            assertNotNull(like.getAuthor().getId());
+//        }
+    }
+
+    private Question addQuestion() {
+/*        Question question = Question.builder()
+                .thumbnail("test")
+                .title("test-recipe")
+                .fullDescription("test")
+                .description("test")
+                .ingredients(new HashSet<Ingredient>(Arrays.asList(new Ingredient("a"), new Ingredient("b"), new Ingredient("c"))))
+                .cookingTime(11)
+                .member(memberRepository.findAll().get(0))
+                .build();*/
+
+        Question question = Question.builder().content("test")
+                .createDate(LocalDateTime.now())
+                .author(userRepository.findAll().get(0))
+                .build();
+
+        Question save = questionRepository.save(question);
+
+        return save;
     }
 
 }

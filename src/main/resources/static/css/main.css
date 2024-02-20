@@ -498,6 +498,9 @@ input[type=submit] {
     font-size: 1rem;
     overflow-wrap: anywhere;
     word-break: auto-phrase;
+    min-height: 130px;
+    justify-content: center;
+    padding-top: 0;
 }
 .feed-content{
     display: -webkit-box;
@@ -627,16 +630,33 @@ input[type=submit] {
     display: flex;
 }
 /* 내 피드페이지 */
+.feed-pop{
+    position: fixed;
+    margin: 0 auto;
+    top: 3rem;
+    left: 0;
+    right: 0;
+}
+.pseudo-container{
+    /*cursor: pointer;*/
+    /*min-width: 180px;*/
+    /*max-width: 180px;*/
+    /*min-height: 180px;*/
+    /*max-height: 180px;*/
+    /*position: relative;*/
+}
+
 .my-feed {
     background: white;
     border: 1px solid var(--border-silver100);
+    cursor: pointer;
     border-radius: 4px;
     min-width: 180px;
     max-width: 180px;
     min-height: 180px;
     max-height: 180px;
-    cursor: pointer;
 }
+
 .my-feed:hover{
     background: var(--background-silver100);
 }
@@ -646,6 +666,7 @@ input[type=submit] {
 .my-feed-media-wrapper {
     flex-grow: 1;
     max-height: 100%;
+    pointer-events: none;
 }
 .my-feed img, .my-feed video{
     border-radius: 4px;
@@ -653,6 +674,7 @@ input[type=submit] {
     /*height: 100%;*/
     max-height: 180px;
     object-fit: cover;
+    pointer-events: none;
 }
 .my-feed-content-wrapper{
     text-overflow:ellipsis;
@@ -660,6 +682,14 @@ input[type=submit] {
     overflow: hidden;
     padding: 0.5rem;
     flex-grow: 1;
+    pointer-events: none;
+}
+.feed-pop-style{
+    max-height: 720px;
+    overflow-y: auto;
+    height: 100%;
+    overscroll-behavior: contain;
+    box-shadow: 5px 6px 12px darkgray;
 }
 /*------회원 가입,로그인 공통------*/
 .signup-container,.login-container,.my-feed-container,.my-profile-container{
@@ -811,6 +841,12 @@ section{
         width: 100%;
         margin-left: auto;
         margin-right: auto;
+    }
+    .my-menu-wrapper {
+        right: 0;
+    }
+    .user-name{
+        display: none;
     }
     .feed-width{
         width: 100%;

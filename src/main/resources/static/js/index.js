@@ -28,8 +28,7 @@ let changeFirstPageDate = (feedList) =>{
     })
 }
 changeFirstPageDate(feedList);
-//로그인된 유저의 헤더 프로필 이미지에 토글 이벤트 등록
-setHeaderProfileEvent();
+setHeaderProfileEvent();//로그인된 유저의 헤더 프로필 이미지에 토글 이벤트 등록
 setFeedSaveEvent();//작성 폼 이벤트 등록
 setFileThumbnailEvent();//파일 선택시 썸네일 미리보기 이벤트 등록
 setFeedEvent();//피드에 이벤트 등록

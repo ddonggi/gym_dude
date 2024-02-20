@@ -3,8 +3,8 @@
     <th:block th:replace="~{fragment/header::header}"></th:block>
     <div class="my-profile-block feed-width padding-default">
         <h1 sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==profileUser.email}" th:text="|내 프로필|"></h1>
-        <h1 sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==profileUser.email}" th:text="|${profileUser.userName} 님의 프로필|"></h1>
-        <h1 sec:authorize="isAnonymous()" th:text="|${profileUser.userName} 님의 프로필|"></h1>
+        <h1 sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==profileUser.email}" th:text="|${profileUser.userName} 님|"></h1>
+        <h1 sec:authorize="isAnonymous()" th:text="|${profileUser.userName} 님|"></h1>
         <section>
             <div class="section-header flex width100 gap-half">
                 <div class="flex-column align-center gap-rem width100">

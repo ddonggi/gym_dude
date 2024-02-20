@@ -137,7 +137,7 @@ public class QuestionController {
             ResponseEntity.badRequest();
         }
         Question question = questionService.getQuestion(id);
-        if(!question.getAuthor().getUserName().equals(principal.getName())){ //현재 로그인한 사람과 글의 작성자가 다를 경우
+        if(!question.getAuthor().getEmail().equals(principal.getName())){ //현재 로그인한 사람과 글의 작성자가 다를 경우
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"수정 권한이 없습니다.");
         }
         questionService.modify(question,questionForm.getContent());
@@ -153,11 +153,61 @@ public class QuestionController {
     @ResponseBody
     public ResponseEntity<String> questionDelete2(@PathVariable("id") Integer id, Principal principal){
         logger.info("to delete id : {}", id);
-        if(!principal.getName().equals(questionService.getQuestion(id).getAuthor().getUserName()))
+        if(!principal.getName().equals(questionService.getQuestion(id).getAuthor().getEmail()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         questionService.delete(id);
 
         return ResponseEntity.ok(id.toString());
     }
 
+    //피드 단건 검색
+    @PostMapping("/feed/{id}")
+    @ResponseBody
+    public ResponseEntity<Object> questionFind(@PathVariable("id") Integer id){
+        Question question = questionService.getQuestion(id);
+        HashMap<String,Object> feed = new HashMap<>();
+        feed.put("feed",question);
+        return ResponseEntity.status(HttpStatus.OK).body(feed);
+    }
+
+    //검색 피드
+    @GetMapping("/search")
+    public String searchFeedPage(Model model,
+                          @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
+                          @RequestParam(value = "keyword") String keyword,
+                          QuestionForm questionForm,
+                          AnswerForm answerForm,
+                          Principal principal
+    ) {
+        logger.info("page:{}",page);
+//        Page<QuestionDTO> paging = questionService.getFeedList(page);
+        Page<QuestionDTO> paging = questionService.getSearchFeedList(page,keyword);
+        model.addAttribute("paging", paging);
+        if(principal!=null) {
+            logger.info("principal name:{}",principal.getName()); // getName은 이메일임
+            SiteUser principalUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            SiteUserDTO siteUserDTO = userService.toUserDTO(principalUser);
+//            logger.info("siteUser:{}", siteUserDTO);
+            logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
+//            model.addAttribute("principalUser", siteUserDTO);
+            model.addAttribute("siteUser", siteUserDTO);
+        }else{
+            logger.info("Guest User");
+        }
+        model.addAttribute("keyword",keyword);
+        return "search";
+    }
+    //검색 피드 페이징
+    @GetMapping("/feed/search")
+    @CrossOrigin
+    @ResponseBody
+    public ResponseEntity<Object> searchFeedPageREST(
+            @RequestParam(value = "page",defaultValue = "0") int page,
+            @RequestParam(value = "keyword") String keyword
+    ){
+//        logger.info("page testtt:{}",page);
+        Page<QuestionDTO> paging = questionService.getSearchFeedList(page,keyword);
+
+        return ResponseEntity.status(HttpStatus.OK).body(paging);
+    }
 }

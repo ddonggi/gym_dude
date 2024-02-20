@@ -58,7 +58,13 @@ public class QuestionService {
          * */
         // NOTE : page 는 optional 이 안되는가 //
     }
-
+    public Page<QuestionDTO> getSearchFeedList(int page,String keyword){
+        List<Sort.Order> sortedList = new ArrayList<>();
+        sortedList.add(Sort.Order.desc("id")); //작성날짜순 -> 글 번호순??
+        Pageable pageable = PageRequest.of(page,10,Sort.by(sortedList));
+        Page<QuestionDTO> QuestionDTOList = questionRepository.findAllByContentContaining(pageable,keyword).map(QuestionDTO::toDto);
+        return QuestionDTOList;
+    }
     public Question getQuestion(Integer id){
         Optional<Question> optionalQuestion = questionRepository.findById(id);
         if(optionalQuestion.isPresent())

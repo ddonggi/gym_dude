@@ -1,7 +1,7 @@
 /* 비동기 통신에 쓰일 보안용 CSRF 정보 */
 let csrf_header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
 let csrf_token = document.querySelector("meta[name='_csrf']").getAttribute("content");
-let siteURL = "";
+let siteURL = "http://localhost:8080";
 let formatter = new Intl.RelativeTimeFormat(navigator.geolocation,{numeric:'auto'});
 
 let getRelativeDate = (originRawDate) => {
@@ -425,13 +425,14 @@ const ioCallback = (entries, io) => {
                 if (response.content.length === 10)
                     observeLastItem(io, document.querySelectorAll('.feed'));
 
+            }).then(()=>{
                 setFeedEvent();
-                setFeedContentHeight();
-            });
+                setFeedContentHeight();});
         }
     });
 };
 
+// 메인화면 피드 리스트
 let renderFeedList = (response) => {
     //피드 불러오기
     let feedContainer = document.querySelector(".feed-container");
@@ -450,7 +451,7 @@ let renderFeedList = (response) => {
                 <!--피드 헤더-->
                 <div class="feed-header padding-default">
                     <div class="flex gap-half" aria-label="${author.userName}의 프로필">
-                        <a class="feed-profile-image" href='/user/feed/${author.id}'>
+                        <a class="feed-profile-image" href='/user/profile/${author.id}'>
                             <img alt="피드프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
                         </a>
                         <div>
@@ -466,8 +467,7 @@ let renderFeedList = (response) => {
                 <!--피드 바디-->
                 <div class="feed-body padding-default flex-column gap-half">
                     <!--피드 글 출력-->
-                    <div class="feed-content">${feed.content}</div>
-                    <input type="checkbox" class="more-btn">
+
                 </div>
                 <!--피드 바디-->
                 
@@ -487,8 +487,9 @@ let renderFeedList = (response) => {
         }
 
         // 더보기 | 팔로우
-        if (principalEmail === author.userName) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 다를 경우
-            currentFeed.querySelector(".feed-header").innerHTML += `
+        console.log('접속한사람 : ',principalEmail,'/ 글 작성자 : ',author.email)
+        if (principalEmail === author.email) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+            currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
                             <button class="delete-button">삭제</button>
@@ -497,19 +498,18 @@ let renderFeedList = (response) => {
                         </div>
                         <button class="option-button flex justify-content-center align-center">
                             ⁝
-                        </button>`;
+                        </button></div>`;
         } else if (principalEmail === 'anonymousUser') {
 
         } else {
             currentFeed.querySelector(".feed-header").innerHTML += `
                         <button class="follow-button" value="${author.id}">팔로우</button>`;
         }
+        let feedBody = currentFeed.querySelector(".feed-body");
 
         //피드 미디어 출력
         if (fileList.length > 0) {
-            let feedBody = currentFeed.querySelector(".feed-body");
             // let fragment = document.createDocumentFragment();
-
             let carouselMain = document.createElement('div');
             carouselMain.classList.add("carousel-main");
             let carouselWrapper = document.createElement('div');
@@ -521,6 +521,7 @@ let renderFeedList = (response) => {
             fileList.forEach(file => {
                 let date = new Date(file.createDate);
                 let formatDate = getFormatDate(date);
+
                 if (file.fileType === "image") {
                     console.log('fileType is image')
 
@@ -532,12 +533,19 @@ let renderFeedList = (response) => {
                         </div>`;
                 } else if (file.fileType === "video") {
                     console.log('filetype video')
-                    carouselWrapper.innerHTML += `
+/*                    carouselWrapper.innerHTML += `
                         <div class="carousel-slide">
                             <video
-                                th:src="${siteURL}/resource/${formatDate}/${file.saveName}"
-                                th:alt="${file.originalName}" controls></video>
-                        </div>`;
+                                src="${siteURL}/resource/${formatDate}/${file.saveName}"
+                                alt="${file.originalName}" controls></video>
+                        </div>`;*/
+                    carouselWrapper.innerHTML +=`<div class="carousel-slide">
+                                <video controls>
+                                <source src="${siteURL}/resource/${formatDate}/${file.saveName}" type="video/mpeg">
+                                <source src="${siteURL}/resource/${formatDate}/${file.saveName}" type="video/ogg">
+                                <source src="${siteURL}/resource/${formatDate}/${file.saveName}" type="video/webm">
+                                ${file.originalName}
+                            </video></div>`;
                 }
             })
             carouselMain.appendChild(carouselWrapper);
@@ -577,6 +585,8 @@ let renderFeedList = (response) => {
                 })
             }
         }
+        feedBody.innerHTML+=`<div class="feed-content">${feed.content}</div>`;
+        feedBody.innerHTML+=`<input type="checkbox" class="more-btn">`;
         //피드 푸터 출력(좋아요, 댓글)
         currentFeed.innerHTML += `
         <div class="feed-footer padding-half text-xs gap-half">
@@ -674,7 +684,7 @@ const userFeedIoCallback = (entries, io) => {
     entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         // if (entry.isIntersecting) {
-        console.log('is observed!!!')
+        // console.log('is observed!!!')
         io.unobserve(entry.target);//옵저빙했던 아이템 해제
         // postData("/question",{page:page}).then(response=>{
         if(principalEmail==='anonymousUser'&&page>=1){ //
@@ -685,14 +695,15 @@ const userFeedIoCallback = (entries, io) => {
             setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
         }else {
             getData("/user/feed/list/"+feedUser.id+"?page=" + (++page)).then(response => {
-                console.log("target page:", page)
-                console.log('response:', response)
+                // console.log("target page:", page)
+                // console.log('response:', response)
                 renderUserFeedList(response);
                 // 마지막 페이지가 아니면 계속 옵저빙
-                console.log('콘텐츠 길이(피드갯수):', response.content.length)
+                // console.log('콘텐츠 길이(피드갯수):', response.content.length)
                 if (response.content.length === 9)
                     observeLastItem(io, document.querySelectorAll('.my-feed'));
 
+                setUserFeedEvent();
                 // setFeedEvent();
                 // setFeedContentHeight();
             });
@@ -710,24 +721,52 @@ const observeLastItem = (io, items) => {
 const io = new IntersectionObserver(ioCallback, {threshold: 0.7}); //인덱스페이지 피드 옵저버
 const userFeedIo = new IntersectionObserver(userFeedIoCallback, {threshold: 0.7}); //유저 피드 옵저버
 let setUserFeedEvent = () => {
-    if (document.querySelectorAll(".my-feed")) {
-        document.querySelectorAll(".my-feed").forEach((userFeed) => {
-            /* 본인 게시물 : 옵션 토글, 게시물 수정,삭제 이벤트 등록 */
-            if (userFeed.querySelector(".option-button")) {
-                // setOptionToggleEvent(feed);
-                // setModifyFormEvent(feed);
-                // setModifyCancelEvent(feed);
-                // setFeedModifySaveEvent(feed);
-                // setDeleteEvent(feed);
+    console.log('set feed event')
+    if (document.querySelectorAll(".pseudo-container")) {
+        console.log('pseudo-container is exist')
+        document.querySelectorAll(".pseudo-container").forEach((feed) => {
+            console.log('each element:',feed)
+            // element.querySelector('click', (e) => {
+            let userFeed;
+            if(feed.querySelector(".my-feed")) {
+                userFeed = feed.querySelector(".my-feed");
+                userFeed.addEventListener('click', (e) => {
+                    // userFeed.classList.toggle("feed-toggle");
+                    // TODO : 피드 하나 가져와서 메인 피드랑 동일하게 보여주고, 이벤트 적용
+                    e.preventDefault()
+
+                    let id = userFeed.id;
+                    postData('/feed/'+id,null,csrf_header,csrf_token).then(response=>{
+                        console.log('feed res:',response)
+                        renderUserFeed(response.feed)
+
+                    }).then(()=>{
+                        feed = document.querySelector(".feed");
+                        /* 본인 게시물 : 옵션 토글, 게시물 수정,삭제 이벤트 등록 */
+                        if (document.querySelector(".option-button")) {
+                            console.log('it is optionbutton')
+                            setOptionToggleEvent(feed);
+                            setModifyFormEvent(feed);
+                            setModifyCancelEvent(feed);
+                            setFeedModifySaveEvent(feed);
+                            setDeleteEvent(feed);
+                        }
+                        setFollowEvent(feed);
+                        setCarouselEvent(feed);
+                        setLikeToggleEvent(feed);
+                        setCommentToggleEvent(feed);
+                        setCommentEvent(feed);
+                        setFeedContentHeight();//피드의 '...' 줄임말 높이 설정
+                    })
+                    // console.log('hi!!!!', id)
+
+
+                })
             }
-            // setFollowEvent(feed);
-            // setCarouselEvent(feed);
-            // setLikeToggleEvent(feed);
-            // setCommentToggleEvent(feed);
-            // setCommentEvent(feed);
         })
     }
 }
+
 let setFeedEvent = () => {
     if (document.querySelectorAll(".feed")) {
         document.querySelectorAll(".feed").forEach((feed) => {
@@ -807,9 +846,9 @@ let easyDate = (formatter) =>{
 //YYmmdd
 let getFormatDate = (date)=> {
     let year = date.getFullYear().toString();
-    console.log('year',year)
+    // console.log('year',year)
     let formatYear = year.substring(2,4);
-    console.log('format year:',formatYear)
+    // console.log('format year:',formatYear)
     //2번 포맷
     return formatYear +
         ((date.getMonth() + 1) < 9 ? "0" + (date.getMonth() + 1) : (date.getMonth() + 1)) +
@@ -921,23 +960,23 @@ let renderUserFeedList =(response) =>{
             createDate = userFeed.modifiedDate;
         };
         // console.log('author:',author)
-        console.log('fileList:',fileList)
-        console.log('answerList:',answerList)
-        console.log('feedId:',feedId)
-        console.log('content:',content)
-        console.log('createDate:',createDate)
-        console.log('isHide:',isHide)
-        console.log('before return')
+        // console.log('fileList:',fileList)
+        // console.log('answerList:',answerList)
+        // console.log('feedId:',feedId)
+        // console.log('content:',content)
+        // console.log('createDate:',createDate)
+        // console.log('isHide:',isHide)
+        // console.log('before return')
         if(isHide){
             if(principalEmail==='anonymousUser')
                 return
             if(siteUser.userName!==feedUser.userName)
                 return;
         }
-        console.log('after return')
+        // console.log('after return')
         let mediaWrapper;
-        userFeedWrapper.innerHTML += `<div class="pseudo-container" id="${feedId}">
-                                            <div class='my-feed flex-column'>
+        userFeedWrapper.innerHTML += `<div class="pseudo-container" >
+                                            <div class='my-feed flex-column' id="${feedId}">
                                             </div>
                                     </div>`;
         if(fileList.length>0) {
@@ -947,7 +986,7 @@ let renderUserFeedList =(response) =>{
             let originName = firstFile.originalName;
             let date = new Date(fileCreateDate);
             let formatDate = getFormatDate(date);
-            console.log('formdate:',formatDate)
+            // console.log('formdate:',formatDate)
             if(firstFile.fileType==='image') {
                 mediaWrapper = `<div class="my-feed-media-wrapper"><img src="/resource/${formatDate}/${filename}" alt="${originName}"/></div>`;
             }else {
@@ -960,6 +999,257 @@ let renderUserFeedList =(response) =>{
         }
 
     })
+}
+
+let renderUserFeed = (feed) => {
+    let author = feedUser;
+    console.log('author.userName:', author.userName)
+    let fileList = feed.fileList;
+    console.log('fileList:',feed.fileList)
+    let answerList = feed.answerList;
+    console.log('answerList:',feed.answerList)
+    console.log('createDate:',feed.createDate)
+    let createDate = getRelativeDate(feed.createDate);
+    let category = author.category;
+    // let category = feedUser.category;
+    console.log('feeduser category:',category)
+    let feedContainer = document.querySelector(".feed-pop");
+    if(category===null)category='';
+    feedContainer.innerHTML =
+        `<div class="feed feed-pop-style" id="${feed.id}">
+                <!--피드 헤더-->
+                <div class="feed-header padding-default">
+                    <div class="flex gap-half" aria-label="${author.userName}의 프로필">
+                        <a class="feed-profile-image" href='/user/feed/${author.id}'>
+                            <img alt="피드프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                        </a>
+                        <div>
+                            <div class="feed-writer text-sm font-bold">${author.userName}</div>
+                            <div class="feed-tag text-xs">${category}</div>
+                            <!-- 날짜 객체를 날짜 포맷에 맞게 변환 -->
+                            <div class="feed-timestamps text-xs">${createDate}</div>
+                        </div>
+                    </div>
+                </div>
+                <!--피드 헤더-->
+            
+                <!--피드 바디-->
+                <div class="feed-body padding-default flex-column gap-half">
+                    <!--피드 글 출력-->
+<!--                    <div class="feed-content">${feed.content}</div>-->
+<!--                    <input type="checkbox" class="more-btn">-->
+                </div>
+                <!--피드 바디-->
+                
+                <!--피드 푸터-->
+                <!--피드 푸터-->
+                <!--댓글-->
+                <!--댓글-->
+            </div>`;
+
+    let currentFeed = document.querySelector(".feed:last-child");
+    let feedBody = currentFeed.querySelector(".feed-body");
+    //프로필
+    if (author.hasProfile === true) {
+        console.log(author.hasProfile)
+        console.log('has profile')
+        console.log('current feed:', currentFeed)
+        currentFeed.querySelector(".feed-profile-image").innerHTML = `<img alt="피드프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${author.id}.png">`;
+    }
+
+    // 더보기 | 팔로우
+    if (principalEmail === author.email) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
+        currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
+                        <div class="option-menu">
+                            <button class="modify-button">수정</button>
+                            <button class="delete-button">삭제</button>
+                            <button class="edit-save-button hide">저장</button>
+                            <button class="edit-cancel-button hide">취소</button>
+                        </div>
+                        <button class="option-button flex justify-content-center align-center">
+                            ⁝
+                        </button></div>
+                    `;
+    } else if (principalEmail === 'anonymousUser') {
+
+    } else {
+        currentFeed.querySelector(".feed-header").innerHTML += `
+                        <button class="follow-button" value="${author.id}">팔로우</button>`;
+    }
+
+    //피드 미디어 출력
+    if (fileList.length > 0) {
+        let feedBody = currentFeed.querySelector(".feed-body");
+        // let fragment = document.createDocumentFragment();
+
+        let carouselMain = document.createElement('div');
+        carouselMain.classList.add("carousel-main");
+        let carouselWrapper = document.createElement('div');
+        carouselWrapper.classList.add("flex", "carousel-wrapper");
+        // let carouselButtonContainer = document.createElement('div');
+        // let carouselPagination = document.createElement('div');
+        // carousel
+
+        fileList.forEach(file => {
+            let date = new Date(file.createDate);
+            let formatDate = getFormatDate(date);
+            if (file.fileType === "image") {
+                console.log('fileType is image')
+
+                carouselWrapper.innerHTML += `
+                        <div class="carousel-slide">
+                            <img
+                                src="${siteURL}/resource/${formatDate}/${file.saveName}"
+                                alt="${file.originalName}"/>
+                        </div>`;
+            } else if (file.fileType === "video") {
+                console.log('filetype video')
+/*                carouselWrapper.innerHTML += `
+                        <div class="carousel-slide">
+                            <video controls>
+                                src="${siteURL}/resource/${formatDate}/${file.saveName}"
+                                alt="${file.originalName}"
+                            </video>
+                        </div>`;*/
+                carouselWrapper.innerHTML +=`<div class="carousel-slide">
+                                <video controls>
+                                <source src="${siteURL}/resource/${formatDate}/${file.saveName}" type="video/mpeg">
+                                <source src="${siteURL}/resource/${formatDate}/${file.saveName}" type="video/ogg">
+                                <source src="${siteURL}/resource/${formatDate}/${file.saveName}" type="video/webm">
+                                ${file.originalName}
+                            </video></div>`;
+            }
+        })
+        carouselMain.appendChild(carouselWrapper);
+        feedBody.appendChild(carouselMain);
+        // carouselMain.appendChild(carouselButtonContainer);
+        // feedBody.appendChild(carouselPagination);
+        if (fileList.length > 1) {
+            carouselMain.innerHTML +=
+                `<div class="carousel-button-container">
+                    <button type="button" class="carousel-prev">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-chevron-double-left" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                            <path fill-rule="evenodd"
+                                  d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </button>
+                    <button type="button" class="carousel-next">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bi bi-chevron-double-right" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z"/>
+                            <path fill-rule="evenodd"
+                                  d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </button>
+                </div>`;
+
+            //캐러셀 중앙 버튼
+            feedBody.innerHTML += `<div class="carousel-pagination"></div>`;
+            let carouselCircle = currentFeed.querySelector(".carousel-pagination");
+            fileList.forEach(() => {
+                carouselCircle.innerHTML += `
+                    <div class="carousel-circle"></div>
+                    `;
+            })
+        }
+    }
+    feedBody.innerHTML+=`<div class="feed-content">${feed.content}</div>`;
+    feedBody.innerHTML+=`<input type="checkbox" class="more-btn">`;
+    //피드 푸터 출력(좋아요, 댓글)
+    currentFeed.innerHTML += `
+        <div class="feed-footer padding-half text-xs gap-half">
+            <div class="like flex align-center">
+                <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                <img class="like-img hide" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
+                좋아요 N
+            </div>
+        </div>`;
+    if (answerList.length > 0) {
+        let feedFooter = currentFeed.querySelector(".feed-footer");
+        feedFooter.innerHTML += `
+                            <span class="answer-count flex align-center">
+                    <img class="chat-img" src="${siteURL}/resource/apps/chat.png" alt="채팅이미지"/>
+                댓글 <strong>${answerList.length}</strong>
+                </span>`;
+    }
+
+    //댓글 영역
+    currentFeed.innerHTML += `<div class="answer-container hide"></div>`;
+    currentFeed.innerHTML += `<!--<div class="answer-container"></div>-->`;
+    console.log('answer conatainer?:',currentFeed.querySelector(".answer-container"));
+    let answerContainer = currentFeed.querySelector(".answer-container");
+
+
+    //댓글 출력
+    if (answerList.length > 0) {
+        answerContainer.innerHTML += `<div class="answer-list"></div>`;
+        let answerListContainer = answerContainer.querySelector(".answer-list");
+        answerList.forEach((answer) => {
+            let answerAuthor = answer.author;
+            let answerCreateDate = getRelativeDate(answer.createDate);
+
+            answerListContainer.innerHTML += `
+                <div class="answer padding-half">
+                    <div class="answer-profile-image" onclick="location.href='/user/feed/${answerAuthor.id}'">
+                        <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                    </div>
+                    <div>
+                        <div class="answer-header">
+                            <div class="text-sm">${answerAuthor.userName}</div>
+                            <div class="feed-timestamps text-xs">${answerCreateDate}</div>
+                        </div>
+                        <div class="answer-body">
+                            <div class="answer-content text-sm">${answer.content}</div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            if (answerAuthor.hasProfile) {
+                currentFeed.querySelector(".answer-profile-image").innerHTML = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${answerAuthor.id}.png">`;
+            }
+            if (answer.modifiedDate !== null) {
+                console.log('answer modified date:',answer.modifiedDate);
+
+                currentFeed.querySelector(".answer-header div:last-child").innerHTML = `<div class="feed-timestamps text-xs">${answer.modifiedDate} (수정됨)</div>`;
+            }
+        })
+    }
+    //댓글 폼
+    let profileImage ="";
+    if (principalEmail === 'anonymousUser') { // 방문자
+        profileImage="/apps/defaultProfile";
+        answerContainer.innerHTML += `
+            <div class="answer-form padding-default flex">
+                <div class="answer-profile-image">
+                    <img class="img object-cover border-full" alt="게스트댓글프로필" src="${siteURL}/resource${profileImage}.png">
+                </div>
+                <div class="flex-column width100 align-flex-end">
+                    <textarea placeholder="로그인 후 작성해 주세요" disabled name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                </div>
+            </div>`;
+    } else { //접속자
+        // console.log('접속자 mail:',principalEmail)
+        if(siteUser.hasProfile)
+            profileImage="/userProfiles/"+siteUser.id; //프로필 있는사람
+        else
+            profileImage = "/apps/defaultProfile"; //없는사람
+
+        answerContainer.innerHTML += `
+            <div class="answer-form padding-default flex">
+                <input type="hidden" name="${csrf_header}" value="${csrf_token}"/>
+                <div class="answer-profile-image">
+                    <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource${profileImage}.png">
+                </div>
+                <div class="flex-column width100 align-flex-end">
+                    <textarea placeholder="여러분의 생각을 적어주세요" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
+                    <input type="submit" class="padding-half comment-submit-button" value="등록"/>
+                </div>
+            </div>`;
+    }
 }
 
 export {

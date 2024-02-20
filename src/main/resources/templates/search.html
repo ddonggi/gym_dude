@@ -6,14 +6,14 @@
             <div class="feed-profile-image">
                 <img alt="피드프로필" class="img object-cover border-full" src="/resource/apps/defaultProfile.png">
             </div>
-<!--            <div class="flex align-center">
-                <div class="text-limit-current text-xs"></div>
-                <div class="text-limit-max text-xs"></div>
-            </div>
-            <div class="question-input-container">
-                <textarea disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
-                <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
-            </div>-->
+            <!--            <div class="flex align-center">
+                            <div class="text-limit-current text-xs"></div>
+                            <div class="text-limit-max text-xs"></div>
+                        </div>
+                        <div class="question-input-container">
+                            <textarea disabled rows="3" class="question-input" placeholder="로그인 후 작성해 주세요" minlength="5" maxlength="600"></textarea>
+                            <button type="button" class="padding-half" onclick="location.href='/user/login'">로그인</button>
+                        </div>-->
             <div class="flex-column width100 gap-half">
                 <div class="flex align-center">
                     <div class="text-limit-current text-xs"></div>
@@ -186,7 +186,7 @@
                     <div sec:authorize="isAuthenticated()" class="flex-column width100 align-flex-end">
                         <textarea placeholder="여러분의 생각을 적어주세요" th:if="${#fields.hasErrors('content')}" th:field="*{content}" th:placeholder="${#fields.errors('content').get(0)}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
                         <textarea placeholder="여러분의 생각을 적어주세요" th:unless="${#fields.hasErrors('content')}" th:field="*{content}" name="content" rows="3" class="answer-input" minlength="3" maxlength="600"></textarea>
-<!--                        <input type="submit" class="padding-half" value="등록"/>-->
+                        <!--                        <input type="submit" class="padding-half" value="등록"/>-->
                         <input type="submit" class="padding-half comment-submit-button" value="등록"/>
                     </div>
                 </form>

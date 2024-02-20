@@ -22,6 +22,9 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @NonNull
     Page<Question> findAll(Pageable pageable);
 
+    @NonNull
+    Page<Question> findAllByContentContaining(Pageable pageable,String word);
+
     //User 와 일치하는 Question 데이터를 찾는다. 파라미터에 Pageable 을 같이 넣어주면 Page 객체로 리턴할 수 있다.
     Page<Question> findAllByAuthor(SiteUser siteUser,
                                    Pageable pageable);

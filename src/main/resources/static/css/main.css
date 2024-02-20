@@ -266,6 +266,11 @@ input[type=submit] {
 }
 
 /* 인덱스 화면 */
+.hashtag {
+    background: white;
+    border: 2px solid silver;
+    border-radius: 19px;
+}
 .index-container{
     width: 100%;
     display: flex;

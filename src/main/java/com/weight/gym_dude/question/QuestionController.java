@@ -179,7 +179,8 @@ public class QuestionController {
                           AnswerForm answerForm,
                           Principal principal
     ) {
-        logger.info("page:{}",page);
+        logger.info("page sear:{}",page);
+        logger.info("keyword serc:{}",keyword);
 //        Page<QuestionDTO> paging = questionService.getFeedList(page);
         Page<QuestionDTO> paging = questionService.getSearchFeedList(page,keyword);
         model.addAttribute("paging", paging);
@@ -195,10 +196,10 @@ public class QuestionController {
             logger.info("Guest User");
         }
         model.addAttribute("keyword",keyword);
-        return "search";
+        return "index";
     }
     //검색 피드 페이징
-    @GetMapping("/feed/search")
+    @GetMapping("/search/feed")
     @CrossOrigin
     @ResponseBody
     public ResponseEntity<Object> searchFeedPageREST(
@@ -206,6 +207,8 @@ public class QuestionController {
             @RequestParam(value = "keyword") String keyword
     ){
 //        logger.info("page testtt:{}",page);
+        logger.info("pagerest:{}",page);
+        logger.info("keywordrest:{}",keyword);
         Page<QuestionDTO> paging = questionService.getSearchFeedList(page,keyword);
 
         return ResponseEntity.status(HttpStatus.OK).body(paging);

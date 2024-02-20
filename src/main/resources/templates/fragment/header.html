@@ -16,7 +16,10 @@ sec:authorize="isAnonymous()" - 이 속성은 로그인 되지 않은 경우에�
 sec:authorize="isAuthenticated()" - 이 속성은 로그인 된 경우에만 해당 엘리먼트가 표시되게 한다.-->
 <!--            <a class="nav-link" th:href="@{/user/login}">로그인</a>-->
             <div class="navbar-right">
-                <div role="button">검색</div>
+                <form th:action="@{/search}" method="get">
+                    <input type="text" name="keyword" minlength="2" maxlength="12">
+                    <button type="submit">검색</button>
+                </form>
                 <!-- 비로그인 사용자만 보이는 항목-->
                 <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
                 <!-- 로그인된 사용자만 보이는 항목-->

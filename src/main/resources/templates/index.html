@@ -1,6 +1,16 @@
 <html layout:decorate="~{layout/layout}" >
 <div layout:fragment="content" class="index-container">
     <th:block th:replace="~{fragment/header::header}"></th:block>
+    <div class="flex gap-half hashtag-container flex-wrap">
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=벤치'" >#벤치</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=스쿼트'">#스쿼트</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=식단'">#식단</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=자세'">#자세</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=피드백'">#피드백</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=몸평'">#몸평</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=삼대'">#삼대</button>
+        <button class="hashtag padding-half" onclick="location.href='/search?keyword=중량'">#중량</button>
+    </div>
     <form enctype="multipart/form-data" th:action="@{/create}" method="post" class="question-container feed-width flex-column align-flex-end padding-default" id="feed-form">
         <div sec:authorize="isAnonymous()" class="question-content">
             <div class="feed-profile-image">
@@ -244,6 +254,10 @@
         if([[${siteUser}]]){
             siteUser = [[${siteUser}]];
             console.log('logined siteUser:',siteUser);
+        }
+        let keyword="";
+        if([[${keyword}]]) {
+            keyword = [[${keyword}]];
         }
     </script>
     <script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>

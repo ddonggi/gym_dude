@@ -416,7 +416,13 @@ const ioCallback = (entries, io) => {
             document.querySelector(".index-container").append(signInContainer);
             setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
         }else {
-            getData("feed?page=" + (++page)).then(response => {
+            let feedUrl = "feed?page=" + (++page)
+            console.log('keyword length',keyword.length)
+            if(keyword.length>=2){
+                feedUrl = "search/feed?page=" + (++page)+"&keyword="+keyword
+            }
+            console.log('feedUrl:',feedUrl)
+            getData(feedUrl).then(response => {
                 console.log("target page:", page)
                 console.log('response:', response)
                 renderFeedList(response);

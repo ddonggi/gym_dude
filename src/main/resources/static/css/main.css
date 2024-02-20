@@ -266,10 +266,20 @@ input[type=submit] {
 }
 
 /* 인덱스 화면 */
+.hashtag-container{
+    padding: 0 1.25rem;
+    /*top: 4rem;*/
+    /*position: sticky;*/
+    /*background: black;*/
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
 .hashtag {
     background: white;
     border: 2px solid silver;
     border-radius: 19px;
+    cursor: pointer;
 }
 .index-container{
     width: 100%;
@@ -277,7 +287,7 @@ input[type=submit] {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 2.25rem;
+    gap: 1.25rem;
 }
 .feed-width{
     width: 632px;
@@ -351,6 +361,7 @@ input[type=submit] {
 .carousel-main {
     /* 이미지 크기 설정  */
     width: 100%;
+    /*width: 630px;*/
     position: relative;
     overflow: hidden;
     margin: 0 auto;
@@ -847,6 +858,9 @@ section{
         margin-left: auto;
         margin-right: auto;
     }
+    .hashtag-container{
+        padding: 0 1.25rem;
+    }
     .my-menu-wrapper {
         right: 0;
     }
@@ -866,9 +880,16 @@ section{
         width: 100%;
         padding: 0 1.25rem;
     }
+    .carousel-main{
+        width: 356px;
+        max-width: 356px;
+    }
     .carousel-wrapper{
-        overflow: scroll;
-        scroll-behavior: smooth;
+        /*overflow: scroll;*/
+        /*scroll-behavior: smooth;*/
+        /*scroll-behavior: smooth;*/
+        position: relative;
+        display: flex;
     }
     .carousel-main:hover .carousel-button-container,.carousel-main:hover .carousel-pagination{
         display: none;

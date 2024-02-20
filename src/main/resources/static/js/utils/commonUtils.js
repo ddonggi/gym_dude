@@ -282,11 +282,14 @@ let setHeaderProfileEvent = () => {
 
     }
 }
+
 /** 피드의 캐러셀에 슬라이드 이벤트를 등록하는 함수
  * @param feed
  * */
 let setCarouselEvent = (feed) => {
+
     if (feed.querySelector(".carousel-main")) {
+
         let carouselMain = feed.querySelector(".carousel-main");
         carouselMain.style.maxHeight = `${carouselMain.clientWidth / 3 * 4}px`;
 
@@ -345,6 +348,78 @@ let setCarouselEvent = (feed) => {
         });
 
         showSlide(0);
+
+        //모바일 터치 슬라이드 이벤트
+        if(window.innerWidth<=768){
+
+            let carouselWrapper = feed.querySelector(".carousel-wrapper");
+            let carouselSlide = feed.querySelector(".carousel-slide");
+            let itemCount = feed.querySelectorAll('.carousel-slide').length;
+            console.log('itemCount.',itemCount)
+
+            console.log('모바일 입니다.')
+            console.log('carouselWrapper:',carouselWrapper)
+            console.log('carouselSlide:',carouselSlide)
+
+            let curPos = 0;
+            let postion = 0;
+            let start_x, end_x;
+            // const IMAGE_WIDTH = 375;
+            const IMAGE_WIDTH = carouselSlide.clientWidth;
+            console.log('wrapper WIDTH:',carouselWrapper.clientWidth)
+            console.log('IMAGE_WIDTH:',IMAGE_WIDTH)
+
+            function prev(){
+                if(curPos > 0){
+                    postion += IMAGE_WIDTH;
+                    carouselWrapper.style.transform = `translateX(${postion}px)`;
+                    curPos = curPos - 1;
+
+                    bullets.forEach((bullet, index) => {
+                        if (index === curPos) {
+                            bullet.classList.add('active');
+                        } else {
+                            bullet.classList.remove('active');
+                        }
+                    });
+                }
+            }
+            function next(){
+                if(curPos < itemCount-1){
+                    postion -= IMAGE_WIDTH;
+                    carouselWrapper.style.transform = `translateX(${postion}px)`;
+                    curPos = curPos + 1;
+
+
+                    bullets.forEach((bullet, index) => {
+                        if (index === curPos) {
+                            bullet.classList.add('active');
+                        } else {
+                            bullet.classList.remove('active');
+                        }
+                    });
+                }
+            }
+
+            function touch_start(event) {
+                start_x = event.touches[0].pageX
+                console.log('start_x',start_x)
+            }
+
+            function touch_end(event) {
+                end_x = event.changedTouches[0].pageX;
+                console.log('start_x',start_x)
+
+                if(start_x > end_x){
+                    next();
+                }else{
+                    prev();
+                }
+            }
+            carouselWrapper.addEventListener('touchstart',touch_start)
+            carouselWrapper.addEventListener('touchend',touch_end)
+
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.weight.gym_dude.answer.Answer;
 import com.weight.gym_dude.file.FileRequest;
+import com.weight.gym_dude.like.Like;
 import com.weight.gym_dude.user.SiteUser;
 import lombok.*;
 
@@ -16,7 +17,9 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Entity
@@ -51,6 +54,10 @@ public class Question {
 //    @JsonIgnore
 //    @ToString.Exclude
     private List<Answer> answerList;
+
+    //전체 조회 화면에서 좋아요 수를 노출하기 위해
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    Set<Like> likes = new HashSet<>();
 
     //File 의 ManyToOne 의 양방향 매핑
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)

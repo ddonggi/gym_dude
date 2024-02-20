@@ -75,6 +75,14 @@ public class UserService {
             throw new DataNotFoundException("site user not found");
         }
     }
+    public SiteUser getUserByName(String name){
+        Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(name);
+        if(optionalSiteUser.isPresent()){
+            return optionalSiteUser.get();
+        }else{
+            throw new DataNotFoundException("site user not found");
+        }
+    }
 
     public SiteUserDTO toUserDTO(SiteUser siteUser) {
         //DTO

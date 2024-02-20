@@ -121,6 +121,18 @@ html, body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: auto;
 }
+html::-webkit-scrollbar-thumb {
+    outline: none;
+    border-radius: 10px;
+    border: 3px solid transparent;
+    /* box-shadow 색상은 지정 안했을 경우 기본적으로 color 값을 따라감 */
+    box-shadow: inset 6px 6px 0;
+}
+
+html::-webkit-scrollbar-track {
+    box-shadow: none;
+    background-color: transparent;
+}
 .signin-container {
     position: fixed;
     bottom: -360px;

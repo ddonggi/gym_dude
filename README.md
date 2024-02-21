@@ -4,27 +4,28 @@
 
 ### 헬스인을 위한 SNS 커뮤니티
 
-![2021_04_user_count]()
+![gym_dude](https://github.com/ddonggi/gym_dude/assets/61221172/417bca29-d9a7-417a-a0ad-2ec02ba6d73d)
 
 
-### [기술 스택]
+## [기술 스택]
 - Springboot / JPA / PostgreSQL
 
 - Thymeleaf / Vanilla JS 
 
-### [구현 완료]
+## [구현 완료]
 
-Sign-up / Sing-out / Login / Logout
-Feed CRUD / Comment / Like 
+- Sign-up / Sign-out / Login / Logout / 
+Feed CRUD(with Multipart) / Comment / Like / Follow 
 
-/ Follow / Search / Infinite Scrolling 
+- Search / Infinite Scrolling / relative Date /
+async nickname check(with debounce) / image carousel
 
+- Mobile view
 ### [구현예정]
 
-Social(OAuth) account / Mail certification / Chatting 
-
-/ BookMark / Report / Barbell Path Tracking / Body Before After
+- Social(OAuth) account / Mail certification / Chatting
+- BookMark / Report / Barbell Path Tracking / Body Before After
 
 ### [+@구현 후보]
 
-Exercise Youtuber List(Rank) / Push / Meetup(partner workout) / Mention
+- Exercise Youtuber List(Rank) / Push / Meetup(partner workout) / Mention

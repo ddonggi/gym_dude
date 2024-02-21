@@ -1,5 +1,6 @@
 package com.weight.gym_dude.user;
 
+import com.weight.gym_dude.follow.FollowService;
 import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.question.QuestionDTO;
 import com.weight.gym_dude.question.QuestionService;
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Principal;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,6 +45,7 @@ public class UserController {
     private final FileUtils fileUtils;
     private final SiteUserImageService siteUserImageService;
     private final AuthenticationManager authenticationManager;
+    private final FollowService followService;
     private final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/login")
@@ -130,6 +133,8 @@ public class UserController {
             SiteUser profileUser = optionalProfileUser.get();
             model.addAttribute("profileUser", profileUser); // 방문할 유저
             model.addAttribute("siteUser", siteUser); //현재 로그인한 유저 ( header 에서도 씀)
+            List<Integer> followingList = followService.getFollowingList(siteUser.getId());
+            model.addAttribute("followingList", followingList);
         }
         return "user/profile";
     }
@@ -148,7 +153,7 @@ public class UserController {
                                 @RequestPart(name = "file",required = false) MultipartFile file,
                                 @RequestPart(name = "category") String category) {
         SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
-        Long id = siteUser.getId();
+        Integer id = siteUser.getId();
 //        SiteUser prince = (SiteUser) authentication.getPrincipal();
 
         logger.info("id:{}",id);
@@ -206,6 +211,8 @@ public class UserController {
             model.addAttribute("feedPaging",feedPaging);
             model.addAttribute("feedUser",feedUser);
             model.addAttribute("siteUser",siteUser); //현재 로그인한 사람
+            List<Integer> followingList = followService.getFollowingList(siteUser.getId());
+            model.addAttribute("followingList", followingList);
         }
         return "user/feed";
     }

@@ -26,7 +26,7 @@ public class SiteUserImageService {
     public void save(SiteUserImage siteUserImage) {
         siteUserImageRepository.save(siteUserImage);
     }
-    public void modified(Long id, SiteUserImage siteUserImage){
+    public void modified(Integer id, SiteUserImage siteUserImage){
 //        siteUserImageRepository
         Optional<SiteUserImage> optionalSiteUserImage = siteUserImageRepository.findByAuthorId(id);
         if(optionalSiteUserImage.isPresent()) {

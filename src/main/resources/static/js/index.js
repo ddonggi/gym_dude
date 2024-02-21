@@ -6,7 +6,7 @@ import {
     observeLastItem,
     setFeedSaveEvent,
     setFileThumbnailEvent,
-    getRelativeDate, setTextChangeTrackingEvent
+    getRelativeDate, setTextChangeTrackingEvent, postData, csrf_header, csrf_token
 } from './utils/commonUtils.js';
 
 let feedList = document.querySelectorAll('.feed');
@@ -52,9 +52,22 @@ let changeFirstPageLikeStatus = (pageContentList) =>{
     })
 }
 
+/*let setFirstPageFollowEvent = () =>{
+    document.querySelectorAll('.follow-button').forEach((followButton)=>{
+        followButton.addEventListener('click',()=>{
+            console.log('followingId:',followButton.value)
+            let data = {'followingId':followButton.value}
+            postData('/follow',data,csrf_header,csrf_token).then(response=>{
+                console.log('follow response:',response)
+            })
+        })
+    })
+}*/
 
+// console.log('res fol:',followList)
 changeFirstPageDate(feedList);
 changeFirstPageLikeStatus(pageContentList);
+// setFirstPageFollowEvent();
 setHeaderProfileEvent();//로그인된 유저의 헤더 프로필 이미지에 토글 이벤트 등록
 setFeedSaveEvent();//작성 폼 이벤트 등록
 setFileThumbnailEvent();//파일 선택시 썸네일 미리보기 이벤트 등록

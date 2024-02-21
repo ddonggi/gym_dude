@@ -6,6 +6,7 @@ package com.weight.gym_dude.question;
 import com.weight.gym_dude.answer.AnswerForm;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestService;
+import com.weight.gym_dude.follow.FollowService;
 import com.weight.gym_dude.like.Like;
 import com.weight.gym_dude.like.LikeRepository;
 import com.weight.gym_dude.like.LikeService;
@@ -43,6 +44,7 @@ public class QuestionController {
     private final FileUtils fileUtils;
     private final FileRequestService fileService;
     private final LikeService likeService;
+    private final FollowService followService;
     private final LikeRepository likeRepository;
 
     //첫 화면 모든 피드
@@ -69,6 +71,8 @@ public class QuestionController {
             logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
 //            model.addAttribute("principalUser", siteUserDTO);
             model.addAttribute("siteUser", siteUserDTO);
+            List<Integer> followingList = followService.getFollowingList(principalUser.getId());
+            model.addAttribute("followingList", followingList);
         }else{
             logger.info("Guest User");
         }
@@ -198,6 +202,8 @@ public class QuestionController {
             logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
 //            model.addAttribute("principalUser", siteUserDTO);
             model.addAttribute("siteUser", siteUserDTO);
+            List<Integer> followingList = followService.getFollowingList(principalUser.getId());
+            model.addAttribute("followingList", followingList);
         }else{
             logger.info("Guest User");
         }

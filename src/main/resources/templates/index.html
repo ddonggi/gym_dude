@@ -99,7 +99,7 @@
                     </button>
                 </div>
 
-                <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.email}" class="follow-button" th:value="${question.author.id}">팔로우</button>
+                <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.email}" class="follow-button" name="following" th:value="${question.author.id}">팔로우</button>
 
             </div>
             <div class="feed-body padding-default flex-column gap-half" >
@@ -261,6 +261,12 @@
         let hasPrevious = [[${paging.hasPrevious}]];
         let hasNext = [[${paging.hasNext}]];
         let pageContentList = [[${paging.content}]]
+        let followingList;
+        if([[${followingList}]]){
+            followingList = [[${followingList}]];
+        }
+        console.log('followingList',followingList)
+        console.log('pageContentList:',pageContentList)
         // 로그인한 유저일땐 siteUser object
         //게스트 유저일땐 #authentication.getName()
         let principalEmail = [[${#authentication.getName()}]];

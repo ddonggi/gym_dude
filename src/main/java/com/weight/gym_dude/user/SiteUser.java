@@ -1,11 +1,16 @@
 package com.weight.gym_dude.user;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.weight.gym_dude.follow.Follow;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
+
+import java.util.List;
 //import javax.persistence.*;
 //import javax.validation.constraints.Email;
 
@@ -32,7 +37,7 @@ public class SiteUser {
     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Column(unique = true) //유일한 값 저장
     private String userName;
@@ -51,6 +56,18 @@ public class SiteUser {
     @ColumnDefault("false")
     private Boolean hasProfile;
 
+    //내가 팔로잉 하는 사람
+    @OneToMany(mappedBy = "following")
+//    @JsonManagedReference
+    @JsonBackReference
+    private List<Follow> followerList;
+
+    //나를 팔로우 하는 사람
+    @OneToMany(mappedBy = "follower")
+//    @JsonManagedReference
+    @JsonBackReference
+    private List<Follow> followingList;
+
     //회원가입
     public SiteUser(String userName, String password, String email) {
         this.userName=userName;
@@ -64,7 +81,7 @@ public class SiteUser {
         this.hasProfile=hasProfile;
     }
     //정보 조회용
-    public SiteUser(Long id, String userName, String category, String email, String introduce, Boolean hasProfile) {
+    public SiteUser(Integer id, String userName, String category, String email, String introduce, Boolean hasProfile) {
         this.id=id;
         this.userName=userName;
         this.category=category;

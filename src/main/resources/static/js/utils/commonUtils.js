@@ -82,6 +82,18 @@ let getData = async (url, page_, csrf_header, csrf_token) => {
     });
     return response.json(); // JSON 응답을 네이티브 JavaScript 객체로 파싱
 }
+
+// let getFollowingList = ()=>{
+//     if(principalEmail !== 'anonymousUser'){
+//         console.log('--------my site id:-----',siteUser.id)
+//         postData('/following/list?id='+siteUser.id,null,csrf_header,csrf_token).then(response=>{
+//             console.log('my following list',response.followingList);
+//             return response.followingList;
+//         })
+//     }
+// }
+// let followList = getFollowingList();
+
 /* 게시물 삭제 이벤트 등록 */
 let setDeleteEvent = (feed) => {
     let id = feed.id;
@@ -433,7 +445,19 @@ let setFollowEvent = (feed) => {
         let followButton = feed.querySelector(".follow-button");
         followButton.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('follow button:', feed.querySelector(".follow-button").value)
+            // console.log('follow button:', feed.querySelector(".follow-button").value)
+            // console.log('followingId:',followButton.value)
+            let followId = followButton.value;
+            postData('/follow?followingId='+followId,null,csrf_header,csrf_token).then(response=> {
+                console.log('follow response:', response)
+                if(response.follow===true) { //팔로우 된 상황
+                    //팔로우취소 버튼 삽입
+                    followButton.innerText='팔로우 취소';
+                } else {//팔로우 취소된 상황
+                    //팔로우 버튼 삽입
+                    followButton.innerText='팔로우';
+                }
+            })
         })
     }
 }
@@ -869,6 +893,7 @@ let setUserFeedEvent = () => {
                             setFeedModifySaveEvent(feed);
                             setDeleteEvent(feed);
                         }
+                        followCheck(feed);
                         setFollowEvent(feed);
                         setCarouselEvent(feed);
                         setLikeToggleEvent(feed);
@@ -896,12 +921,28 @@ let setFeedEvent = () => {
                 setFeedModifySaveEvent(feed);
                 setDeleteEvent(feed);
             }
+            followCheck(feed);
             setFollowEvent(feed);
             setCarouselEvent(feed);
             setLikeToggleEvent(feed);
             setCommentToggleEvent(feed);
             setCommentEvent(feed);
         })
+    }
+}
+
+
+let followCheck = (feed) => {
+    if(feed.querySelector(".follow-button")) {
+        let followButton = feed.querySelector(".follow-button");
+        let followerId = feed.querySelector(".follow-button").value;
+        console.log(followingList)
+        for(let i =0; i<followingList.length; i++) {
+            console.log('feeds follow id:',followerId,'/ my following user id:',followingList[i])
+            if (Number(followerId) ===followingList[i]) {
+                followButton.innerText = '팔로우 취소';
+            }
+        }
     }
 }
 
@@ -1453,7 +1494,7 @@ let setCloseEvent = () => {
         console.log('clicked')
         // feedPop.classList.remove("popped");
         document.querySelector(".feed-pop").innerHTML=``;
-        document.querySelector(".my-feed-container").removeChild(document.querySelector(".popped"));
+        // document.querySelector(".my-feed-container").removeChild(document.querySelector(".popped"));
         setUserFeedEvent();
     })
 }
@@ -1482,5 +1523,6 @@ export {
     setAsyncNickNameCheckEvent,
     setProfileThumbnailEvent,
     userFeedIo,
-    setUserFeedEvent
+    setUserFeedEvent,
+    followCheck
 };

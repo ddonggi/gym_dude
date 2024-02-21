@@ -27,6 +27,10 @@
                 <button sec:authorize="isAuthenticated()"
                         th:if="${#authentication.getName()==profileUser.email}"
                         class="profile-edit-button" onclick="location.href='/user/profile/edit'">편집</button>
+                <button sec:authorize="isAuthenticated()"
+                        th:unless="${#authentication.getName()==profileUser.email}"
+                        class="follow-button profile-edit-button" name="following" th:value="${profileUser.id}" >팔로우</button>
+
             </div>
             <article>
                 <h2>내 소개</h2>
@@ -36,6 +40,12 @@
         </section>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>
+    <script th:inline="javascript">
+        let followingList;
+        if([[${followingList}]]){
+            followingList = [[${followingList}]];
+        }
+    </script>
     <script layout:fragment="profile_js" th:src="@{/js/profile.js}" type="module"></script>
 </div>
 </html>

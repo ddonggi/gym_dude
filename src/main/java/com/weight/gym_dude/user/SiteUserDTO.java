@@ -16,7 +16,7 @@ import lombok.*;
 @Builder
 //@ToString
 public class SiteUserDTO {
-    private Long id;
+    private Integer id;
     private String userName;
     private String password;
     private String email;

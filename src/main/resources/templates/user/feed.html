@@ -61,6 +61,10 @@
         let page = [[${feedPaging}]];
         console.log('feedpage first:',page);
         console.log('principalEmail :',principalEmail);
+        let followingList;
+        if([[${followingList}]]){
+            followingList = [[${followingList}]];
+        }
     </script>
     <script layout:fragment="feed_js" th:src="@{/js/userFeed.js}" type="module"></script>
 </div>

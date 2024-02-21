@@ -1,16 +1,12 @@
 package com.weight.gym_dude.file;
 
-import com.weight.gym_dude.question.Question;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**

@@ -848,17 +848,18 @@ let setUserFeedEvent = () => {
             if(feed.querySelector(".my-feed")) {
                 userFeed = feed.querySelector(".my-feed");
                 userFeed.addEventListener('click', (e) => {
-                    // userFeed.classList.toggle("feed-toggle");
-                    // TODO : 피드 하나 가져와서 메인 피드랑 동일하게 보여주고, 이벤트 적용
                     e.preventDefault()
 
                     let id = userFeed.id;
                     postData('/feed/'+id,null,csrf_header,csrf_token).then(response=>{
                         console.log('feed res:',response)
                         renderUserFeed(response.feed)
-
                     }).then(()=>{
+                        //여백 부분 눌렀을때 창 꺼짐 이벤트
+                        setCloseEvent();
+
                         feed = document.querySelector(".feed");
+
                         /* 본인 게시물 : 옵션 토글, 게시물 수정,삭제 이벤트 등록 */
                         if (document.querySelector(".option-button")) {
                             console.log('it is optionbutton')
@@ -1442,8 +1443,20 @@ let renderUserFeed = (feed) => {
                 </div>
             </div>`;
     }
+    if(!document.querySelector(".popped"))
+        document.querySelector(".feed-pop").innerHTML+=`<div class="popped"></div>`;
 }
-
+let setCloseEvent = () => {
+    let feedPop = document.querySelector(".popped");
+    // feedPop.classList.add("");
+    feedPop.addEventListener('click',()=>{
+        console.log('clicked')
+        // feedPop.classList.remove("popped");
+        document.querySelector(".feed-pop").innerHTML=``;
+        document.querySelector(".my-feed-container").removeChild(document.querySelector(".popped"));
+        setUserFeedEvent();
+    })
+}
 export {
     postData,
     csrf_token,

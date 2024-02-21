@@ -56,7 +56,7 @@ public class Question {
     private List<Answer> answerList;
 
     //전체 조회 화면에서 좋아요 수를 노출하기 위해
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)
     @JsonManagedReference
     private List<Like> likes;
 

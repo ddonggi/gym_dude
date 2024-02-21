@@ -35,7 +35,7 @@ let changeFirstPageLikeStatus = (pageContentList) =>{
         let likeList = content.likes;
         console.log('likeList:',likeList)
         let isLike = false;
-        if (likeList.length > 0) {
+        if (likeList.length > 0&&principalEmail!=='anonymousUser') {
             for(let i=0; i<likeList.length; i++) {
                 console.log('like user id:', likeList[i].author.id, '/user id:', siteUser.id)
                 if(likeList[i].author.id===siteUser.id){

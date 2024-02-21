@@ -14,6 +14,7 @@
                     </div>
                     <div class="flex-column width-sm">닉네임
                         <div th:text="${profileUser.userName}"></div>
+                        <button th:onclick="|location.href='@{/user/feed/}${profileUser.id}'|">피드보러 가기</button>
                     </div>
                     <div class="flex-column width-sm"> 관심분야
                         <div th:if="${profileUser.category!=null}" th:text="${profileUser.category}"></div>

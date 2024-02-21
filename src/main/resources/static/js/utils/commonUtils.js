@@ -1,7 +1,7 @@
 /* 비동기 통신에 쓰일 보안용 CSRF 정보 */
 let csrf_header = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
 let csrf_token = document.querySelector("meta[name='_csrf']").getAttribute("content");
-let siteURL = "http://localhost:8080";
+let siteURL = "";
 let formatter = new Intl.RelativeTimeFormat(navigator.geolocation,{numeric:'auto'});
 
 let getRelativeDate = (originRawDate) => {
@@ -100,7 +100,7 @@ let setDeleteEvent = (feed) => {
                 location.reload();
                 // feed.remove();
                 // location.href="/";
-            });
+            }).then(alert('삭제되었습니다'));
         }
     })
 }
@@ -123,7 +123,7 @@ let setModifyFormEvent = (feed) => {
         feed.querySelector(".modify-button").classList.toggle("hide");
         //삭제버튼 숨김
         feed.querySelector(".delete-button").classList.toggle("hide");
-        //저장, 취소버튼 생성 => todo : 토글
+        //저장, 취소버튼 생성
         //optionMenu.innerHTML += `<input type="submit" value="저장" class="edit-save-button"></input><a class="edit-cancel-button">취소</a>`;
         feed.querySelector(".edit-save-button").classList.toggle("hide");
         feed.querySelector(".edit-cancel-button").classList.toggle("hide");
@@ -461,16 +461,28 @@ let setCommentToggleEvent = (feed) => {
 }
 
 let setLikeToggleEvent = (feed) => {
-    let likeButton = feed.querySelector(".like");
+    let likeContainer = feed.querySelector(".like");
     if(principalEmail!=='anonymousUser'){ // 로그인한 유저 일 경우
-        likeButton.addEventListener('click', () => {
-            likeButton.classList.toggle("like-text-color");
-            likeButton.querySelectorAll(".like-img").forEach(button => {
-                button.classList.toggle("hide");
+        likeContainer.addEventListener('click', (e) => {
+            e.preventDefault()
+            // likeButton.querySelectorAll(".like-img").forEach(button => {
+            console.log('like feed id',feed.id);
+
+            postData('/like/'+feed.id).then((response)=>{
+                console.log('like res:',response)
+                if(response.like){ //누른 상태면
+                    likeContainer.querySelector(".like-img").setAttribute('src','/resource/apps/heart.png');
+                }else{
+                    likeContainer.querySelector(".like-img").setAttribute('src','/resource/apps/heartBorder.png');
+                }
+                likeContainer.querySelector(".like-button").classList.toggle("like-text-color");
+                likeContainer.querySelector(".like-button").innerText=`${response.likeCount}`;
             })
+            // button.classList.toggle("hide");
+            // })
         })
     }else{
-        likeButton.addEventListener('click', () => {
+        likeContainer.addEventListener('click', () => {
             alert('로그인 후 이용해 주세요')
         })
     }
@@ -524,6 +536,8 @@ let renderFeedList = (response) => {
         console.log('author.userName:', author.userName)
         let fileList = feed.fileList;
         let answerList = feed.answerList;
+        let likeList = feed.likes;
+        console.log('likeList:',likeList)
         let createDate = getRelativeDate(feed.createDate);
         let category = author.category;
         if(category===null)category='';
@@ -669,23 +683,45 @@ let renderFeedList = (response) => {
         feedBody.innerHTML+=`<div class="feed-content">${feed.content}</div>`;
         feedBody.innerHTML+=`<input type="checkbox" class="more-btn">`;
         //피드 푸터 출력(좋아요, 댓글)
-        currentFeed.innerHTML += `
-        <div class="feed-footer padding-half text-xs gap-half">
-            <div class="like flex align-center">
-                <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
-                <img class="like-img hide" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
-                좋아요 N
-            </div>
-        </div>`;
-        if (answerList.length > 0) {
-            let feedFooter = currentFeed.querySelector(".feed-footer");
-                feedFooter.innerHTML += `
-                            <span class="answer-count flex align-center">
-                    <img class="chat-img" src="${siteURL}/resource/apps/chat.png" alt="채팅이미지"/>
-                댓글 <strong>${answerList.length}</strong>
-                </span>`;
+
+        let isLike=false;
+        //유저
+        if (likeList.length > 0) {
+            if(principalEmail !== 'anonymousUser') {//로그인 한 사람
+                console.log("----------you are not anonymous")
+                for(let i=0; i<likeList.length; i++) {
+                    console.log('like user id:', likeList[i].author.id, '/user id:', siteUser.id)
+                    if(likeList[i].author.id===siteUser.id){
+                        console.log('당신이 좋아요 눌렀네요');
+                        isLike=true;
+                        break;
+                    }
+                }
+            }
+        }
+        if(isLike===true){ //좋아요 누른 상태
+            // currentFeed.querySelector(".like").innerHTML=`<img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+            //                 <div class="like-button">${likeList.length}</div>`;
+            currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+                            <img class="like-img" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
+                            <div class="like-button like-text-color">${likeList.length}</div>
+                        </div>
+                    </div>`;
+
+        }else{
+            //기본상태
+            currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+                            <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                            <div class="like-button">${likeList.length}</div>
+                        </div>
+                    </div>`;
         }
 
+        //-----------------------------
         //댓글 영역
         currentFeed.innerHTML += `<div class="answer-container hide"></div>`;
         currentFeed.innerHTML += `<!--<div class="answer-container"></div>-->`;
@@ -792,7 +828,7 @@ const userFeedIoCallback = (entries, io) => {
     });
 };
 const observeLastItem = (io, items) => {
-    const lastItem = items[items.length - 5]; //관찰 대상
+    const lastItem = items[items.length - 4]; //관찰 대상
     if(items.length>4) {
         io.observe(lastItem); // 관찰 대상 등록
     }
@@ -956,7 +992,7 @@ let setFeedSaveEvent = ()=>{
                 alert('최소5자 이상은 써주세요')
                 return
             }
-            if(confirm("제출하시겠습니까?")){
+            if(confirm("저장 하시겠습니까?")){
                 console.log('content:',content)
                 const formData = new FormData();
                 if(document.querySelector("#files").files.length>0) {
@@ -968,7 +1004,9 @@ let setFeedSaveEvent = ()=>{
                 formData.append("content",new Blob([JSON.stringify({"content":content})],{type: "application/json"}));
                 postFileData(url,formData,csrf_header,csrf_token).then((response)=>{
                     console.log('response:',response)
-                }).then(()=>alert("정상적으로 제출되었습니다")).then(()=>location.reload())
+                })
+                    // .then(()=>alert("정상적으로 제출되었습니다"))
+                    .then(()=>location.reload())
             }
         })
     }
@@ -1092,12 +1130,13 @@ let renderUserFeed = (feed) => {
     console.log('createDate:',feed.createDate)
     let createDate = getRelativeDate(feed.createDate);
     let category = author.category;
+    let likeList = feed.likes;
     // let category = feedUser.category;
     console.log('feeduser category:',category)
     let feedContainer = document.querySelector(".feed-pop");
     if(category===null)category='';
     feedContainer.innerHTML =
-        `<div class="feed feed-pop-style" id="${feed.id}">
+        `<div class="feed feed-pop-style feed-width" id="${feed.id}">
                 <!--피드 헤더-->
                 <div class="feed-header padding-default">
                     <div class="flex gap-half" aria-label="${author.userName}의 프로필">
@@ -1241,14 +1280,86 @@ let renderUserFeed = (feed) => {
     feedBody.innerHTML+=`<div class="feed-content">${feed.content}</div>`;
     feedBody.innerHTML+=`<input type="checkbox" class="more-btn">`;
     //피드 푸터 출력(좋아요, 댓글)
-    currentFeed.innerHTML += `
+/*    currentFeed.innerHTML += `
         <div class="feed-footer padding-half text-xs gap-half">
             <div class="like flex align-center">
                 <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
                 <img class="like-img hide" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
                 좋아요 N
             </div>
-        </div>`;
+        </div>`;*/
+
+/*    if (likeList.length > 0) {
+        likeList.forEach((like) => {
+            if(principalEmail !== 'anonymousUser') {//로그인 한 사람
+                if (like.author.id === siteUser.id) { // 유저가 좋아요 누른 상태
+                    currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+<!--                            <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>-->
+                            <img class="like-img hide" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
+                            <div class="like-button like-text-color">${likeList.length}</div>
+                        </div>
+                    </div>`;
+                } else { // 유저가 좋아요 안누른 상태
+                    currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+                            <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+<!--                            <img class="like-img hide" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>-->
+                            <div class="like-button">${likeList.length}</div>
+                        </div>
+                    </div>`;
+                }
+            }
+        })
+    } else { //아무런 좋아요 없을때
+        currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+                            <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                            <div class="like-button">${likeList.length}</div>
+                        </div>
+                    </div>`;
+    }*/
+
+    let isLike=false;
+    //유저
+    if (likeList.length > 0) {
+        if(principalEmail !== 'anonymousUser') {//로그인 한 사람
+            console.log("----------you are not anonymous")
+            for(let i=0; i<likeList.length; i++) {
+                console.log('like user id:', likeList[i].author.id, '/user id:', siteUser.id)
+                if(likeList[i].author.id===siteUser.id){
+                    console.log('당신이 좋아요 눌렀네요');
+                    isLike=true;
+                    break;
+                }
+            }
+        }
+    }
+    if(isLike===true){ //좋아요 누른 상태
+        // currentFeed.querySelector(".like").innerHTML=`<img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+        //                 <div class="like-button">${likeList.length}</div>`;
+        currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+                            <img class="like-img" src="${siteURL}/resource/apps/heart.png" alt="좋아요이미지"/>
+                            <div class="like-button like-text-color">${likeList.length}</div>
+                        </div>
+                    </div>`;
+
+    }else{
+        //기본상태
+        currentFeed.innerHTML += `
+                    <div class="feed-footer padding-half text-xs gap-half">
+                        <div class="like flex align-center">
+                            <img class="like-img" src="${siteURL}/resource/apps/heartBorder.png" alt="좋아요이미지"/>
+                            <div class="like-button">${likeList.length}</div>
+                        </div>
+                    </div>`;
+    }
+
     if (answerList.length > 0) {
         let feedFooter = currentFeed.querySelector(".feed-footer");
         feedFooter.innerHTML += `

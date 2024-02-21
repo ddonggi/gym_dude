@@ -100,10 +100,10 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
-                                config.setAllowedOrigins(Collections.singletonList("http://localhost:8080"));
+                                config.setAllowedOrigins(Collections.singletonList("https://9243-203-236-116-1.ngrok-free.app/"));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setAllowCredentials(true);
-                                config.setAllowedHeaders(Collections.singletonList("*"));
+//                                config.setAllowedHeaders(Collections.singletonList("*"));
                                 config.setMaxAge(3600L); //1시간
                                 return config;
                             }

@@ -1,5 +1,6 @@
 package com.weight.gym_dude.like;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.user.SiteUser;
 import jakarta.persistence.*;
@@ -27,11 +28,13 @@ public class Like {
     private Integer id;
 
     //여러개의 좋아요가 댓글에 달릴 수 있다.
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JsonBackReference
     private Question question;
 
     //여러개의 좋아요
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+//    @JsonBackReference
     private SiteUser author;
 
     public Like(Question question, SiteUser author) {

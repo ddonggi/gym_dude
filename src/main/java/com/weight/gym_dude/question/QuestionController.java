@@ -6,6 +6,9 @@ package com.weight.gym_dude.question;
 import com.weight.gym_dude.answer.AnswerForm;
 import com.weight.gym_dude.file.FileRequest;
 import com.weight.gym_dude.file.FileRequestService;
+import com.weight.gym_dude.like.Like;
+import com.weight.gym_dude.like.LikeRepository;
+import com.weight.gym_dude.like.LikeService;
 import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.user.SiteUserDTO;
 import com.weight.gym_dude.user.UserService;
@@ -27,9 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequestMapping("/")
 @Controller
@@ -40,6 +42,8 @@ public class QuestionController {
     private final UserService userService;
     private final FileUtils fileUtils;
     private final FileRequestService fileService;
+    private final LikeService likeService;
+    private final LikeRepository likeRepository;
 
     //첫 화면 모든 피드
     @GetMapping("/")
@@ -53,6 +57,8 @@ public class QuestionController {
 //        Page<Question> paging = questionService.getList(page);
         logger.info("page:{}",page);
         Page<QuestionDTO> paging = questionService.getFeedList(page);
+        logger.info("paging:{}",paging);
+
 //        model.addAttribute("questionList", questionList);
         model.addAttribute("paging", paging);
         if(principal!=null) {

@@ -57,7 +57,8 @@ public class Question {
 
     //전체 조회 화면에서 좋아요 수를 노출하기 위해
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    Set<Like> likes = new HashSet<>();
+    @JsonManagedReference
+    private List<Like> likes;
 
     //File 의 ManyToOne 의 양방향 매핑
     @OneToMany(mappedBy = "question", cascade = CascadeType.REMOVE)

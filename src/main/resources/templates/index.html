@@ -140,11 +140,28 @@
             </div><!--feed-body-->
             <!--feed footer -->
             <div class="feed-footer padding-half text-xs gap-half"><!--feed-footer-->
+<!--                <div sec:authorize="isAuthenticated()" th:if="${question.likes.size>0&&(like.getAuthor().id==siteUser.id)}" th:each="like,loop : ${question.likes}" class="like flex align-center">-->
+                    <!-- 이미 접속한 유저가 좋아요 누른 상태일때 -->
+<!--                    <img class="like-img" src="/resource/apps/heart.png" alt="좋아요이미지"/>-->
+<!--                    <div th:text="${question.likes.size}" class="like-button like-text-color"></div>-->
+
+                    <!--                     좋아요 안누른 상태일때 -->
+<!--                    <img sec:authorize="isAuthenticated()" th:unless="${like.getAuthor().id}==${siteUser.id}" class="like-img" src="/resource/apps/heartBorder.png" alt="좋아요이미지"/>-->
+<!--                    <div sec:authorize="isAuthenticated()" th:unless="${like.getAuthor().id}==${siteUser.id}" th:text="${question.likes.size}" class="like-button"></div>-->
+
+<!--                    <img sec:authorize="isAnonymous()" class="like-img" src="/resource/apps/heartBorder.png" alt="좋아요이미지"/>-->
+<!--                    <div sec:authorize="isAnonymous()" th:text="${question.likes.size}" class="like-button"></div>-->
+<!--                </div>-->
+<!--                <div sec:authorize="isAuthenticated()" th:unless="${question.likes.size>0&&(like.getAuthor().id==siteUser.id)}" th:each="like,loop : ${question.likes}" class="like flex align-center">-->
+<!--                    <img class="like-img" src="/resource/apps/heartBorder.png" alt="좋아요이미지"/>-->
+<!--                    <div th:text="${question.likes.size}" class="like-button"></div>-->
+<!--                </div>-->
+<!--                <div th:unless="${question.likes.size>0}" class="like flex align-center">-->
                 <div class="like flex align-center">
                     <img class="like-img" src="/resource/apps/heartBorder.png" alt="좋아요이미지"/>
-                    <img class="like-img hide" src="/resource/apps/heart.png" alt="좋아요이미지"/>
-                    좋아요 N
+                    <div th:text="${question.likes.size}" class="like-button"></div>
                 </div>
+
                 <!--답변 갯수 출력-->
                 <span th:if="${#lists.size(question.answerList) > 0}" class="answer-count flex align-center">
                     <img class="chat-img" src="/resource/apps/chat.png" alt="채팅이미지"/>
@@ -243,7 +260,7 @@
         let number = [[${paging.number}]];
         let hasPrevious = [[${paging.hasPrevious}]];
         let hasNext = [[${paging.hasNext}]];
-
+        let pageContentList = [[${paging.content}]]
         // 로그인한 유저일땐 siteUser object
         //게스트 유저일땐 #authentication.getName()
         let principalEmail = [[${#authentication.getName()}]];

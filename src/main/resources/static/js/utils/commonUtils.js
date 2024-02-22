@@ -15,12 +15,20 @@ let getRelativeDate = (originRawDate) => {
     let resultSeconds = originDate.getSeconds()-now.getSeconds();
     if(resultYear<0) return formatter.format(resultYear,'year');
     else if(resultMonth<0) return formatter.format(resultMonth,'month');
-    else if(resultDate<0) return formatter.format(resultDate,'day');
-    else if(resultHours<0) return formatter.format(resultHours,'hour');
-    else if(resultMinutes<0) return formatter.format(resultMinutes,'minute');
-    else return formatter.format(resultSeconds,'second');
+    else if(resultDate<0) {
+        if(formatter.format(resultDate,'day')==='어제'){
+         return formatter.format(resultDate,'day')+' '+String.fromCodePoint(0x1F195);//new
+        }
+        return formatter.format(resultDate,'day');
+    }
+    else if(resultHours<0) return formatter.format(resultHours,'hour')+String.fromCodePoint(0x1F195);//new
+    // else if(resultMinutes<0) return '&#x1F195;'+formatter.format(resultMinutes,'minute');
+    else if(resultMinutes<0) return formatter.format(resultMinutes,'minute')+' '+String.fromCodePoint(0x1F195);//new
+    else return formatter.format(resultSeconds,'second')+' '+String.fromCodePoint(0x1F195);//new
 }
-
+// U+1F525 fileU+1F195
+//String.fromCodePoint(0x1F525)//fire
+//String.fromCodePoint(0x1F195)//new
 
 /* 비동기통신을 위한 fetch API */
 let postData = async (url, data = {}, csrf_header, csrf_token) => {
@@ -523,7 +531,10 @@ const ioCallback = (entries, io) => {
         if(principalEmail==='anonymousUser'&&page>=1){ //
             let signInContainer = document.createElement("div");
             signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
-            signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
+            signInContainer.innerHTML=`<div class="flex-column gap-rem"><h2>로그인 후 이용해 주세요</h2>
+                <button onclick="location.href='/user/login'">로그인</button>
+                <button onclick="location.href='/user/signup'">회원가입</button>
+            </div>`
             document.querySelector(".index-container").append(signInContainer);
             setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
         }else {
@@ -563,6 +574,7 @@ let renderFeedList = (response) => {
         let likeList = feed.likes;
         console.log('likeList:',likeList)
         let createDate = getRelativeDate(feed.createDate);
+        if(likeList.length>2) createDate+=String.fromCodePoint(0x1F525);
         let category = author.category;
         if(category===null)category='';
         feedContainer.innerHTML +=
@@ -712,11 +724,11 @@ let renderFeedList = (response) => {
         //유저
         if (likeList.length > 0) {
             if(principalEmail !== 'anonymousUser') {//로그인 한 사람
-                console.log("----------you are not anonymous")
+                // console.log("----------you are not anonymous")
                 for(let i=0; i<likeList.length; i++) {
-                    console.log('like user id:', likeList[i].author.id, '/user id:', siteUser.id)
+                    // console.log('like user id:', likeList[i].author.id, '/user id:', siteUser.id)
                     if(likeList[i].author.id===siteUser.id){
-                        console.log('당신이 좋아요 눌렀네요');
+                        // console.log('당신이 좋아요 눌렀네요');
                         isLike=true;
                         break;
                     }
@@ -831,7 +843,7 @@ const userFeedIoCallback = (entries, io) => {
         if(principalEmail==='anonymousUser'&&page>=1){ //
             let signInContainer = document.createElement("div");
             signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
-            signInContainer.innerHTML=`<div class="flex-column">로그인 후 이용해 주세요<div onclick="location.href='/user/login'">로그인</div><div onclick="location.href='/user/signup'">회원가입</div></div>`
+            signInContainer.innerHTML=`<div class="flex-column gap-rem">로그인 후 이용해 주세요<button onclick="location.href='/user/login'">로그인</button><button onclick="location.href='/user/signup'">회원가입</button></div>`
             document.querySelector(".my-feed-container").append(signInContainer);
             setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
         }else {

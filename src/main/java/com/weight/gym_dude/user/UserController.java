@@ -133,8 +133,10 @@ public class UserController {
             SiteUser profileUser = optionalProfileUser.get();
             model.addAttribute("profileUser", profileUser); // 방문할 유저
             model.addAttribute("siteUser", siteUser); //현재 로그인한 유저 ( header 에서도 씀)
-            List<Integer> followingList = followService.getFollowingList(siteUser.getId());
-            model.addAttribute("followingList", followingList);
+            if(siteUser!=null) {
+                List<Integer> followingList = followService.getFollowingList(siteUser.getId());
+                model.addAttribute("followingList", followingList);
+            }
         }
         return "user/profile";
     }
@@ -201,6 +203,7 @@ public class UserController {
                          Principal principal) {
         logger.info("feed request");
         SiteUser siteUser = null;
+        logger.info("principal:{}",principal);
         if(principal!=null) {
             siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
         }
@@ -211,8 +214,10 @@ public class UserController {
             model.addAttribute("feedPaging",feedPaging);
             model.addAttribute("feedUser",feedUser);
             model.addAttribute("siteUser",siteUser); //현재 로그인한 사람
-            List<Integer> followingList = followService.getFollowingList(siteUser.getId());
-            model.addAttribute("followingList", followingList);
+            if(principal!=null) {
+                List<Integer> followingList = followService.getFollowingList(siteUser.getId());
+                model.addAttribute("followingList", followingList);
+            }
         }
         return "user/feed";
     }

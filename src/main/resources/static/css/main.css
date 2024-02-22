@@ -143,7 +143,8 @@ html::-webkit-scrollbar-track {
     height: 360px;
     box-shadow: 6px 1px 6px silver;
     transition-property: botton;
-    transition: all 0.5s
+    transition: all 0.5s;
+    z-index: 2;
 }
 .slide-up{
     bottom: 0;
@@ -230,6 +231,7 @@ input[type=submit] {
     /*margin-top: 10px;*/
     /*padding: 5px 10px;*/
     /*background: coral;*/
+    background: coral;
     /*background: linear-gradient(35deg, palevioletred, yellow);;*/
     border-radius: 5px;
     border:none;
@@ -268,6 +270,20 @@ input[type=submit] {
         width: 1px;
         height: 0.75rem;
 }
+button{
+    cursor: pointer;
+    border: none;
+    background: var(--text-partition);
+    height: fit-content;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+}
+input[type="text"] {
+    height: 1.9rem;
+    border: 1px solid var(--border-silver100);
+    border-radius: 3px;
+}
+
 /* 입력 필수 항목 */
 *:required {
 }
@@ -289,7 +305,7 @@ input[type=submit] {
 }
 .hashtag {
     background: white;
-    border: 2px solid silver;
+    border: 1px solid var(--border-silver100);
     border-radius: 19px;
     cursor: pointer;
 }
@@ -496,8 +512,10 @@ input[type=submit] {
 .follow-button{
     cursor: pointer;
     border: none;
-    background: none;
+    background: var(--text-partition);
     height: fit-content;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
 }
 .option-container{
     height: fit-content;

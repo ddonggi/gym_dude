@@ -109,7 +109,7 @@ let setDeleteEvent = (feed) => {
     deleteButton.addEventListener('click', (e) => {
         e.preventDefault();
         if (confirm("정말 삭제 하시겠습니까? 삭제 후엔 되돌릴 수 없습니다")) {
-            console.log("예 삭제 눌렀슴더");
+            // console.log("예 삭제 눌렀슴더");
             // deleteQuestion(id).then(data=>console.log('data:',data));
             let url = "/delete/question/" + id;
             console.log('url:', url)
@@ -120,9 +120,32 @@ let setDeleteEvent = (feed) => {
                 location.reload();
                 // feed.remove();
                 // location.href="/";
-            }).then(alert('삭제되었습니다'));
+            })
+                // .then(()=>alert('삭제되었습니다'));
         }
     })
+}
+
+let setDeleteCommentEvent = (feed) =>{
+    if(feed.querySelector(".answer-list")){
+        feed.querySelectorAll('.answer').forEach((comment)=>{
+            let commentId = comment.id;
+            if(comment.querySelector(".comment-delete-button")) {
+                comment.querySelector(".comment-delete-button").addEventListener('click', () => {
+                    console.log('commentId:', commentId)
+                    commentId=commentId.replace("comment","")
+                    if (confirm("정말 삭제 하시겠습니까? 삭제 후엔 되돌릴 수 없습니다")) {
+                        postData('/answer/delete/' + commentId,null,csrf_header,csrf_token).then(response => {
+                            if(response.message){
+                                // alert('삭제가 완료되었습니다')
+                                feed.querySelector(".answer-list").removeChild(comment);
+                            }
+                        })
+                    }
+                })
+            }
+        })
+    }
 }
 
 let setModifyFormEvent = (feed) => {
@@ -204,10 +227,19 @@ let setTextChangeTrackingEvent = (element) =>{
     })
 }
 let setAsyncNickNameCheckEvent = (element)=>{
-    element.addEventListener('input', debounce(() => saveInput(element)))
+    element.addEventListener('input', inputDebounce(() => saveInput(element)))
 }
 
-function debounce(func, timeout = 500) {
+function inputDebounce(func, timeout = 500) {
+    let timer;
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            func.apply(this, args);
+        }, timeout);
+    };
+}
+function clickDebounce(func, timeout = 200) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
@@ -495,11 +527,12 @@ let setCommentToggleEvent = (feed) => {
 let setLikeToggleEvent = (feed) => {
     let likeContainer = feed.querySelector(".like");
     if(principalEmail!=='anonymousUser'){ // 로그인한 유저 일 경우
-        likeContainer.addEventListener('click', (e) => {
+        console.log('likeContainer:',likeContainer);
+        likeContainer.addEventListener('click', clickDebounce((e) => {
+            console.log('좋아요 클릭.')
             e.preventDefault()
             // likeButton.querySelectorAll(".like-img").forEach(button => {
             console.log('like feed id',feed.id);
-
             postData('/like/'+feed.id).then((response)=>{
                 console.log('like res:',response)
                 if(response.like){ //누른 상태면
@@ -512,7 +545,7 @@ let setLikeToggleEvent = (feed) => {
             })
             // button.classList.toggle("hide");
             // })
-        })
+        }))
     }else{
         likeContainer.addEventListener('click', () => {
             alert('로그인 후 이용해 주세요')
@@ -520,45 +553,7 @@ let setLikeToggleEvent = (feed) => {
     }
 }
 
-let page = 0;
-const ioCallback = (entries, io) => {
-    entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        // if (entry.isIntersecting) {
-        console.log('is observed!!!')
-        io.unobserve(entry.target);//옵저빙했던 아이템 해제
-        // postData("/question",{page:page}).then(response=>{
-        if(principalEmail==='anonymousUser'&&page>=1){ //
-            let signInContainer = document.createElement("div");
-            signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
-            signInContainer.innerHTML=`<div class="flex-column gap-rem"><h2>로그인 후 이용해 주세요</h2>
-                <button onclick="location.href='/user/login'">로그인</button>
-                <button onclick="location.href='/user/signup'">회원가입</button>
-            </div>`
-            document.querySelector(".index-container").append(signInContainer);
-            setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
-        }else {
-            let feedUrl = "feed?page=" + (++page)
-            console.log('keyword length',keyword.length)
-            if(keyword.length>=2){
-                feedUrl = "search/feed?page=" + (++page)+"&keyword="+keyword
-            }
-            console.log('feedUrl:',feedUrl)
-            getData(feedUrl).then(response => {
-                console.log("target page:", page)
-                console.log('response:', response)
-                renderFeedList(response);
-                // 마지막 페이지가 아니면 계속 옵저빙
-                console.log('콘텐츠 길이(피드갯수):', response.content.length)
-                if (response.content.length === 10)
-                    observeLastItem(io, document.querySelectorAll('.feed'));
 
-            }).then(()=>{
-                setFeedEvent();
-                setFeedContentHeight();});
-        }
-    });
-};
 
 // 메인화면 피드 리스트
 let renderFeedList = (response) => {
@@ -756,12 +751,20 @@ let renderFeedList = (response) => {
                         </div>
                     </div>`;
         }
+        if (answerList.length > 0) {
+            let feedFooter = currentFeed.querySelector(".feed-footer");
+            feedFooter.innerHTML += `
+                            <span class="answer-count flex align-center">
+                    <img class="chat-img" src="${siteURL}/resource/apps/chat.png" alt="채팅이미지"/>
+                댓글 <strong>${answerList.length}</strong>
+                </span>`;
+        }
 
         //-----------------------------
         //댓글 영역
         currentFeed.innerHTML += `<div class="answer-container hide"></div>`;
-        currentFeed.innerHTML += `<!--<div class="answer-container"></div>-->`;
-        console.log('answer conatainer?:',currentFeed.querySelector(".answer-container"));
+        // currentFeed.innerHTML += `<div class="answer-container"></div>`;
+        // console.log('answer conatainer?:',currentFeed.querySelector(".answer-container"));
         let answerContainer = currentFeed.querySelector(".answer-container");
 
 
@@ -771,17 +774,48 @@ let renderFeedList = (response) => {
             let answerListContainer = answerContainer.querySelector(".answer-list");
             answerList.forEach((answer) => {
                 let answerAuthor = answer.author;
+                let answerId = answer.id;
+                console.log('answer id:',answerId)
                 let answerCreateDate = getRelativeDate(answer.createDate);
 
+                //수정기능은 보류 삭제만
+/*                if (answer.modifiedDate !== null) {
+                    console.log('answer modified date:',answer.modifiedDate);
+                    answerCreateDate = getRelativeDate(answer.modifiedDate)+' ';
+                    currentFeed.querySelector(".answer-header div:last-child").innerHTML = `<div class="feed-timestamps text-xs">${answer.modifiedDate} (수정됨)</div>`;
+                }*/
+
+                let defaultProfileElem = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">`;
+                if (answerAuthor.hasProfile) {
+                    console.log('이 유저는 프로필이 있습니다')
+                    defaultProfileElem = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${answerAuthor.id}.png">`;
+                }
+                let defaultOptionButton = `<div></div>`;
+
+                if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+                    console.log('principalEmail === author.email:',principalEmail === author.email)
+                    console.log('내가 작성한 댓글이에요!!')
+                    defaultOptionButton= `<div class="option-container flex align-center ${answerAuthor.id}">
+                        <div>
+                            <button class="comment-delete-button ">삭제</button>
+                        </div>
+                        </div>`;
+                }
+
                 answerListContainer.innerHTML += `
-                <div class="answer padding-half">
-                    <div class="answer-profile-image" onclick="location.href='/user/feed/${answerAuthor.id}'">
-                        <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                <div class="answer padding-half" id="comment${answerId}">
+                    <div class="answer-profile-image ${answerAuthor.id}" onclick="location.href='/user/feed/${answerAuthor.id}'">
+                        ${defaultProfileElem}
                     </div>
-                    <div>
-                        <div class="answer-header">
-                            <div class="text-sm">${answerAuthor.userName}</div>
-                            <div class="feed-timestamps text-xs">${answerCreateDate}</div>
+                    <div class="flex-column width100">
+                        <div class="answer-header flex width100">
+                            <div>
+                                <div class="text-sm">${answerAuthor.userName}</div>
+                                <div class="feed-timestamps text-xs">${answerCreateDate}</div>
+                            </div>
+                            <div>
+                                ${defaultOptionButton}         
+                            </div>
                         </div>
                         <div class="answer-body">
                             <div class="answer-content text-sm">${answer.content}</div>
@@ -789,14 +823,7 @@ let renderFeedList = (response) => {
                     </div>
                 </div>
                 `;
-                if (answerAuthor.hasProfile) {
-                    currentFeed.querySelector(".answer-profile-image").innerHTML = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${answerAuthor.id}.png">`;
-                }
-                if (answer.modifiedDate !== null) {
-                    console.log('answer modified date:',answer.modifiedDate);
 
-                    currentFeed.querySelector(".answer-header div:last-child").innerHTML = `<div class="feed-timestamps text-xs">${answer.modifiedDate} (수정됨)</div>`;
-                }
             })
         }
         //댓글 폼
@@ -833,6 +860,44 @@ let renderFeedList = (response) => {
         }
     })
 }
+let page = 0;
+const ioCallback = (entries, io) => {
+    entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        // if (entry.isIntersecting) {
+        console.log('is observed!!!')
+        io.unobserve(entry.target);//옵저빙했던 아이템 해제
+        // postData("/question",{page:page}).then(response=>{
+        if(principalEmail==='anonymousUser'&&page>=1){ //
+            let signInContainer = document.createElement("div");
+            signInContainer.classList.add("signin-container","feed-width","flex","justify-content-center");
+            signInContainer.innerHTML=`<div class="flex-column gap-rem"><h2>로그인 후 이용해 주세요</h2>
+                <button onclick="location.href='/user/login'">로그인</button>
+                <button onclick="location.href='/user/signup'">회원가입</button>
+            </div>`
+            document.querySelector(".index-container").append(signInContainer);
+            setTimeout(()=>{signInContainer.classList.add("slide-up");},300)
+        }else {
+            let feedUrl = "feed?page=" + (++page)
+            console.log('keyword length',keyword.length)
+            if(keyword.length>=2){
+                feedUrl = "search/feed?page=" + (++page)+"&keyword="+keyword
+            }
+            console.log('feedUrl:',feedUrl)
+            getData(feedUrl).then(response => {
+                console.log("target page:", page)
+                console.log('response:', response)
+                renderFeedList(response);
+                // 마지막 페이지가 아니면 계속 옵저빙
+                console.log('콘텐츠 길이(피드갯수):', response.content.length)
+                if (response.content.length === 10)
+                    observeLastItem(io, document.querySelectorAll('.feed'));
+                setFeedEvent();
+                setFeedContentHeight();
+            })
+        }
+    });
+};
 const userFeedIoCallback = (entries, io) => {
     entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
@@ -857,7 +922,6 @@ const userFeedIoCallback = (entries, io) => {
                     observeLastItem(io, document.querySelectorAll('.my-feed'));
 
                 setUserFeedEvent();
-                // setFeedEvent();
                 // setFeedContentHeight();
             });
         }
@@ -873,6 +937,7 @@ const observeLastItem = (io, items) => {
 // 관찰자 초기화
 const io = new IntersectionObserver(ioCallback, {threshold: 0.7}); //인덱스페이지 피드 옵저버
 const userFeedIo = new IntersectionObserver(userFeedIoCallback, {threshold: 0.7}); //유저 피드 옵저버
+
 let setUserFeedEvent = () => {
     console.log('set feed event')
     if (document.querySelectorAll(".pseudo-container")) {
@@ -909,9 +974,11 @@ let setUserFeedEvent = () => {
                         setFollowEvent(feed);
                         setCarouselEvent(feed);
                         setLikeToggleEvent(feed);
+                        setFeedContentHeight();//피드의 '...' 줄임말 높이 설정
+                        //댓글 영역
                         setCommentToggleEvent(feed);
                         setCommentEvent(feed);
-                        setFeedContentHeight();//피드의 '...' 줄임말 높이 설정
+                        setDeleteCommentEvent(feed); // 내가 쓴 댓글일 경우 삭제
                     })
                     // console.log('hi!!!!', id)
 
@@ -937,8 +1004,10 @@ let setFeedEvent = () => {
             setFollowEvent(feed);
             setCarouselEvent(feed);
             setLikeToggleEvent(feed);
-            setCommentToggleEvent(feed);
-            setCommentEvent(feed);
+            //댓글 영역
+            setCommentToggleEvent(feed); //여러개일 경우 보기 접기
+            setDeleteCommentEvent(feed); // 내가 쓴 댓글일 경우 삭제
+            setCommentEvent(feed); //댓글 등록 이벤트
         })
     }
 }
@@ -948,9 +1017,9 @@ let followCheck = (feed) => {
     if(feed.querySelector(".follow-button")) {
         let followButton = feed.querySelector(".follow-button");
         let followerId = feed.querySelector(".follow-button").value;
-        console.log(followingList)
+        // console.log(followingList)
         for(let i =0; i<followingList.length; i++) {
-            console.log('feeds follow id:',followerId,'/ my following user id:',followingList[i])
+            // console.log('feeds follow id:',followerId,'/ my following user id:',followingList[i])
             if (Number(followerId) ===followingList[i]) {
                 followButton.innerText = '팔로우 취소';
             }
@@ -963,16 +1032,16 @@ let setCommentEvent = (currentFeed)=>{
         let submitButton = currentFeed.querySelector(".comment-submit-button");
         submitButton.addEventListener('click', (e) => {
             e.preventDefault();
-            console.log('comment-submit-button clicked')
+            // console.log('comment-submit-button clicked')
             let url = `/answer/create/${currentFeed.id}`;
             let input = currentFeed.querySelector(".answer-input");
-            console.log('comment text:', input.value);
+            // console.log('comment text:', input.value);
             if (input.value.length < 5) {
                 alert("최소 5글자 이상으로 작성해 주세요");
             } else {
                 let data = {"content": `${input.value}`};
                 postData(url, data, csrf_header, csrf_token).then((resData) => {
-                    console.log('comment res data:', resData);
+                    // console.log('comment res data:', resData);
                     input.value='';
                     let content=resData.content;
                     let author=resData.author;
@@ -983,7 +1052,7 @@ let setCommentEvent = (currentFeed)=>{
                     }else{
                         profileImage="/apps/defaultProfile";
                     }
-                    let responseComment=`<div class="answer padding-half">
+/*                    let responseComment=`<div class="answer padding-half">
                         <div class="answer-profile-image" onclick="location.href='/user/feed/${author.id}'">
                             <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource${profileImage}.png">
                         </div>
@@ -996,7 +1065,31 @@ let setCommentEvent = (currentFeed)=>{
                                 <div class="answer-content text-sm">${content}</div>
                             </div>
                         </div>
-                    </div>`;
+                    </div>`;*/
+
+                let responseComment=`<div class="answer padding-half" id="comment${resData.id}">
+                    <div class="answer-profile-image ${author.id}" onclick="location.href='/user/feed/${author.id}'">
+                            <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource${profileImage}.png">
+                    </div>
+                    <div class="flex-column width100">
+                        <div class="answer-header flex width100">
+                            <div>
+                                <div class="text-sm">${author.userName}</div>
+                                <div class="feed-timestamps text-xs">${answerCreateDate}</div>
+                            </div>
+                            <div>
+                                <div class="option-container flex align-center ${author.id}">
+                        <div>
+                            <button class="comment-delete-button ">삭제</button>
+                        </div>
+                        </div>
+                            </div>
+                        </div>
+                        <div class="answer-body">
+                            <div class="answer-content text-sm">${content}</div>
+                        </div>
+                    </div>
+                </div>`;
 
                         if(currentFeed.querySelector(".answer-list")){
                             currentFeed.querySelector(".answer-list").innerHTML+=responseComment;
@@ -1004,14 +1097,10 @@ let setCommentEvent = (currentFeed)=>{
                             currentFeed.querySelector(".answer-container").insertAdjacentHTML("afterbegin",`<div class="answer-list">${responseComment}</div>`);
                         }
 
-                })
+                }).then(()=>setDeleteCommentEvent(currentFeed))
             }
         })
     }
-}
-
-let easyDate = (formatter) =>{
-    console.log('');
 }
 
 //YYmmdd
@@ -1437,16 +1526,39 @@ let renderUserFeed = (feed) => {
         answerList.forEach((answer) => {
             let answerAuthor = answer.author;
             let answerCreateDate = getRelativeDate(answer.createDate);
+            let answerId = answer.id;
+            console.log('answer id:',answerId)
+            let defaultOptionButton = `<div></div>`;
 
+            let defaultProfileElem = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">`;
+            if (answerAuthor.hasProfile) {
+                console.log('이 유저는 프로필이 있습니다')
+                defaultProfileElem = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${answerAuthor.id}.png">`;
+            }
+
+            if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+                console.log('principalEmail === author.email:',principalEmail === author.email)
+                console.log('내가 작성한 댓글이에요!!')
+                defaultOptionButton= `<div class="option-container flex align-center ${answerAuthor.id}">
+                        <div>
+                            <button class="comment-delete-button ">삭제</button>
+                        </div>
+                        </div>`;
+            }
             answerListContainer.innerHTML += `
-                <div class="answer padding-half">
-                    <div class="answer-profile-image" onclick="location.href='/user/feed/${answerAuthor.id}'">
-                        <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
+                <div class="answer padding-half" id="comment${answerId}">
+                    <div class="answer-profile-image ${answerAuthor.id}" onclick="location.href='/user/feed/${answerAuthor.id}'">
+                        ${defaultProfileElem}
                     </div>
-                    <div>
-                        <div class="answer-header">
-                            <div class="text-sm">${answerAuthor.userName}</div>
-                            <div class="feed-timestamps text-xs">${answerCreateDate}</div>
+                    <div class="flex-column width100">
+                        <div class="answer-header flex width100">
+                            <div>
+                                <div class="text-sm">${answerAuthor.userName}</div>
+                                <div class="feed-timestamps text-xs">${answerCreateDate}</div>
+                            </div>
+                            <div>
+                                ${defaultOptionButton}         
+                            </div>
                         </div>
                         <div class="answer-body">
                             <div class="answer-content text-sm">${answer.content}</div>
@@ -1510,6 +1622,7 @@ let setCloseEvent = () => {
         setUserFeedEvent();
     })
 }
+
 export {
     postData,
     csrf_token,

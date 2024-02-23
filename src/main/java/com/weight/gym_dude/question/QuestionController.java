@@ -225,4 +225,36 @@ public class QuestionController {
 
         return ResponseEntity.status(HttpStatus.OK).body(paging);
     }
+
+    //이번주 인기 피드
+    @GetMapping("/hot-feed")
+    public String hotFeed(
+            Model model,
+//            @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
+//            @RequestParam(value = "keyword") String keyword,
+            QuestionForm questionForm,
+            AnswerForm answerForm,
+            Principal principal
+    ){
+        Optional<List<Question>> optionalQuestions = Optional.ofNullable(questionService.hotFeed());
+        List<Question> questionList = new ArrayList<>();
+        if (optionalQuestions.isPresent()){
+            questionList = optionalQuestions.get();
+        }
+        if(principal!=null) {
+            logger.info("principal name:{}",principal.getName()); // getName은 이메일임
+            SiteUser principalUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            SiteUserDTO siteUserDTO = userService.toUserDTO(principalUser);
+//            logger.info("siteUser:{}", siteUserDTO);
+            logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
+//            model.addAttribute("principalUser", siteUserDTO);
+            model.addAttribute("siteUser", siteUserDTO);
+            List<Integer> followingList = followService.getFollowingList(principalUser.getId());
+            model.addAttribute("followingList", followingList);
+        }else{
+            logger.info("Guest User");
+        }
+        model.addAttribute("paging",questionList);
+        return "hot-feed";
+    }
 }

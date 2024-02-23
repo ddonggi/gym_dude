@@ -105,4 +105,9 @@ public class QuestionService {
         question.setModifiedDate(LocalDateTime.now());
         questionRepository.save(question);
     }
+
+    public List<Question> hotFeed() {
+        // 최신 좋아요 많은순 5개
+        return questionRepository.findAllOrderByQuestionLikeCount();
+    }
 }

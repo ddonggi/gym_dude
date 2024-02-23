@@ -267,19 +267,13 @@
 
 
     <script th:inline="javascript">
-        let size = [[${paging.size}]];
-        // let totalPages = [[${paging.totalPages}]];
-        // let totalElements = [[${paging.totalElements}]];
-        let number = [[${paging.number}]];
-        // let hasPrevious = [[${paging.hasPrevious}]];
-        // let hasNext = [[${paging.hasNext}]];
-        let pageContentList = [[${paging.content}]]
+        let contentList = [[${paging}]];
         let followingList;
         if([[${followingList}]]){
             followingList = [[${followingList}]];
         }
         console.log('followingList',followingList)
-        console.log('pageContentList:',pageContentList)
+        // console.log('pageContentList:',pageContentList)
         // 로그인한 유저일땐 siteUser object
         //게스트 유저일땐 #authentication.getName()
         let principalEmail = [[${#authentication.getName()}]];
@@ -296,6 +290,6 @@
             keyword = [[${keyword}]];
         }
     </script>
-    <script layout:fragment="index_js" th:src="@{/js/index.js}" type="module"></script>
+    <script layout:fragment="index_js" th:src="@{/js/hot-feed.js}" type="module"></script>
 </div>
 </html>

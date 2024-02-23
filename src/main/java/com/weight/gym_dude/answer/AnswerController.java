@@ -25,6 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Optional;
 
 /*
  * Created by 이동기 on 2023-09-12
@@ -38,11 +39,12 @@ public class AnswerController {
     private final AnswerService answerService;
     private final UserService userService;
     Logger logger = LoggerFactory.getLogger(QuestionController.class);
+    private final AnswerRepository answerRepository;
 
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/create/{id}")
     @ResponseBody
-    public ResponseEntity<Object> questionModifyRest(@RequestBody @Valid AnswerForm answerForm, BindingResult bindingResult,
+    public ResponseEntity<Object> createComment(@RequestBody @Valid AnswerForm answerForm, BindingResult bindingResult,
                                                      @PathVariable("id") Integer id, Principal principal) {
         logger.info("댓글 내용:{}", answerForm.getContent());
         logger.info("원본글 id:{}", id);
@@ -52,12 +54,13 @@ public class AnswerController {
         Question question = questionService.getQuestion(id);
         SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
         SiteUserDTO siteUserDTO = userService.toUserDTO(author);
-        answerService.create(question, answerForm.getContent(),author);
+        Answer answer = answerService.create(question, answerForm.getContent(),author);
 
         HashMap<String, Object> answerContent = new HashMap<>();
         answerContent.put("content", answerForm.getContent());
         answerContent.put("createDate", LocalDateTime.now());
         answerContent.put("author", siteUserDTO);
+        answerContent.put("id", answer.getId());
         return ResponseEntity.status(HttpStatus.OK).body(answerContent);
     }
 
@@ -79,4 +82,24 @@ public class AnswerController {
 //        return String.format("redirect:/question/detail/%s", id);
         return "redirect:/";
     }*/
+
+    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
+    @PostMapping("/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<Object> deleteComment(
+                                                     @PathVariable("id") Integer id, Principal principal) {
+        logger.info("댓글글 id:{}", id);
+//        Question question = questionService.getQuestion(id);
+        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        int authorId = answerRepository.findById(id).get().getAuthor().getId(); // 댓글 작성자의 id
+        HashMap<String, Object> answerContent = new HashMap<>();
+
+        if(!siteUser.getId().equals(authorId)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"삭제 권한이 없습니다.");
+        }
+        answerRepository.deleteById(id);
+
+        answerContent.put("message","삭제가 완료되었습니다");
+        return ResponseEntity.status(HttpStatus.OK).body(answerContent);
+    }
 }

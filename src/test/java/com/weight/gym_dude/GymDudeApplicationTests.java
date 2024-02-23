@@ -54,6 +54,7 @@ class GymDudeApplicationTests {
     private MockMvc mockMvc;
     @Autowired
     private LikeRepository likeRepository;
+
     //데이터 입력(글쓰기)
     @Test
 //    @Transactional
@@ -72,19 +73,19 @@ class GymDudeApplicationTests {
 
     //전체 질문 조회 및 비교
     @Test
-    void selectAllAndCompareTest(){
+    void selectAllAndCompareTest() {
         List<Question> questionList = this.questionRepository.findAll();
 //        assertEquals(2,questionList.size());
 
         Question question = questionList.get(0);
-        assertEquals("ㅁㅇㄴㄹㅍㅁㅇㄴㄹㅍ",question.getContent());
+        assertEquals("ㅁㅇㄴㄹㅍㅁㅇㄴㄹㅍ", question.getContent());
     }
 
     //단일 질문 조회 및 확인
     @Test
-    void selectAndCompareTest(){
+    void selectAndCompareTest() {
         Optional<Question> oq = this.questionRepository.findById(1);
-        if(oq.isPresent()){
+        if (oq.isPresent()) {
             Question question = oq.get();
             System.out.println("question.getContent() = " + question.getContent());
         }
@@ -147,9 +148,9 @@ class GymDudeApplicationTests {
 
     //글 내용으로 찾기
     @Test
-    void findByContentTest(){
+    void findByContentTest() {
         Optional<Question> oq = this.questionRepository.findByContent("ㅁㅇㄴㄹㅍㅁㅇㄴㄹㅍ");
-        if(oq.isPresent()){
+        if (oq.isPresent()) {
             Question question = oq.get();
             System.out.println("question = " + question.getContent());
         }
@@ -157,7 +158,7 @@ class GymDudeApplicationTests {
 
     //글 데이터 수정하기
     @Test
-    void updateTest(){
+    void updateTest() {
         Optional<Question> oq = this.questionRepository.findById(9);
         //assertTrue()는 괄호 안의 값이 true(참) 인지를 테스트한다. oq.isPresent()가 false를 리턴하면 오류가 발생하고 테스트가 종료된다.
         assertTrue(oq.isPresent());
@@ -169,7 +170,7 @@ class GymDudeApplicationTests {
 
     // 질문 데이터 삭제하기
     @Test
-    void deleteTest(){
+    void deleteTest() {
         //리포지터리의 count 메서드는 테이블 행의 개수를 리턴한다.
         System.out.println("questionRepository.count() = " + questionRepository.count());
 //        assertEquals(8,questionRepository.count());
@@ -184,7 +185,7 @@ class GymDudeApplicationTests {
 
     //댓글 데이터 생성, 저장
     @Test
-    void answerCreateAndSaveTest(){
+    void answerCreateAndSaveTest() {
         Optional<Question> oq = this.questionRepository.findById(7);
         //assertTrue()는 괄호 안의 값이 true(참) 인지를 테스트한다. oq.isPresent()가 false를 리턴하면 오류가 발생하고 테스트가 종료된다.
         assertTrue(oq.isPresent());
@@ -200,17 +201,17 @@ class GymDudeApplicationTests {
 
     //답변 id로 질문 데이터 조회
     @Test
-    void findAnswerTest(){
+    void findAnswerTest() {
         Optional<Answer> optionalAnswer = this.answerRepository.findById(5);//댓글의 id
         assertTrue(optionalAnswer.isPresent());
         Answer answer = optionalAnswer.get();
-        assertEquals(9,answer.getQuestion().getId()); //댓글의 게시글의id 가 9인지 비교
+        assertEquals(9, answer.getQuestion().getId()); //댓글의 게시글의id 가 9인지 비교
     }
 
     //질문을 조회한 후 이 질문에 달린 답변 전체를 구하는 테스트 코드
     @Transactional
     @Test
-    void findAnswerFromQuestionTest(){
+    void findAnswerFromQuestionTest() {
         Optional<Question> optionalQuestion = this.questionRepository.findById(9);
         assertTrue(optionalQuestion.isPresent());
         Question question = optionalQuestion.get();
@@ -225,31 +226,31 @@ class GymDudeApplicationTests {
 
         // @Transactional 애너테이션을 사용하면 메서드가 종료될 때 까지 DB 세션이 유지된다.
         List<Answer> answerList = question.getAnswerList();
-        assertEquals(2,answerList.size());
-        for(Answer answer:answerList){
+        assertEquals(2, answerList.size());
+        for (Answer answer : answerList) {
             System.out.println("answer.getContent() = " + answer.getContent());
         }
     }
 
     //닉네임 중복 검사
     @Test
-    void usernameCheck(){
+    void usernameCheck() {
         String nickname = "ㅁㄴㅇㄹㅁㄴㅇㄹ";
         Optional<SiteUser> optionalSiteUser = userRepository.findByUserName(nickname);
-        if(optionalSiteUser.isPresent()){
+        if (optionalSiteUser.isPresent()) {
             System.out.println("nickname = " + optionalSiteUser.get().getUserName());
-        }else{
-            System.out.println(nickname+"을 찾을 수 없습니다.");
+        } else {
+            System.out.println(nickname + "을 찾을 수 없습니다.");
         }
     }
 
     //로그인
     @Test
-    void findByUserEmail(){
-        String email="test@test.com";
+    void findByUserEmail() {
+        String email = "test@test.com";
 //        String email="ldg6153@naver.com";
         Optional<SiteUser> optionalSiteUser = userRepository.findByEmail(email);
-        if(optionalSiteUser.isPresent()){
+        if (optionalSiteUser.isPresent()) {
             SiteUser siteUser = optionalSiteUser.get();
             List<GrantedAuthority> authorities = new ArrayList<>();
             System.out.println("email = " + email);
@@ -261,15 +262,15 @@ class GymDudeApplicationTests {
                 authorities.add(new SimpleGrantedAuthority(UserRole.USER.getValue()));
             }
             new User(siteUser.getUserName(), siteUser.getPassword(), authorities);
-        }else{
+        } else {
             throw new UsernameNotFoundException("사용자를 찾을 수 없습니다.");
         }
     }
 
     @Test
-    void fileReadTest(){
+    void fileReadTest() {
         List<FileRequest> files = fileRequestRepository.findAllByQuestionId(90);
-        for(FileRequest file:files) {
+        for (FileRequest file : files) {
             Resource resource = fileUtils.readFileAsResource(file);
             System.out.println("resource = " + resource);
         }
@@ -277,7 +278,7 @@ class GymDudeApplicationTests {
 
     //좋아요 테스트
     @DisplayName("좋아요 테스트")
-    @WithMockUser(username = "테스트계정", password = "custom_password", roles = {"USER","ADMIN"})
+    @WithMockUser(username = "테스트계정", password = "custom_password", roles = {"USER", "ADMIN"})
     @Test
     void testCreateLike() throws Exception {
         Question question = addQuestion();
@@ -285,16 +286,16 @@ class GymDudeApplicationTests {
 //        Optional<Question> optionalQuestion = questionRepository.findById(161);
 //        if(optionalQuestion.isPresent()) {
 //            Question question = optionalQuestion.get();
-        System.out.println("qId:"+question.getId());
+        System.out.println("qId:" + question.getId());
 
         mockMvc.perform(post("/like/" + 161))
-                    .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
-            Like like = likeRepository.findAll().get(0);
+        Like like = likeRepository.findAll().get(0);
 
-            assertNotNull(like);
-            assertNotNull(like.getAuthor().getId());
-            assertNotNull(like.getQuestion().getId());
+        assertNotNull(like);
+        assertNotNull(like.getAuthor().getId());
+        assertNotNull(like.getQuestion().getId());
 //        }
     }
 
@@ -306,18 +307,18 @@ class GymDudeApplicationTests {
 //        Optional<Question> optionalQuestion = questionRepository.findById(161);
 //        if(optionalQuestion.isPresent()) {
 //            Question question = optionalQuestion.get();
-        System.out.println("qId:"+question.getId());
+        System.out.println("qId:" + question.getId());
         mockMvc.perform(post("/like/" + 161))
-                    .andExpect(status().isOk());
+                .andExpect(status().isOk());
 
         mockMvc.perform(post("/like/" + question.getId()))
-                    .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
 
-            Like like = likeRepository.findAll().get(0);
+        Like like = likeRepository.findAll().get(0);
 
-            assertNotNull(like);
-            assertNotNull(like.getAuthor().getId());
-            assertNotNull(like.getAuthor().getId());
+        assertNotNull(like);
+        assertNotNull(like.getAuthor().getId());
+        assertNotNull(like.getAuthor().getId());
 //        }
     }
 
@@ -340,6 +341,21 @@ class GymDudeApplicationTests {
         Question save = questionRepository.save(question);
 
         return save;
+    }
+
+    @Test
+    public void hotFeedTest() {
+        Optional<List<Question>> optionalQuestions = Optional.ofNullable(this.questionRepository.findAllOrderByQuestionLikeCount());
+        optionalQuestions.ifPresent(questions -> {
+            System.out.println("questions.size() = " + questions.size());
+            questions.stream()
+                    .forEach(question -> {
+                                System.out.println("question.getContent() = " + question.getContent());
+                                System.out.println("question.getLikes() = " + question.getLikes().size());
+                                System.out.println("question.getCreateDate() = " + question.getCreateDate());
+                            }
+                    );
+        });
     }
 
 }

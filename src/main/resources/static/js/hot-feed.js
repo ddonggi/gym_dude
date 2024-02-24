@@ -2,8 +2,6 @@ import {
     setHeaderProfileEvent,
     setFeedContentHeight,
     setFeedEvent,
-    io,
-    observeLastItem,
     setFeedSaveEvent,
     setFileThumbnailEvent,
     getRelativeDate, setTextChangeTrackingEvent, postData, csrf_header, csrf_token

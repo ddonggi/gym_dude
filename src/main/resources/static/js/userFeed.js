@@ -2,7 +2,7 @@ import {userFeedIo, observeLastItem, setHeaderProfileEvent, setUserFeedEvent} fr
 
 setHeaderProfileEvent();
 let userFeedList = document.querySelectorAll(".my-feed");
-observeLastItem(userFeedIo,userFeedList);
+observeLastItem(userFeedIo,userFeedList,"userFeed");
 setUserFeedEvent();
 
 

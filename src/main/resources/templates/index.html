@@ -193,7 +193,7 @@
                                     <div th:if="${answer.modifiedDate}" th:text="|${answer.modifiedDate} (수정됨)|" class="feed-timestamps text-xs"></div>
                                     <div th:unless="${answer.modifiedDate}" th:text="${answer.createDate}" class="feed-timestamps text-xs"></div>
                                 </div>
-                                <div>
+                                <div th:if="${siteUser!=null}">
                                     <div th:if="${answer.author.id==siteUser.id}" class="option-container flex align-center">
                                         <div>
                                             <button class="comment-delete-button ">삭제</button>

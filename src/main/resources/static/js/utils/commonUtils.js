@@ -524,32 +524,34 @@ let setCommentToggleEvent = (feed) => {
     }
 }
 
+let likeClickEvent = (feed,likeContainer,e) =>{
+    console.log('좋아요 클릭.')
+    e.preventDefault()
+    // likeButton.querySelectorAll(".like-img").forEach(button => {
+    console.log('like feed id',feed.id);
+    postData('/like/'+feed.id).then((response)=>{
+        console.log('like res:',response)
+        if(response.like){ //누른 상태면
+            likeContainer.querySelector(".like-img").setAttribute('src','/resource/apps/heart.png');
+        }else{
+            likeContainer.querySelector(".like-img").setAttribute('src','/resource/apps/heartBorder.png');
+        }
+        likeContainer.querySelector(".like-button").classList.toggle("like-text-color");
+        likeContainer.querySelector(".like-button").innerText=`${response.likeCount}`;
+    })
+    // button.classList.toggle("hide");
+    // })
+}
+let loginAlert = () => {
+    alert('로그인 후 이용해 주세요')
+}
 let setLikeToggleEvent = (feed) => {
     let likeContainer = feed.querySelector(".like");
     if(principalEmail!=='anonymousUser'){ // 로그인한 유저 일 경우
         console.log('likeContainer:',likeContainer);
-        likeContainer.addEventListener('click', clickDebounce((e) => {
-            console.log('좋아요 클릭.')
-            e.preventDefault()
-            // likeButton.querySelectorAll(".like-img").forEach(button => {
-            console.log('like feed id',feed.id);
-            postData('/like/'+feed.id).then((response)=>{
-                console.log('like res:',response)
-                if(response.like){ //누른 상태면
-                    likeContainer.querySelector(".like-img").setAttribute('src','/resource/apps/heart.png');
-                }else{
-                    likeContainer.querySelector(".like-img").setAttribute('src','/resource/apps/heartBorder.png');
-                }
-                likeContainer.querySelector(".like-button").classList.toggle("like-text-color");
-                likeContainer.querySelector(".like-button").innerText=`${response.likeCount}`;
-            })
-            // button.classList.toggle("hide");
-            // })
-        }))
+        likeContainer.addEventListener('click', clickDebounce((e) => likeClickEvent(feed,likeContainer,e)));
     }else{
-        likeContainer.addEventListener('click', () => {
-            alert('로그인 후 이용해 주세요')
-        })
+        likeContainer.addEventListener('click',loginAlert)
     }
 }
 
@@ -562,6 +564,8 @@ let renderFeedList = (response) => {
     let feedList = response.content;
     console.log('feedlist length;',feedList.length);
     feedList.forEach((feed) => {
+
+        console.log('dddddddddddddddddd바보똥ㅑ!!!!!!!!!!')
         let author = feed.author;
         console.log('author.userName:', author.userName)
         let fileList = feed.fileList;
@@ -575,6 +579,7 @@ let renderFeedList = (response) => {
         feedContainer.innerHTML +=
             `<div class="feed" id="${feed.id}">
                 <!--피드 헤더-->
+                <div class="">-------------------------------</div>
                 <div class="feed-header padding-default">
                     <div class="flex gap-half" aria-label="${author.userName}의 프로필">
                         <a class="feed-profile-image" href='/user/profile/${author.id}'>
@@ -792,14 +797,16 @@ let renderFeedList = (response) => {
                 }
                 let defaultOptionButton = `<div></div>`;
 
-                if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
-                    console.log('principalEmail === author.email:',principalEmail === author.email)
-                    console.log('내가 작성한 댓글이에요!!')
-                    defaultOptionButton= `<div class="option-container flex align-center ${answerAuthor.id}">
+                if(siteUser) {
+                    if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+                        console.log('principalEmail === author.email:', principalEmail === author.email)
+                        console.log('내가 작성한 댓글이에요!!')
+                        defaultOptionButton = `<div class="option-container flex align-center ${answerAuthor.id}">
                         <div>
                             <button class="comment-delete-button ">삭제</button>
                         </div>
                         </div>`;
+                    }
                 }
 
                 answerListContainer.innerHTML += `
@@ -861,6 +868,7 @@ let renderFeedList = (response) => {
     })
 }
 let page = 0;
+let searchPage = 0;
 const ioCallback = (entries, io) => {
     entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
@@ -881,7 +889,7 @@ const ioCallback = (entries, io) => {
             let feedUrl = "feed?page=" + (++page)
             console.log('keyword length',keyword.length)
             if(keyword.length>=2){
-                feedUrl = "search/feed?page=" + (++page)+"&keyword="+keyword
+                feedUrl = "search/feed?page=" + (++searchPage)+"&keyword="+keyword
             }
             console.log('feedUrl:',feedUrl)
             getData(feedUrl).then(response => {
@@ -890,9 +898,11 @@ const ioCallback = (entries, io) => {
                 renderFeedList(response);
                 // 마지막 페이지가 아니면 계속 옵저빙
                 console.log('콘텐츠 길이(피드갯수):', response.content.length)
-                if (response.content.length === 10)
-                    observeLastItem(io, document.querySelectorAll('.feed'));
-                setFeedEvent();
+                if (response.content.length === 10) {
+                    observeLastItem(io, document.querySelectorAll('.feed'),"feed");
+                    // setFeedEvent();
+                }
+                setFeedEventAfterRender(response.content.length)
                 setFeedContentHeight();
             })
         }
@@ -919,7 +929,7 @@ const userFeedIoCallback = (entries, io) => {
                 // 마지막 페이지가 아니면 계속 옵저빙
                 // console.log('콘텐츠 길이(피드갯수):', response.content.length)
                 if (response.content.length === 9)
-                    observeLastItem(io, document.querySelectorAll('.my-feed'));
+                    observeLastItem(io, document.querySelectorAll('.my-feed'),"userFeed");
 
                 setUserFeedEvent();
                 // setFeedContentHeight();
@@ -927,10 +937,16 @@ const userFeedIoCallback = (entries, io) => {
         }
     });
 };
-const observeLastItem = (io, items) => {
-    const lastItem = items[items.length - 4]; //관찰 대상
-    if(items.length>4) {
-        io.observe(lastItem); // 관찰 대상 등록
+const observeLastItem = (io, items, type) => {
+    console.log('feed type:',type)
+    let observingMinLength = 10; //일반적인 피드는 10개 불러오기때문에
+    if(type==="userFeed")//유저 피드는 9개
+        observingMinLength=9
+    if(items.length>=observingMinLength) {
+        const lastItem = items[items.length - 4]; //관찰 대상
+        if (items.length > 4) {
+            io.observe(lastItem); // 관찰 대상 등록
+        }
     }
 };
 
@@ -990,6 +1006,7 @@ let setUserFeedEvent = () => {
 }
 
 let setFeedEvent = () => {
+    console.log('----------feed event 등록 -------------')
     if (document.querySelectorAll(".feed")) {
         document.querySelectorAll(".feed").forEach((feed) => {
             /* 본인 게시물 : 옵션 토글, 게시물 수정,삭제 이벤트 등록 */
@@ -1009,6 +1026,37 @@ let setFeedEvent = () => {
             setDeleteCommentEvent(feed); // 내가 쓴 댓글일 경우 삭제
             setCommentEvent(feed); //댓글 등록 이벤트
         })
+    }
+}
+
+//io 콜백 이후 render 한 만큼만 이벤트 등록
+let setFeedEventAfterRender = (feedLength) => {
+    console.log('----------render after feed event 등록 -------------')
+    console.log('받아온 피드 갯수:',feedLength)
+    if (document.querySelectorAll(".feed")) {
+        // console.log('총 피드 갯수:',document.querySelectorAll(`.feed:nth-last-child(-n+${feedLength})`).length)
+        if(feedLength>0) {
+            document.querySelectorAll(".feed").forEach((feed, index) => {
+                // document.querySelectorAll(`.feed:nth-last-child(-n+${feedLength})`).forEach((feed,index) => {
+                console.log('index:', index)
+                /* 본인 게시물 : 옵션 토글, 게시물 수정,삭제 이벤트 등록 */
+                if (feed.querySelector(".option-button")) {
+                    setOptionToggleEvent(feed);
+                    setModifyFormEvent(feed);
+                    setModifyCancelEvent(feed);
+                    setFeedModifySaveEvent(feed);
+                    setDeleteEvent(feed);
+                }
+                followCheck(feed);
+                setFollowEvent(feed);
+                setCarouselEvent(feed);
+                setLikeToggleEvent(feed);
+                //댓글 영역
+                setCommentToggleEvent(feed); //여러개일 경우 보기 접기
+                setDeleteCommentEvent(feed); // 내가 쓴 댓글일 경우 삭제
+                setCommentEvent(feed); //댓글 등록 이벤트
+            })
+        }
     }
 }
 
@@ -1536,14 +1584,16 @@ let renderUserFeed = (feed) => {
                 defaultProfileElem = `<img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource/userProfiles/${answerAuthor.id}.png">`;
             }
 
-            if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
-                console.log('principalEmail === author.email:',principalEmail === author.email)
-                console.log('내가 작성한 댓글이에요!!')
-                defaultOptionButton= `<div class="option-container flex align-center ${answerAuthor.id}">
+            if(principalEmail!=='anonymousUser') {
+                if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+                    console.log('principalEmail === author.email:', principalEmail === author.email)
+                    console.log('내가 작성한 댓글이에요!!')
+                    defaultOptionButton = `<div class="option-container flex align-center ${answerAuthor.id}">
                         <div>
                             <button class="comment-delete-button ">삭제</button>
                         </div>
                         </div>`;
+                }
             }
             answerListContainer.innerHTML += `
                 <div class="answer padding-half" id="comment${answerId}">

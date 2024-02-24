@@ -1,12 +1,18 @@
 package com.weight.gym_dude.user;
 
-import com.weight.gym_dude.util.DataNotFoundException;
+import com.weight.gym_dude.util.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Duration;
 import java.util.Optional;
+import java.util.Random;
 
 /**
  * PackageName : com.weight.gym_dude.user
@@ -17,11 +23,17 @@ import java.util.Optional;
  **/
 
 @Service
+@Slf4j
 @RequiredArgsConstructor //final이 붙거나 @NotNull 이 붙은 필드의 생성자를 자동 생성해주는 롬복 어노테이션
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
+    private final RedisService redisService;
 
+    @Value("${spring.mail.properties.auth-code-expiration-millis}")
+    private long authCodeExpirationMillis;
+    private static final String AUTH_CODE_PREFIX = "AuthCode ";
     public SiteUser create(String userName, String password, String email){
         /*
 
@@ -106,4 +118,73 @@ public class UserService {
         userRepository.save(principalUser);
         return principalUser;
     }
+    public void sendCodeToEmail(MailForm mailForm){
+        String email = mailForm.getEmail();
+        // email 중복검사
+        checkDuplicateEmail(email);
+
+        String title = "[짐프렌드] 이메일 인증번호 안내";
+        String authCode = createCode();
+        redisService.setValues(AUTH_CODE_PREFIX + email,
+                authCode, Duration.ofMillis(authCodeExpirationMillis));
+        authCode = "안녕하세요, 고객님\n" +
+                "\n" +
+                "요청하신 짐프렌드 이메일 인증번호를 안내 드립니다.\n" +
+                "\n" +
+                "아래 번호를 입력하여 짐프렌드 인증 절차를 완료해 주세요.\n" +
+                "\n" +
+                "인증번호 : "+authCode+
+                "\n\n" +
+                "본 인증번호는 3분 후에 만료됩니다.\n" +
+                "\n";
+        mailService.sendEmail(email, title, authCode);
+        // 이메일 인증 요청 시 인증 번호 Redis에 저장 ( key = "AuthCode " + Email / value = AuthCode )
+//        redisService.setValues(AUTH_CODE_PREFIX + email,
+
+    }
+    public void checkDuplicateEmail(String email){
+        Optional<SiteUser> optionalSiteUser = userRepository.findByEmail(email);
+        if(optionalSiteUser.isPresent()){
+            throw new SiteUserExistException("user is exist");
+        }
+    }
+    private String createCode() {
+        int length = 6;
+        try {
+            Random random = SecureRandom.getInstanceStrong();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < length; i++) {
+                builder.append(random.nextInt(10));
+            }
+            return builder.toString();
+        } catch (NoSuchAlgorithmException e) {
+            log.debug("UserService.createCode() exception occur");
+            throw new BusinessLogicException("Internal server error");
+        }
+    }
+
+    public boolean emailVerification(String email, String authCode) {
+//        sameUserInDBByEmail(email);
+        // email 중복검사
+        checkDuplicateEmail(email);
+
+//        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
+        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
+        if (!(redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode))) {
+//            throw new IllegalArgumentException("인증번호가 틀렸습니다. 다시 입력해주세요.");
+            return false;
+        } else {
+            redisService.deleteValues(redisAuthCode);
+            return true;
+        }
+    }
+
+/*    public EmailVerificationResult verifiedCode(String email, String authCode) {
+        checkDuplicateEmail(email);
+        String redisAuthCode = redisService.getValues(AUTH_CODE_PREFIX + email);
+        boolean authResult = redisService.checkExistsValue(redisAuthCode) && redisAuthCode.equals(authCode);
+
+        return EmailVerificationResult.of(authResult);
+    }*/
+
 }

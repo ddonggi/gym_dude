@@ -1,6 +1,7 @@
 package com.weight.gym_dude.user;
 
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
 import jakarta.validation.constraints.*;
@@ -36,6 +37,9 @@ public class UserCreateForm {
 
     @NotEmpty(message = "비밀번호 확인은 필수 항목 입니다")
     private String password2;
+
+    @NotEmpty(message = "이메일 인증은 필수 항목 입니다")
+    private String emailVerification;
 
     @NotEmpty(message = "이메일은 필수 항목 입니다")
     @Email(message = "이메일 양식에 맞지 않습니다")

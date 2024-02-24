@@ -1,5 +1,6 @@
 package com.weight.gym_dude.user;
 
+import com.nimbusds.oauth2.sdk.SuccessResponse;
 import com.weight.gym_dude.follow.FollowService;
 import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.question.QuestionDTO;
@@ -17,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -76,8 +79,55 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("/mail-request")
+    @ResponseBody
+    public ResponseEntity<Object> signupRequest(
+            @Valid @RequestBody MailForm mailForm,
+            BindingResult bindingResult
+    ){
+        //Validation 예외처리
+        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+        Map<String,Object> body = new HashMap<>();
+        if(fieldErrors.size()>0){
+            for(FieldError fieldError: bindingResult.getFieldErrors()){
+                logger.error(fieldError.getField()+"필드 : "+fieldError.getDefaultMessage());
+            }
+            body.put("message","이메일 인증 오류");
+            return ResponseEntity.status(403).body(body);
+        }
+        userService.sendCodeToEmail(mailForm);
+        body.put("message","이메일 인증 코드 발송 완료");
+        return ResponseEntity.ok().body(body);
+    }
+
+    //인증 코드 검사
+    @PostMapping("/mail-verification")
+    @ResponseBody
+    public ResponseEntity<Object> mailCodeVerification(
+            @Valid @RequestBody MailForm mailForm,
+            BindingResult bindingResult
+    ){
+        if (bindingResult.hasErrors())
+            logger.info("에러발생:{}",bindingResult.getFieldError());
+
+        boolean mailVerification = userService.emailVerification(mailForm.getEmail(), mailForm.getCode());
+        Map<String,Object> body = new HashMap<>();
+        if(mailVerification) {
+            body.put("message", "인증되었습니다");
+            body.put("verification", true);
+        }
+        else {
+            body.put("message", "인증번호가 틀렸습니다. 다시 입력해주세요.");
+            body.put("verification", false);
+        }
+
+        return ResponseEntity.ok().body(body);
+    }
+
     @PostMapping("/signup")
     public String signup(@Valid UserCreateForm userCreateForm, BindingResult bindingResult) {
+        logger.info("emailVerification:{}",userCreateForm.getEmailVerification());
+
         if (bindingResult.hasErrors()) {
             logger.info("에러발생:{}",bindingResult.getFieldError());
             return "signup_form";

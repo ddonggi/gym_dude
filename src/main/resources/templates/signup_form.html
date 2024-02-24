@@ -28,13 +28,24 @@
 
             <div class="signup-email">
                 <label for="email" class="form-label">이메일</label>
-                <div th:if="${#fields.hasErrors('email')}" >
-<!--                    <input type="email" th:field="*{email}" id="email" th:placeholder="${#fields.errors('email').get(0)}" class="input-block-sm"/>-->
-                    <input type="email" th:field="*{email}" id="email"  class="input-block-sm" />
-                    <div role="alert" th:errorclass="error" class="text-xs text-warning" th:errors="*{email}"></div>
+                <div class="flex">
+                    <div th:if="${#fields.hasErrors('email')}" >
+                        <input type="email" th:field="*{email}" id="email"  class="input-block-sm" />
+                        <div role="alert" th:errorclass="error" class="text-xs text-warning" th:errors="*{email}"></div>
+                    </div>
+                    <div th:unless="${#fields.hasErrors('email')}" role="alert">
+                        <input type="email" th:field="*{email}" id="email" class="input-block-sm" placeholder="example@fitive.com"/>
+                    </div>
+                    <button class="email-request" type="button">인증번호 받기</button>
                 </div>
-                <div th:unless="${#fields.hasErrors('email')}" role="alert">
-                    <input type="email" th:field="*{email}" id="email" class="input-block-sm" placeholder="example@fitive.com"/>
+                <div class="flex" th:if="${#fields.hasErrors('emailVerification')}" >
+                    <input id="email-verification-input" placeholder="인증번호"/><button type="button" class="email-verification">인증번호 확인</button>
+                    <input th:field="*{emailVerification}" type="checkbox" id="mail-checkbox"  class="hide" value=""/>
+                    <div role="alert" th:errorclass="error" class="text-xs text-warning" th:errors="*{emailVerification}"></div>
+                </div>
+                <div class="flex" th:unless="${#fields.hasErrors('emailVerification')}" >
+                    <input id="email-verification-input" placeholder="인증번호"/><button type="button" class="email-verification">인증번호 확인</button>
+                    <input th:field="*{emailVerification}" type="checkbox" id="mail-checkbox" class="hide"  value=""/>
                 </div>
             </div>
 
@@ -74,13 +85,6 @@
         </form>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>
-    <script th:inline="javascript" type="module">
-        import {setTextChangeTrackingEvent,setAsyncNickNameCheckEvent} from '/js/utils/commonUtils.js';
-        let nicknameInput = document.querySelector(".nickname-input");
-        let passwordInput = document.querySelector(".password-input");
-        setTextChangeTrackingEvent(nicknameInput);
-        setTextChangeTrackingEvent(passwordInput);
-        setAsyncNickNameCheckEvent(nicknameInput);
-    </script>
+    <script layout:fragment="index_js" th:src="@{/js/signup.js}" type="module"></script>
 </div>
 </html>

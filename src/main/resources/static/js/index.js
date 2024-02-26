@@ -95,4 +95,25 @@ observeLastItem(io,feedList);
 
 //피드의 '...' 줄임말 높이 설정
 setFeedContentHeight();
-window.addEventListener('click',()=>console.log('click'))
+// window.addEventListener('click',()=>console.log('click'))
+
+document.getElementById('files').addEventListener('input',(e)=>{
+    // console.log('files :',e.target)
+    // console.log('files 0 :',e.target.files[0].size)
+    let maxSize = 50 * 1024 * 1024; //* 50MB 사이즈 제한
+    let files = e.target.files;
+    console.log('maxSize size :', maxSize)
+    let currentSize = 0;
+    for(let i =0; i<files.length; i++) {
+        // console.log('file size :', files[i].size)
+        currentSize += files[i].size;
+        console.log('current size:',currentSize)
+    }
+    console.log('final size:',currentSize)
+    if(currentSize > maxSize){
+        alert('사이즈는 50MB 이하로 업로드해 주세요.')
+        console.log(currentSize/1024/1024+'/'+maxSize/1024/1024);
+        document.getElementById('files').value="";
+    }
+
+})

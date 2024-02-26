@@ -6,6 +6,8 @@ import com.weight.gym_dude.user.SiteUser;
 import lombok.*;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 //import javax.persistence.*;
 import java.time.LocalDateTime;
 

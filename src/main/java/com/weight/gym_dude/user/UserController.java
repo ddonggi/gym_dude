@@ -5,6 +5,7 @@ import com.weight.gym_dude.follow.FollowService;
 import com.weight.gym_dude.question.Question;
 import com.weight.gym_dude.question.QuestionDTO;
 import com.weight.gym_dude.question.QuestionService;
+import com.weight.gym_dude.util.BusinessLogicException;
 import com.weight.gym_dude.util.FileUtils;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -318,7 +319,7 @@ public class UserController {
 
     //한 유저의 피드 페이징
     @GetMapping("/feed/list/{id}")
-    @CrossOrigin
+//    @CrossOrigin
     @ResponseBody
     public ResponseEntity<Object> index(
             @PathVariable(value = "id") Long id,
@@ -353,5 +354,39 @@ public class UserController {
     @PostMapping("/modify")
     public String modify(){
         return "redirect:/my_page";
+    }
+
+
+
+    @PostMapping("/account/quit/{id}")
+    public ResponseEntity<Object> Quit(
+            @PathVariable(value = "id") Long id,
+            Principal principal,
+            Authentication authentication
+    ){
+        String email= principal.getName();
+        if(principal!=null) {
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+        }
+        Map<String,Object> body = new HashMap<>();
+//        userRepository.delete();
+        SiteUser siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
+        logger.info("request id:{}",id);
+        logger.info("siteUser id:{}",siteUser.getId());
+        if((long)siteUser.getId()!=id){
+            body.put("message","삭제 권한이 없습니다");
+            body.put("result",false);
+            return ResponseEntity.status(HttpStatus.OK).body(body);
+        }
+        userRepository.delete(siteUser);
+        body.put("message","삭제 되었습니다");
+        body.put("result",true);
+        return ResponseEntity.status(HttpStatus.OK).body(body);
     }
 }

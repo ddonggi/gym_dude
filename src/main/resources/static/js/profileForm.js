@@ -14,7 +14,8 @@ let introduceInput = document.querySelector(".my-profile-introduce-input");
 
 setTextChangeTrackingEvent(nicknameInput);
 setTextChangeTrackingEvent(introduceInput);
-setAsyncNickNameCheckEvent(nicknameInput);
+
+setAsyncNickNameCheckEvent(nicknameInput,true);
 setProfileThumbnailEvent();
 if(siteUser.category!==null) {
     document.querySelectorAll("option").forEach((option)=>{

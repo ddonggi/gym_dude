@@ -36,6 +36,7 @@
                 <h2>내 소개</h2>
                 <pre th:if="${profileUser.introduce!=null}" th:text="${profileUser.introduce}"></pre>
                 <pre th:unless="${profileUser.introduce!=null}" th:text="|나에 대해 소개해 보세요|"></pre>
+                <button sec:authorize="isAuthenticated()" th:if="${siteUser.id.equals(profileUser.id)}" class="account-quit-button">회원 탈퇴</button>
             </article>
         </section>
     </div>
@@ -45,6 +46,7 @@
         if([[${followingList}]]){
             followingList = [[${followingList}]];
         }
+        let profileUser = [[${profileUser}]];
     </script>
     <script layout:fragment="profile_js" th:src="@{/js/profile.js}" type="module"></script>
 </div>

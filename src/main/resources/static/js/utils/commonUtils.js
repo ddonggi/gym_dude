@@ -226,8 +226,8 @@ let setTextChangeTrackingEvent = (element) =>{
         else currentContainer.classList.remove("text-warning")
     })
 }
-let setAsyncNickNameCheckEvent = (element)=>{
-    element.addEventListener('input', inputDebounce(() => saveInput(element)))
+let setAsyncNickNameCheckEvent = (element,isProfilePage)=>{
+    element.addEventListener('input', inputDebounce(() => saveInput(element,isProfilePage)))
 }
 
 function inputDebounce(func, timeout = 500) {
@@ -249,7 +249,7 @@ function clickDebounce(func, timeout = 200) {
     };
 }
 let regex = /^[가-힣a-zA-Z0-9]*$/;
-function saveInput(element) {
+function saveInput(element,isProfilePage) {
     // console.log('Saving data:',element);
     // element.value
     // console.log(inputText.indexOf(" "))
@@ -271,8 +271,12 @@ function saveInput(element) {
     else{
         //저장버튼 활성
         // pointer
-        // submitButton.classList.remove("disabled");
-        // submitButton.removeAttribute('disabled');
+        let isProfile = isProfilePage
+        console.log('is profile??:',isProfile);
+        if(isProfilePage) {
+            submitButton.classList.remove("disabled");
+            submitButton.removeAttribute('disabled');
+        }
         postData('/user/name/check',{username:inputText},csrf_header,csrf_token).then(response => {
             if(response.result==="positive") {
                 element.nextElementSibling.classList.add("text-good");
@@ -578,7 +582,6 @@ let renderFeedList = (response) => {
         feedContainer.innerHTML +=
             `<div class="feed" id="${feed.id}">
                 <!--피드 헤더-->
-                <div class="">-------------------------------</div>
                 <div class="feed-header padding-default">
                     <div class="flex gap-half" aria-label="${author.userName}의 프로필">
                         <a class="feed-profile-image" href='/user/profile/${author.id}'>
@@ -1193,6 +1196,7 @@ let setFeedSaveEvent = ()=>{
                     }
                 }
                 formData.append("content",new Blob([JSON.stringify({"content":content})],{type: "application/json"}));
+
                 postFileData(url,formData,csrf_header,csrf_token).then((response)=>{
                     console.log('response:',response)
                 })

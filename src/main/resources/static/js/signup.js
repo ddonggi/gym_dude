@@ -10,9 +10,7 @@ let passwordInput = document.querySelector(".password-input");
 
 setTextChangeTrackingEvent(nicknameInput);
 setTextChangeTrackingEvent(passwordInput);
-setAsyncNickNameCheckEvent(nicknameInput);
-
-
+setAsyncNickNameCheckEvent(nicknameInput,false);
 
 let emailRequest = () =>{
     document.querySelector(".email-request").addEventListener('click',()=>{

@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -91,8 +92,16 @@ public class SecurityConfig {
      * */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+//                http.getConfigurer(OAuth2AuthorizationServerConfigurer.class).oidc(Customizer.withDefaults());
+
         return
-                http    // 특정 URL에 대한 권한 설정.
+                http
+                        //oauth2Login 요청이 들어오면
+                        //userInfoEndpoint로 접근해 구현해낼 구현체 (CustomOAuth2UserService)를 등록
+                        .oauth2Login(oauth2Login ->
+                                oauth2Login.userInfoEndpoint(userInfoEndpointConfig ->
+                                        userInfoEndpointConfig.userService(customOAuth2UserService)))
+                        // 특정 URL에 대한 권한 설정.
                         .authorizeHttpRequests((authorizeRequests) -> {
 //                        authorizeRequests.requestMatchers("").authenticated();
 //                        authorizeRequests.requestMatchers("").hasAnyRole("ADMIN");
@@ -130,14 +139,10 @@ public class SecurityConfig {
                         .logout((logout) -> {
                             logout.logoutRequestMatcher(new AntPathRequestMatcher("/user/logout")) //로그아웃 url
                             .logoutSuccessUrl("/")
-//                            logoutConfigurer.deleteCookies("JSESSIONID");
+//                                    logoutConfigurer.deleteCookies("JSESSIONID");
                             .invalidateHttpSession(true);// 사용자 세션 삭제
                         })
-                        //oauth2Login 요청이 들어오면
-                        //userInfoEndpoint로 접근해 구현해낼 구현체 (CustomOAuth2UserService)를 등록
-                        .oauth2Login(oauth2Login ->
-                                oauth2Login.userInfoEndpoint(userInfoEndpointConfig ->
-                                        userInfoEndpointConfig.userService(customOAuth2UserService)))
+
                         .build();
 
 /*

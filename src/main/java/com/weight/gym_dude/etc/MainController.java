@@ -4,6 +4,7 @@ package com.weight.gym_dude.etc;
  */
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
@@ -14,6 +15,15 @@ public class MainController {
 //        return "index";
 //    }
 
-//    "/privacy-policy"
-//    "/service-terms"
+    @GetMapping("/terms")
+    public String terms(){
+
+        return "terms";
+    }
+
+    @GetMapping("/policy")
+    public String policy(){
+
+        return "policy";
+    }
 }

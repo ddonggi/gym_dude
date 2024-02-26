@@ -3,8 +3,8 @@
     <div class="feed-pop feed-width"></div>
     <th:block th:replace="~{fragment/header::header}"></th:block>
     <div class="my-feed-block feed-width">
-        <h2 th:if="${siteUser.id.equals(feedUser.id)}" th:text="|내 피드|"></h2>
-        <h2 th:unless="${siteUser.id.equals(feedUser.id)}" th:text="|${feedUser.userName}님의 피드|"></h2>
+        <h2 th:if="${siteUser!=null&&siteUser.id.equals(feedUser.id)}" th:text="|내 피드|"></h2>
+        <h2 th:unless="${siteUser!=null&&siteUser.id.equals(feedUser.id)}" th:text="|${feedUser.userName}님의 피드|"></h2>
         <div class="padding-default">
             <div class="my-feed-wrapper flex flex-wrap justify-content-center">
                 <div class="pseudo-container" th:each="question,loop : ${feedPaging}" >
@@ -21,7 +21,7 @@
                         <div class="my-feed-content-wrapper" th:text="${question.content}"></div>
                     </div>
                     <!--로그인하고 나의 피드--->
-                    <div sec:authorize="isAuthenticated()" th:if="${siteUser.id.equals(feedUser.id)}" class="my-feed flex-column" th:id="${question.id}">
+                    <div sec:authorize="isAuthenticated()" th:if="${siteUser!=null&&siteUser.id.equals(feedUser.id)}" class="my-feed flex-column" th:id="${question.id}">
                         <!--썸네일 부분 -->
                         <div th:if="${question.fileList.size>0&&question.fileList.get(0).getFileType()=='image'}" class="my-feed-media-wrapper">
                             <img th:src="|/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|" th:alt="${question.fileList.get(0).originalName}"/>
@@ -38,7 +38,7 @@
                         <div class="my-feed-content-wrapper" th:text="${question.content}"></div>
                     </div>
                     <!--로그인하고 다른 유저의 피드-->
-                    <div sec:authorize="isAuthenticated()" th:if="${!siteUser.id.equals(feedUser.id) and question.isHide==false}" class="my-feed flex-column" th:id="${question.id}">
+                    <div sec:authorize="isAuthenticated()" th:if="${siteUser!=null&&!siteUser.id.equals(feedUser.id) and question.isHide==false}" class="my-feed flex-column" th:id="${question.id}">
                         <!--썸네일 부분 -->
                         <div th:if="${question.fileList.size>0&&question.fileList.get(0).getFileType()=='image'}" class="my-feed-media-wrapper">
                             <img th:src="|/resource/${#temporals.format(question.fileList.get(0).createDate,'yyMMdd')}/${question.fileList.get(0).saveName}|"  th:alt="${question.fileList.get(0).originalName}"/>

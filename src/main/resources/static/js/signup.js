@@ -72,4 +72,46 @@ let emailVerification = () =>{
 }
 emailRequest()
 emailVerification()
-document.querySelector(".email-verification")
+
+let allAgree = document.getElementById("all-agree");
+let ageAgree = document.getElementById("age-over-14-agree")
+let termsAgree = document.getElementById("terms-agree")
+let policyAgree = document.getElementById("privacy-policy-agree")
+
+let allCheckedEvent = () =>{
+    allAgree.addEventListener('click',()=>{
+        if(allAgree.checked===true){
+            console.log('all checked')
+            ageAgree.checked= true;
+            termsAgree.checked=true;
+            policyAgree.checked= true;
+        } else{
+            console.log('all uncheked')
+            ageAgree.checked= false;
+            termsAgree.checked=false;
+            policyAgree.checked= false;
+        }
+    })
+}
+let submitButton = document.querySelector(".submit-button");
+let checkBoxChangeEvent = ()=>{
+    document.querySelectorAll(".custom-checkbox").forEach((checkbox)=>{
+        checkbox.addEventListener('change',()=>{
+            console.log('change ageAgree')
+            if(ageAgree.checked=== true &&
+                termsAgree.checked===true &&
+                policyAgree.checked=== true){
+                submitButton.disabled=false;
+            }else{
+                submitButton.disabled=true;
+            }
+    })
+    })
+    // termsAgree.addEventListener('change',()=>console.log('change termsAgree'))
+    // policyAgree.addEventListener('change',()=>console.log('change policyAgree'))
+
+
+}
+allCheckedEvent()
+checkBoxChangeEvent()
+

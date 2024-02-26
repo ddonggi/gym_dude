@@ -177,6 +177,8 @@ public class UserController {
     @GetMapping("/profile/{id}")
     public String profile(@PathVariable(value = "id") Long id, Model model,Principal principal, Authentication authentication) {
         SiteUser siteUser = null;
+//        logger.info("principal::{}",principal);
+//        logger.info("principal getName::{}",principal.getName());
         if(principal!=null) {
             String email= principal.getName();
             if(authentication!=null){
@@ -286,7 +288,8 @@ public class UserController {
     ) {
         logger.info("feed request");
         SiteUser siteUser = null;
-        logger.info("principal:{}",principal);
+//        logger.info("principal::{}",principal);
+//        logger.info("principal getName::{}",principal.getName());
         if(principal!=null) {
             String email= principal.getName();
             if(authentication!=null){

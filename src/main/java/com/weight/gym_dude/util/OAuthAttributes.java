@@ -3,6 +3,7 @@ package com.weight.gym_dude.util;
 import com.weight.gym_dude.user.SiteUser;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 
 @Getter
 @Builder
+@Slf4j
 public class OAuthAttributes {
     private Map<String, Object> attributes;
     private String nameAttributeKey;
@@ -33,6 +35,7 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofGoogle(String userNameAttributeName, Map<String, Object> attributes) {
+//        log.info("Google!!");
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
@@ -42,6 +45,7 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofNaver(String userNameAttributeName, Map<String, Object> attributes) {
+//        log.info("naver!!");
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuthAttributes.builder()
@@ -53,6 +57,7 @@ public class OAuthAttributes {
     }
 
     private static OAuthAttributes ofKakao(String userNameAttributeName, Map<String, Object> attributes) {
+//        log.info("Kakao!!");
         Map<String, Object> response = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> account = (Map<String, Object>) attributes.get("profile");
 

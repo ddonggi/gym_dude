@@ -28,9 +28,15 @@
         <input type="submit" class="button padding-default" value="로그인"></input>
     </form>
         <div>아직 회원이 아니신가요? <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/signup}">회원가입</a></div>
-        <div>----------------------------</div>
-        <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">Google Login</a>
-        <a href="/oauth2/authorization/naver" class="btn btn-secondary active" role="button">Naver Login</a>
+        <div class="width100 divide-horizon"></div>
+        <div class="flex-column oauth-container gap-rem">
+            <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">
+                <img class="signup-image" src="/resource/apps/google/light/web_light_sq_SI.svg" alt="구글 로그인" />
+            </a>
+            <a href="/oauth2/authorization/naver" class="btn btn-secondary active" role="button">
+                <img class="signup-image" src="/resource/apps/naver/btnG_완성형.png" alt="네이버 로그인"/>
+            </a>
+        </div>
 <!--        <a href="/oauth2/authorization/kakao" class="btn btn-secondary active" role="button">Kakao Login</a>-->
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>

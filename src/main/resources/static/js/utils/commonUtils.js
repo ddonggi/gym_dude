@@ -271,8 +271,8 @@ function saveInput(element) {
     else{
         //저장버튼 활성
         // pointer
-        submitButton.classList.remove("disabled");
-        submitButton.removeAttribute('disabled');
+        // submitButton.classList.remove("disabled");
+        // submitButton.removeAttribute('disabled');
         postData('/user/name/check',{username:inputText},csrf_header,csrf_token).then(response => {
             if(response.result==="positive") {
                 element.nextElementSibling.classList.add("text-good");
@@ -565,7 +565,6 @@ let renderFeedList = (response) => {
     console.log('feedlist length;',feedList.length);
     feedList.forEach((feed) => {
 
-        console.log('dddddddddddddddddd바보똥ㅑ!!!!!!!!!!')
         let author = feed.author;
         console.log('author.userName:', author.userName)
         let fileList = feed.fileList;
@@ -620,7 +619,7 @@ let renderFeedList = (response) => {
         // 더보기 | 팔로우
         console.log('접속한사람 : ',principalEmail,'/ 글 작성자 : ',author.email)
         // if (principalEmail === author.email) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
-        if (siteUser.id === author.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+        if (principalEmail!=='anonymousUser'&&(siteUser.id === author.id)) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
             currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -1370,8 +1369,10 @@ let renderUserFeed = (feed) => {
     }
 
     // 더보기 | 팔로우
+    else if (principalEmail === 'anonymousUser') {
+    }
     // if (principalEmail === author.email) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
-    if (siteUser.id === author.id) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
+    else if (siteUser.id === author.id) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
         currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -1383,8 +1384,6 @@ let renderUserFeed = (feed) => {
                             ⁝
                         </button></div>
                     `;
-    } else if (principalEmail === 'anonymousUser') {
-
     } else {
         currentFeed.querySelector(".feed-header").innerHTML += `
                         <button class="follow-button" value="${author.id}">팔로우</button>`;

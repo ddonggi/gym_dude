@@ -83,7 +83,12 @@
                 </div>
             </div>
 
-            <button type="submit" class="button padding-default submit-button" >회원가입</button>
+            <div class=""><div class=""><input type="checkbox" id="all-agree" class="custom-checkbox"><label for="all-agree" class="">모두 동의</label></div></div>
+            <div class=""><div class=""><input type="checkbox" id="age-over-14-agree" class="custom-checkbox"><label for="age-over-14-agree" class="">(필수) 만 14세 이상입니다.</label></div></div>
+            <div class="flex justify-content-between align-center"><div class=""><input type="checkbox" id="terms-agree" class="custom-checkbox"><label for="terms-agree" class="">(필수) 짐프렌드 이용약관 동의</label></div><a href="/terms" target="_blank" rel="noreferrer" class="">보기</a></div>
+            <div class="flex justify-content-between align-center"><div class=""><input type="checkbox" id="privacy-policy-agree" class="custom-checkbox"><label for="privacy-policy-agree" class="">(필수) 개인정보 수집 및 이용 동의</label></div><a href="/policy" target="_blank" rel="noreferrer" class="">보기</a></div>
+
+            <button type="submit" class="button padding-default submit-button" disabled>회원가입</button>
         </form>
     </div>
     <th:block th:replace="~{fragment/footer::footer}"></th:block>

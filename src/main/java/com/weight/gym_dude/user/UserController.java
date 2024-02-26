@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -66,16 +68,16 @@ public class UserController {
     @PostMapping("/name/check")
     @ResponseBody
     public ResponseEntity<Object> nicknameDuplicateCheck(@RequestBody UserCreateForm userCreateForm){
-        logger.info("닉네임 체크 시작:{}",userCreateForm.getUsername());
-        boolean isNickNameExist = userService.nicknameExist(userCreateForm.getUsername());
+//        logger.info("닉네임 체크 시작:{}",userCreateForm.getUsername());
+//        boolean isNickNameExist = userService.nicknameExist(userCreateForm.getUsername());
         HashMap<String,String> response = new HashMap<>();
-        if(isNickNameExist) {
-            response.put("result","negative");
-            response.put("message","사용할 수 없는 닉네임 입니다");
-        }else{
+//        if(isNickNameExist) {
+//            response.put("result","negative");
+//            response.put("message","사용할 수 없는 닉네임 입니다");
+//        }else{
             response.put("result","positive");
             response.put("message","사용 가능한 닉네임 입니다");
-        }
+//        }
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -173,10 +175,18 @@ public class UserController {
 
 //    @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/profile/{id}")
-    public String profile(@PathVariable(value = "id") Long id, Model model,Principal principal) {
+    public String profile(@PathVariable(value = "id") Long id, Model model,Principal principal, Authentication authentication) {
         SiteUser siteUser = null;
         if(principal!=null) {
-            siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            String email= principal.getName();
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+            siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
         }
         Optional<SiteUser> optionalProfileUser = userRepository.findById(id);
         if(optionalProfileUser.isPresent()) {
@@ -192,19 +202,40 @@ public class UserController {
     }
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @GetMapping("/profile/edit")
-    public String myProfileEdit(Model model,Principal principal) {
-        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+    public String myProfileEdit(Model model,Principal principal,Authentication authentication) {
+        if(principal!=null) {
+            String email= principal.getName();
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+        SiteUser siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
         model.addAttribute("siteUser",siteUser);
+        }
         return "user/profile_form";
     }
     @PreAuthorize("isAuthenticated()")// 권한이 부여된 사람(=로그인한 사람)만 실행 가능하다
     @PostMapping("/profile/edit")
     public String myProfileEdit(Model model, Principal principal,
+                                Authentication authentication,
                                 @RequestPart(name = "userName") String userName,
                                 @RequestPart(name = "introduce",required = false) String introduce,
                                 @RequestPart(name = "file",required = false) MultipartFile file,
                                 @RequestPart(name = "category") String category) {
-        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        String email= principal.getName();
+        if(principal!=null) {
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+        }
+        SiteUser siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
         Integer id = siteUser.getId();
 //        SiteUser prince = (SiteUser) authentication.getPrincipal();
 
@@ -250,12 +281,22 @@ public class UserController {
     public String feed(Model model,
                          @PathVariable(value = "id") Long id,
                          @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
-                         Principal principal) {
+                         Principal principal,
+                         Authentication authentication
+    ) {
         logger.info("feed request");
         SiteUser siteUser = null;
         logger.info("principal:{}",principal);
         if(principal!=null) {
-            siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            String email= principal.getName();
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+            siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
         }
         Optional<SiteUser> optionalFeedUser = userRepository.findById(id);
         if(optionalFeedUser.isPresent()){

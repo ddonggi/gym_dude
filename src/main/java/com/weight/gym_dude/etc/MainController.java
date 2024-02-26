@@ -14,4 +14,6 @@ public class MainController {
 //        return "index";
 //    }
 
+//    "/privacy-policy"
+//    "/service-terms"
 }

@@ -619,7 +619,8 @@ let renderFeedList = (response) => {
 
         // 더보기 | 팔로우
         console.log('접속한사람 : ',principalEmail,'/ 글 작성자 : ',author.email)
-        if (principalEmail === author.email) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+        // if (principalEmail === author.email) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+        if (siteUser.id === author.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
             currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -799,7 +800,7 @@ let renderFeedList = (response) => {
 
                 if(siteUser) {
                     if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
-                        console.log('principalEmail === author.email:', principalEmail === author.email)
+                        console.log('principalEmail === author.email:', siteUser.id === answerAuthor.id)
                         console.log('내가 작성한 댓글이에요!!')
                         defaultOptionButton = `<div class="option-container flex align-center ${answerAuthor.id}">
                         <div>
@@ -1369,7 +1370,8 @@ let renderUserFeed = (feed) => {
     }
 
     // 더보기 | 팔로우
-    if (principalEmail === author.email) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
+    // if (principalEmail === author.email) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
+    if (siteUser.id === author.id) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
         currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -1586,7 +1588,7 @@ let renderUserFeed = (feed) => {
 
             if(principalEmail!=='anonymousUser') {
                 if (siteUser.id === answerAuthor.id) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
-                    console.log('principalEmail === author.email:', principalEmail === author.email)
+                    console.log('principalEmail === author.email:', siteUser.id === answerAuthor.id)
                     console.log('내가 작성한 댓글이에요!!')
                     defaultOptionButton = `<div class="option-container flex align-center ${answerAuthor.id}">
                         <div>

@@ -14,6 +14,7 @@ import com.weight.gym_dude.user.SiteUser;
 import com.weight.gym_dude.user.SiteUserDTO;
 import com.weight.gym_dude.user.UserService;
 import com.weight.gym_dude.util.FileUtils;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -53,19 +59,36 @@ public class QuestionController {
                        @RequestParam(value = "page", defaultValue = "0") int page, //spring boot의 페이징은 0부터
                        QuestionForm questionForm,
                        AnswerForm answerForm,
-                       Principal principal
+                          Principal principal,
+                          Authentication authentication
     ) {
 //        List<Question> questionList = questionService.getList();
 //        Page<Question> paging = questionService.getList(page);
-        logger.info("page:{}",page);
+//        logger.info("page:{}",page);
         Page<QuestionDTO> paging = questionService.getFeedList(page);
-        logger.info("paging:{}",paging);
-
-//        model.addAttribute("questionList", questionList);
+//        logger.info("paging:{}",paging);
         model.addAttribute("paging", paging);
+
+        logger.info("----------------------"); // getName은 이메일임
+
         if(principal!=null) {
-            logger.info("principal name:{}",principal.getName()); // getName은 이메일임
-            SiteUser principalUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            logger.info("principal:{}",principal); // getName은 이메일임
+            logger.info("principal.getName:{}",principal.getName()); // getName은 이메일임
+            logger.info("authentication:{}",authentication); // getName은 이메일임
+            logger.info("authentication.getPrincipal:{}",authentication.getPrincipal()); // getName은 이메일임
+            logger.info("authentication.getName:{}",authentication.getName()); // getName은 이메일임
+            logger.info("authentication.getCredentials:{}",authentication.getCredentials()); // getName은 이메일임
+            logger.info("authentication.getAuthorities:{}",authentication.getAuthorities()); // getName은 이메일임
+            logger.info("authentication.getDetails:{}",authentication.getDetails()); // getName은 이메일임
+            String email = principal.getName();
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+            SiteUser principalUser = userService.getUser(email);//현재 로그인한 사용자의 이메일으로 db조회
             SiteUserDTO siteUserDTO = userService.toUserDTO(principalUser);
 //            logger.info("siteUser:{}", siteUserDTO);
             logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
@@ -95,6 +118,7 @@ public class QuestionController {
     @PostMapping("/create")
     @ResponseBody
     public ResponseEntity<Object> questionCreateRest(Model model,
+            Authentication authentication,
             @RequestPart(name = "files",required = false) Optional<List<MultipartFile>> optionalFiles,
             @RequestPart(name="content") @Valid QuestionForm questionForm, // @Valid 애노테이션을 통해 questionForm 의 @NotEmpty 등이 작동한다
             BindingResult bindingresult, // @Valid 애노테이션으로 인해 검증된 결과를 의미하는 객체
@@ -106,7 +130,15 @@ public class QuestionController {
             logger.info("error>>:{}", bindingresult.getFieldError());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(bindingresult);
         }
-        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        String email = principal.getName();
+        if(authentication!=null){
+            if(authentication.getPrincipal() instanceof OAuth2User){
+                logger.info("change oauth2user!!!!!");
+                OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                email =  oAuth2User.getAttributes().get("email").toString();
+            }
+        }
+        SiteUser siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
         Question question = questionService.create(questionForm.getContent(),siteUser,false);
         logger.info("question create complete");
         logger.info("question Id:{}",question.getId());
@@ -140,14 +172,22 @@ public class QuestionController {
     @PostMapping("/modify/{id}")
     @ResponseBody
     public ResponseEntity<Object> questionModify(@RequestBody @Valid QuestionForm questionForm, BindingResult bindingResult,
-                                 @PathVariable("id") Integer id,Principal principal){
+                                 @PathVariable("id") Integer id,Principal principal,Authentication authentication){
         logger.info("컨텐츠 내용:{}",questionForm.getContent());
         logger.info("id:{}",id);
         if(bindingResult.hasErrors()) {
             ResponseEntity.badRequest();
         }
         Question question = questionService.getQuestion(id);
-        if(!question.getAuthor().getEmail().equals(principal.getName())){ //현재 로그인한 사람과 글의 작성자가 다를 경우
+        String email= principal.getName();
+        if(authentication!=null){
+            if(authentication.getPrincipal() instanceof OAuth2User){
+                logger.info("change oauth2user!!!!!");
+                OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                email =  oAuth2User.getAttributes().get("email").toString();
+            }
+        }
+        if(!question.getAuthor().getEmail().equals(email)){ //현재 로그인한 사람과 글의 작성자가 다를 경우
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"수정 권한이 없습니다.");
         }
         questionService.modify(question,questionForm.getContent());
@@ -161,9 +201,17 @@ public class QuestionController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/delete/question/{id}")
     @ResponseBody
-    public ResponseEntity<String> questionDelete2(@PathVariable("id") Integer id, Principal principal){
+    public ResponseEntity<String> questionDelete2(@PathVariable("id") Integer id, Principal principal,Authentication authentication){
         logger.info("to delete id : {}", id);
-        if(!principal.getName().equals(questionService.getQuestion(id).getAuthor().getEmail()))
+        String email= principal.getName();
+        if(authentication!=null){
+            if(authentication.getPrincipal() instanceof OAuth2User){
+                logger.info("change oauth2user!!!!!");
+                OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                email =  oAuth2User.getAttributes().get("email").toString();
+            }
+        }
+        if(!email.equals(questionService.getQuestion(id).getAuthor().getEmail()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "삭제권한이 없습니다.");
         questionService.delete(id);
 
@@ -187,7 +235,8 @@ public class QuestionController {
                           @RequestParam(value = "keyword") String keyword,
                           QuestionForm questionForm,
                           AnswerForm answerForm,
-                          Principal principal
+                          Principal principal,
+                                 Authentication authentication
     ) {
         logger.info("page sear:{}",page);
         logger.info("keyword serc:{}",keyword);
@@ -196,7 +245,15 @@ public class QuestionController {
         model.addAttribute("paging", paging);
         if(principal!=null) {
             logger.info("principal name:{}",principal.getName()); // getName은 이메일임
-            SiteUser principalUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            String email = principal.getName();
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+            SiteUser principalUser = userService.getUser(email);//현재 로그인한 사용자의 이메일으로 db조회
             SiteUserDTO siteUserDTO = userService.toUserDTO(principalUser);
 //            logger.info("siteUser:{}", siteUserDTO);
             logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());
@@ -234,7 +291,8 @@ public class QuestionController {
 //            @RequestParam(value = "keyword") String keyword,
             QuestionForm questionForm,
             AnswerForm answerForm,
-            Principal principal
+            Principal principal,
+            Authentication authentication
     ){
         Optional<List<Question>> optionalQuestions = Optional.ofNullable(questionService.hotFeed());
         List<Question> questionList = new ArrayList<>();
@@ -243,7 +301,15 @@ public class QuestionController {
         }
         if(principal!=null) {
             logger.info("principal name:{}",principal.getName()); // getName은 이메일임
-            SiteUser principalUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+            String email = principal.getName();
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+            SiteUser principalUser = userService.getUser(email);//현재 로그인한 사용자의 이메일으로 db조회
             SiteUserDTO siteUserDTO = userService.toUserDTO(principalUser);
 //            logger.info("siteUser:{}", siteUserDTO);
             logger.info("feed page logined siteUser name:{}", siteUserDTO.getUserName());

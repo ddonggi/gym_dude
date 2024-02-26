@@ -1,6 +1,8 @@
 package com.weight.gym_dude.config;
 
+import com.weight.gym_dude.user.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,8 +36,11 @@ import java.util.Collections;
 @EnableMethodSecurity(prePostEnabled = true) //@PreAuthorize 애너테이션을 사용하기 위해 반드시 필요한 설정
 @Configuration //스프링의 환경설정 파일임을 의미하는 애너테이션이다. 여기서는 스프링 시큐리티의 설정을 위해 사용되었다.
 @EnableWebSecurity //모든 요청 URL이 스프링 시큐리티의 제어를 받도록 만드는 애너테이션이다. 이 애너테이션을 사용하면 스프링 시큐리티를 활성화하는 역할
+@RequiredArgsConstructor
 /* NOTE : @EnableWebSecurity 애너테이션을 사용하면 내부적으로 SpringSecurityFilterChain이 동작하여 URL 필터가 적용된다. **/
 public class SecurityConfig {
+
+    private final CustomOAuth2UserService customOAuth2UserService;
 
     /*
     스프링 시큐리티의 세부 설정은 SecurityFilterChain 빈을 생성하여 설정할 수 있다. 다음 문장은 모든 인증되지 않은 요청을 허락한다는 의미이다. 따라서 로그인을 하지 않더라도 모든 페이지에 접근할 수 있다.
@@ -100,7 +105,7 @@ public class SecurityConfig {
                             @Override
                             public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                                 CorsConfiguration config = new CorsConfiguration();
-                                config.setAllowedOrigins(Collections.singletonList("https://9243-203-236-116-1.ngrok-free.app/"));
+//                                config.setAllowedOrigins(Collections.singletonList("https://9243-203-236-116-1.ngrok-free.app/"));
                                 config.setAllowedMethods(Collections.singletonList("*"));
                                 config.setAllowCredentials(true);
 //                                config.setAllowedHeaders(Collections.singletonList("*"));
@@ -128,6 +133,11 @@ public class SecurityConfig {
 //                            logoutConfigurer.deleteCookies("JSESSIONID");
                             .invalidateHttpSession(true);// 사용자 세션 삭제
                         })
+                        //oauth2Login 요청이 들어오면
+                        //userInfoEndpoint로 접근해 구현해낼 구현체 (CustomOAuth2UserService)를 등록
+                        .oauth2Login(oauth2Login ->
+                                oauth2Login.userInfoEndpoint(userInfoEndpointConfig ->
+                                        userInfoEndpointConfig.userService(customOAuth2UserService)))
                         .build();
 
 /*

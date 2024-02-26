@@ -2,8 +2,8 @@
 <div layout:fragment="content" class="my-profile-container">
     <th:block th:replace="~{fragment/header::header}"></th:block>
     <div class="my-profile-block feed-width padding-default">
-        <h1 sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==profileUser.email}" th:text="|내 프로필|"></h1>
-        <h1 sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==profileUser.email}" th:text="|${profileUser.userName} 님|"></h1>
+        <h1 sec:authorize="isAuthenticated()" th:if="${siteUser.id.equals(profileUser.id)}" th:text="|내 프로필|"></h1>
+        <h1 sec:authorize="isAuthenticated()" th:unless="${siteUser.id.equals(profileUser.id)}" th:text="|${profileUser.userName} 님|"></h1>
         <h1 sec:authorize="isAnonymous()" th:text="|${profileUser.userName} 님|"></h1>
         <section>
             <div class="section-header flex width100 gap-half">
@@ -25,10 +25,10 @@
                     </div>
                 </div>
                 <button sec:authorize="isAuthenticated()"
-                        th:if="${#authentication.getName()==profileUser.email}"
+                        th:if="${siteUser.id.equals(profileUser.id)}"
                         class="profile-edit-button" onclick="location.href='/user/profile/edit'">편집</button>
                 <button sec:authorize="isAuthenticated()"
-                        th:unless="${#authentication.getName()==profileUser.email}"
+                        th:unless="${siteUser.id.equals(profileUser.id)}"
                         class="follow-button profile-edit-button" name="following" th:value="${profileUser.id}" >팔로우</button>
 
             </div>

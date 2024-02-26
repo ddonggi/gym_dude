@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -45,14 +47,27 @@ public class AnswerController {
     @PostMapping("/create/{id}")
     @ResponseBody
     public ResponseEntity<Object> createComment(@RequestBody @Valid AnswerForm answerForm, BindingResult bindingResult,
-                                                     @PathVariable("id") Integer id, Principal principal) {
+                                                @PathVariable("id") Integer id, Principal principal, Authentication authentication) {
         logger.info("댓글 내용:{}", answerForm.getContent());
         logger.info("원본글 id:{}", id);
         if (bindingResult.hasErrors()) {
             ResponseEntity.badRequest();
         }
         Question question = questionService.getQuestion(id);
-        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+
+        String email= principal.getName();
+        if(principal!=null) {
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+        }
+//        SiteUser author = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        SiteUser author = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
+
         SiteUserDTO siteUserDTO = userService.toUserDTO(author);
         Answer answer = answerService.create(question, answerForm.getContent(),author);
 
@@ -87,10 +102,21 @@ public class AnswerController {
     @PostMapping("/delete/{id}")
     @ResponseBody
     public ResponseEntity<Object> deleteComment(
-                                                     @PathVariable("id") Integer id, Principal principal) {
+                                                     @PathVariable("id") Integer id, Principal principal,Authentication authentication) {
         logger.info("댓글글 id:{}", id);
 //        Question question = questionService.getQuestion(id);
-        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        String email= principal.getName();
+        if(principal!=null) {
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+        }
+//        SiteUser siteUser = userService.getUser(principal.getName());//현재 로그인한 사용자의 이름으로 db조회
+        SiteUser siteUser = userService.getUser(email);//현재 로그인한 사용자의 이름으로 db조회
         int authorId = answerRepository.findById(id).get().getAuthor().getId(); // 댓글 작성자의 id
         HashMap<String, Object> answerContent = new HashMap<>();
 

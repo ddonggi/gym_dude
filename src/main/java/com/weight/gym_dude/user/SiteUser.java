@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
+import java.io.Serializable;
 import java.util.List;
 //import javax.persistence.*;
 //import javax.validation.constraints.Email;
@@ -30,7 +31,7 @@ import java.util.List;
 //@ToString
 @Entity
 @DynamicInsert //default value 기능을 수행을 위함.해당 컬럼이 null일 경우에, insert에서 제외
-public class SiteUser {
+public class SiteUser implements Serializable {
 
     /*
     * SiteUser로 하는 이유는 User 클래스가 이미 스프링 시큐리티에 있기 때문에, 혼선을 막기 위함
@@ -39,7 +40,6 @@ public class SiteUser {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true) //유일한 값 저장
     private String userName;
 
     private String password;

@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,10 +37,21 @@ public class FollowController {
     @PostMapping("/follow")
     public ResponseEntity<Object> follow(
             Principal principal,
+            Authentication authentication,
             @RequestParam(name = "followingId") Integer followingId
     ){
         logger.info("followingId:{}",followingId);
-        SiteUser siteUser = userService.getUser(principal.getName());
+        String email= principal.getName();
+        if(principal!=null) {
+            if(authentication!=null){
+                if(authentication.getPrincipal() instanceof OAuth2User){
+                    logger.info("change oauth2user!!!!!");
+                    OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
+                    email =  oAuth2User.getAttributes().get("email").toString();
+                }
+            }
+        }
+        SiteUser siteUser = userService.getUser(email);
         return followService.followUser(followingId,siteUser);
 
 //        return ResponseEntity.ok().body();

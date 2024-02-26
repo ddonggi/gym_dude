@@ -86,7 +86,7 @@
 
                 <!-- 본인이 쓴 글일 경우 수정창 | 팔로우 -->
                 <!--현재 사용자가 인증되었다면 #authentication.getPrincipal()을 통해 principal을 확인할 수 있다 -->
-                <div class="option-container flex align-center" sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.email}">
+                <div class="option-container flex align-center" sec:authorize="isAuthenticated()" th:if="${siteUser.id.equals(question.author.id)}">
                     <!--CSRF값을 수동으로라도 추가해야 되는 이유는 스프링 시큐리티(Spring Security)를 사용할 때 CSRF 값이 반드시 필요하기 때문이다.-->
                     <!--                    <input type="hidden" th:name="${_csrf.headerName}" th:value="${_csrf.token}"/>-->
                     <div class="option-menu">
@@ -99,12 +99,12 @@
                         javascript:을 사용하면 현재 페이지에 아무런 변화 없이 코드를 실행할 수 있습니다.
                         void(0)를 사용하는 것은 아무것도 하지 말라는 뜻입니다. 즉, 다시 로딩하지 않고, 경로를 이동하지 않고, 어떤 코드도 실행하지 말라는 것과 같습니다. -->
                     </div>
-                    <button sec:authorize="isAuthenticated()" th:if="${#authentication.getName()==question.author.email}" class="option-button flex justify-content-center align-center">
+                    <button sec:authorize="isAuthenticated()" th:if="${siteUser.id.equals(question.author.id)}" class="option-button flex justify-content-center align-center">
                         ⁝
                     </button>
                 </div>
 
-                <button sec:authorize="isAuthenticated()" th:unless="${#authentication.getName()==question.author.email}" class="follow-button" name="following" th:value="${question.author.id}">팔로우</button>
+                <button sec:authorize="isAuthenticated()" th:unless="${siteUser.id.equals(question.author.id)}" class="follow-button" name="following" th:value="${question.author.id}">팔로우</button>
 
             </div>
             <div class="feed-body padding-default flex-column gap-half" >

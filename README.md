@@ -27,6 +27,11 @@ async nickname check(with debounce) / image carousel
 
 [2024/ 02/ 25]
 - Social(OAuth) Login (Google,Naver,KaKao)
+
+[2024/ 02 /26]
+- user quit logic / account delete
+- File Upload size Limit
+
 ### [구현예정]
 
 - 1RM Calculator / Chatting

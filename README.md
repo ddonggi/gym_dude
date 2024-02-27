@@ -23,7 +23,7 @@ async nickname check(with debounce) / image carousel
 - Mobile view
   
 [2024/ 02 / 24]
-- Mail certification
+- Mail certification (w. redis)
 
 [2024/ 02/ 25]
 - Social(OAuth) Login (Google,Naver,KaKao)

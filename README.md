@@ -21,9 +21,15 @@ Feed CRUD(with Multipart) / Comment / Like / Follow
 async nickname check(with debounce) / image carousel
 
 - Mobile view
+  
+[2024/ 02 / 24]
+- Mail certification
+
+[2024/ 02/ 25]
+- Social(OAuth) Login (Google,Naver,KaKao)
 ### [구현예정]
 
-- Social(OAuth) account / Mail certification / Chatting
+- 1RM Calculator / Chatting
 - BookMark / Report / Barbell Path Tracking / Body Before After
 
 ### [+@구현 후보]

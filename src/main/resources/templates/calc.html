@@ -1,0 +1,106 @@
+<html layout:decorate="~{layout/layout}">
+<div layout:fragment="content" class="index-container">
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+    <h1>1RM 계산</h1>
+<!--    <form class="flex-column" action="#" oninput="result.value=parseInt(a.value)*parseInt(b.value)">
+        <div class="flex-column feed-width gap-rem">
+            <div class="flex gap-rem">
+                <div class="flex-column">
+                    <div>벤치프레스</div>
+                    <input type="radio" name="workout" value="벤치프레스">
+                </div>
+                &lt;!&ndash;            <img src="" alt="벤치프레스"/>&ndash;&gt;
+                <div class="flex-column">
+                    <div>스쿼트</div>
+                    <input type="radio" name="workout" value="스쿼트">
+                </div>
+                &lt;!&ndash;            <img src="" alt="벤치프레스"/>&ndash;&gt;
+                <div class="flex-column">
+                    <div>데드리프트</div>
+                    <input type="radio" name="workout" value="데드리프트">
+                </div>
+                &lt;!&ndash;            <img src="" alt="벤치프레스"/>&ndash;&gt;
+            </div>
+            <div>무게</div>
+            <input type="number" id="a" name="weight" placeholder="무게(kg)"/>
+            <div>반복횟수</div>
+            <select name="b">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+        </div>
+        <h3>1rm</h3>
+        <output class="feed-width" name="result" for="a b"></output>
+        kg
+    </form>-->
+
+    <h2>바벨운동 1RM(max) 계산기</h2>
+
+    <div class="feed-width" id="1rmCalculator">
+        <div class="flex gap-rem gap-rem justify-content-center">
+            <div class="flex-column workout-tab">
+                <div>벤치프레스</div>
+                <input type="radio" class="hide" name="workout" value="벤치프레스">
+            </div>
+            <!--            <img src="" alt="벤치프레스"/>-->
+            <div class="flex-column workout-tab">
+                <div>스쿼트</div>
+                <input type="radio" class="hide" name="workout" value="스쿼트">
+            </div>
+            <!--            <img src="" alt="벤치프레스"/>-->
+            <div class="flex-column workout-tab">
+                <div>데드리프트</div>
+                <input type="radio" class="hide" name="workout" value="데드리프트">
+            </div>
+            <!--            <img src="" alt="벤치프레스"/>-->
+        </div>
+
+        <label for="weightInput">무게 (kg):</label>
+        <input type="number" id="weightInput" name="weight" min="0" step="any" required placeholder="kg">
+
+        <label for="repsSelect">반복 회수:</label>
+        <select id="repsSelect" name="reps" required>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+        </select>
+
+        <div class="flex">
+            예상 1RM(max): <span id ="result" class="rm-result" data-val=""></span>kg
+        </div>
+        <div class="flex">
+            <div class="flex-column rms">
+
+            </div>
+            <div class="flex-column partition">
+                <div></div><div></div><div></div><div></div><div></div>
+                <div></div><div></div><div></div><div></div><div></div>
+            </div>
+        </div>
+
+        <h3>실제 1RM은 개인의 능력과 형태에 따라 다를 수 있으므로, 이러한 예측은 근사치에 불과합니다!!</h3>
+        <h3>득근합시다!</h3>
+        <!--        <button type="button" onclick="calculate1RM()">계산하기</button>-->
+    </div>
+
+    <script>
+
+    </script>
+    <script layout:fragment="index_js" th:src="@{/js/utils/oneRepMaxCalc.js}" type="module"></script>
+</div>
+</html>

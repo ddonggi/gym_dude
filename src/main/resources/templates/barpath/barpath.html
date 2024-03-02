@@ -1,0 +1,44 @@
+<html layout:decorate="~{layout/layout}">
+<div layout:fragment="content" class="bar-path-container">
+    <div class="feed-pop feed-width"></div>
+    <th:block th:replace="~{fragment/header::header}"></th:block>
+    <p id="status">OpenCV.js is loading...</p>
+    <div>
+        <div class="inputoutput feed-width">
+            <img id="imageSrc" alt="No Image" />
+            <div class="caption">imageSrc
+<!--                <input type="file" id="fileInput" name="file" />-->
+                <input type="file" name="files" id="files" multiple class="" accept="video/*"/>
+            </div>
+        </div>
+        <div class="inputoutput feed-width">
+            <canvas id="canvasOutput" ></canvas>
+            <div class="caption">canvasOutput</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        let imgElement = document.getElementById('imageSrc');
+        let inputElement = document.getElementById('files');
+        inputElement.addEventListener('change', (e) => {
+            imgElement.src = URL.createObjectURL(e.target.files[0]);
+        }, false);
+        imgElement.onload = function() {
+            let mat = cv.imread(imgElement);
+            let mat2 = new cv.Mat();
+            cv.cvtColor(mat,mat2, cv.COLOR_RGBA2GRAY,0);
+            cv.imshow('canvasOutput', mat2);
+            mat.delete();
+            mat2.delete();
+        };
+
+        let Module = {
+            // https://emscripten.org/docs/api_reference/module.html#Module.onRuntimeInitialized
+            onRuntimeInitialized() {
+                document.getElementById('status').innerHTML = 'OpenCV.js is ready.';
+            }
+        };
+    </script>
+    <script layout:fragment="parpath_js" th:src="@{/js/barpath/barpath.js}" type="module"></script>
+    <script layout:fragment="open_cv" async th:src="@{/js/barpath/opencv.js}"></script>
+</div>
+</html>

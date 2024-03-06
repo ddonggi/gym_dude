@@ -8,14 +8,14 @@
 
 
 ## [기술 스택]
-- Springboot / JPA / PostgreSQL
+- `Springboot` / `Spring Security` / `JPA` / `PostgreSQL`
 
-- Thymeleaf / Vanilla JS 
+- `Thymeleaf` / `Vanilla JS`
 
 ## [구현 완료]
 
 - Sign-up / Sign-out / Login / Logout / 
-Feed CRUD(with Multipart) / Comment / Like / Follow 
+Feed CRUD(with Multipart) / Comment / Like / Follow
 
 - Search / Infinite Scrolling / relative Date /
 async nickname check(with debounce) / image carousel
@@ -32,11 +32,24 @@ async nickname check(with debounce) / image carousel
 - user quit logic / account delete
 - File Upload size Limit
 
-### [구현예정]
+[2024/03/01]
+- 1RM Calculator
 
-- 1RM Calculator / Chatting
+### [구현예정]
+- Chatting
 - BookMark / Report / Barbell Path Tracking / Body Before After
 
 ### [+@구현 후보]
 
 - Exercise Youtuber List(Rank) / Push / Meetup(partner workout) / Mention
+
+### 고도화를 위한 여정
+- 서버 부하 테스트
+> 수많은 요청 처리 / 동시성 처리 : 현실에서 실제로 있을 수 있는 문제 상황을 가정하고 기술적으로 해결해 나가보기
+
+- CI/CD
+> Jenkins, Kubernates, Docker 등 오케스트레이션 툴로 CI/DC 파이프라인 구성해보기
+
+
+- MSA
+> Spring cloud로 게이트웨이 서비스와 라우팅기능을 구축하고, 서비스기능 별로 분할 해보기

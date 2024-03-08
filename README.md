@@ -43,7 +43,7 @@ async nickname check(with debounce) / image carousel
 
 - Exercise Youtuber List(Rank) / Push / Meetup(partner workout) / Mention
 
-### 고도화를 위한 여정
+### 개선을 위한 여정
 - 서버 부하 테스트
 > 수많은 요청 처리 / 동시성 처리 : 현실에서 실제로 있을 수 있는 문제 상황을 가정하고 기술적으로 해결해 나가보기
 

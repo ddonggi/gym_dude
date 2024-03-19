@@ -24,6 +24,8 @@ sec:authorize="isAuthenticated()" - 이 속성은 로그인 된 경우에만 해
                     <button type="submit">검색</button>
                 </form>
                 <!-- 비로그인 사용자만 보이는 항목-->
+                <a class="nav-link" th:href="@{/calc}">1RM</a>
+                <a class="nav-link" th:href="@{/bar-path}">바패스</a>
                 <a class="nav-link" sec:authorize="isAnonymous()" th:href="@{/user/login}">로그인</a>
                 <!-- 로그인된 사용자만 보이는 항목-->
 <!--                <div sec:authorize="isAuthenticated()" th:text="|${#authentication.getName()} 님|"></div>-->

@@ -622,7 +622,10 @@ let renderFeedList = (response) => {
         // 더보기 | 팔로우
         console.log('접속한사람 : ',principalEmail,'/ 글 작성자 : ',author.email)
         // if (principalEmail === author.email) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
-        if (principalEmail!=='anonymousUser'&&(siteUser.id === author.id)) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
+        if (principalEmail === 'anonymousUser') {
+
+        }
+        else if (principalEmail!=='anonymousUser'&&(siteUser.id === author.id)) { //현재 접속한 사람의 닉네임과, 글 작성자의 닉네임이 동일할 경우
             currentFeed.querySelector(".feed-header").innerHTML += `<div class="option-container flex align-center">
                         <div class="option-menu">
                             <button class="modify-button">수정</button>
@@ -633,8 +636,6 @@ let renderFeedList = (response) => {
                         <button class="option-button flex justify-content-center align-center">
                             ⁝
                         </button></div>`;
-        } else if (principalEmail === 'anonymousUser') {
-
         } else {
             currentFeed.querySelector(".feed-header").innerHTML += `
                         <button class="follow-button" value="${author.id}">팔로우</button>`;
@@ -814,7 +815,7 @@ let renderFeedList = (response) => {
 
                 answerListContainer.innerHTML += `
                 <div class="answer padding-half" id="comment${answerId}">
-                    <div class="answer-profile-image ${answerAuthor.id}" onclick="location.href='/user/feed/${answerAuthor.id}'">
+                    <div class="answer-profile-image ${answerAuthor.id}" onclick="location.href='/user/profile/${answerAuthor.id}'">
                         ${defaultProfileElem}
                     </div>
                     <div class="flex-column width100">
@@ -1070,7 +1071,7 @@ let followCheck = (feed) => {
         let followerId = feed.querySelector(".follow-button").value;
         // console.log(followingList)
         for(let i =0; i<followingList.length; i++) {
-            // console.log('feeds follow id:',followerId,'/ my following user id:',followingList[i])
+            console.log('feeds follow id:',followerId,'/ my following user id:',followingList[i])
             if (Number(followerId) ===followingList[i]) {
                 followButton.innerText = '팔로우 취소';
             }
@@ -1119,7 +1120,7 @@ let setCommentEvent = (currentFeed)=>{
                     </div>`;*/
 
                 let responseComment=`<div class="answer padding-half" id="comment${resData.id}">
-                    <div class="answer-profile-image ${author.id}" onclick="location.href='/user/feed/${author.id}'">
+                    <div class="answer-profile-image ${author.id}" onclick="location.href='/user/profile/${author.id}'">
                             <img alt="댓글프로필" class="img object-cover border-full" src="${siteURL}/resource${profileImage}.png">
                     </div>
                     <div class="flex-column width100">
@@ -1335,7 +1336,7 @@ let renderUserFeed = (feed) => {
                 <!--피드 헤더-->
                 <div class="feed-header padding-default">
                     <div class="flex gap-half" aria-label="${author.userName}의 프로필">
-                        <a class="feed-profile-image" href='/user/feed/${author.id}'>
+                        <a class="feed-profile-image" href='/user/profile/${author.id}'>
                             <img alt="피드프로필" class="img object-cover border-full" src="${siteURL}/resource/apps/defaultProfile.png">
                         </a>
                         <div>
@@ -1373,7 +1374,7 @@ let renderUserFeed = (feed) => {
     }
 
     // 더보기 | 팔로우
-    else if (principalEmail === 'anonymousUser') {
+    if (principalEmail === 'anonymousUser') {
     }
     // if (principalEmail === author.email) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
     else if (siteUser.id === author.id) { //현재 접속한 사람의 이메일과 작성자의 이메일이 동일할경우
@@ -1602,7 +1603,7 @@ let renderUserFeed = (feed) => {
             }
             answerListContainer.innerHTML += `
                 <div class="answer padding-half" id="comment${answerId}">
-                    <div class="answer-profile-image ${answerAuthor.id}" onclick="location.href='/user/feed/${answerAuthor.id}'">
+                    <div class="answer-profile-image ${answerAuthor.id}" onclick="location.href='/user/profile/${answerAuthor.id}'">
                         ${defaultProfileElem}
                     </div>
                     <div class="flex-column width100">
